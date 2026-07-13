@@ -3,160 +3,137 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>mnemo — the agent memory that keeps a corrected fact corrected</title>
-<meta name="description" content="mnemo is a zero-dependency memory layer and MCP server for AI agents: value-ranked recall, consolidation, and a first-class correction + erasure channel — revert, lineage-aware retraction, tamper-evident receipts, and a cross-store erasure auditor. Measured against mem0 and Graphiti.">
+<title>mnemo — agent memory that keeps a corrected fact corrected</title>
+<meta name="description" content="mnemo is a zero-dependency memory layer and MCP server for AI agents: value-ranked recall, consolidation, and a first-class correction and erasure channel — revert, lineage-aware retraction, tamper-evident receipts, and a cross-store erasure auditor. Measured against mem0 and Graphiti.">
 <meta property="og:title" content="mnemo — agent memory + MCP server">
 <meta property="og:description" content="The memory layer built to keep a corrected fact corrected. Zero dependencies, MCP server, measured integrity, tested at 1.1.">
 <meta property="og:type" content="website">
-<meta name="theme-color" content="#0b0b12">
+<meta name="theme-color" content="#0a0a0b">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%A7%A0%3C/text%3E%3C/svg%3E">
 <style>
   :root{
-    --bg:#fafaf9; --bg2:#f2f2f5; --fg:#101014; --muted:#5a5a68; --faint:#8a8a99;
-    --line:#e7e7ee; --card:#ffffff; --card2:#fbfbfe;
-    --accent:#5b4ff0; --accent2:#9b5cf6; --accent3:#e0518a; --accent-ink:#4b3fd6;
-    --accent-soft:#eeecff; --code-bg:#f5f5fa; --good:#0a7c46; --good-soft:#e4f5ec;
-    --shadow:0 1px 2px rgba(16,16,20,.04), 0 8px 30px rgba(16,16,20,.06);
-    --glow:0 0 0 1px rgba(91,79,240,.14), 0 18px 50px -12px rgba(91,79,240,.32);
+    --bg:#ffffff; --bg2:#fafafb; --fg:#0d0e12; --muted:#5f616c; --faint:#9a9ca6;
+    --line:#ebebf0; --line2:#e2e2e9; --card:#ffffff;
+    --accent:#4f46e5; --accent-ink:#4038c9;
+    --code-bg:#0d0e13; --code-fg:#e6e7ee; --code-line:#242630;
+    --good:#0a7c46;
     --mono:'SFMono-Regular',ui-monospace,'JetBrains Mono','Cascadia Code',Consolas,monospace;
     --sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,system-ui,sans-serif;
   }
   @media (prefers-color-scheme:dark){:root{
-    --bg:#08080c; --bg2:#0d0d15; --fg:#ececf3; --muted:#9b9bad; --faint:#6a6a7c;
-    --line:#20202b; --card:#101018; --card2:#14141e;
-    --accent:#8b7dff; --accent2:#b57bff; --accent3:#ff6fa5; --accent-ink:#a99bff;
-    --accent-soft:#171531; --code-bg:#12121b; --good:#4ade80; --good-soft:#0f2a1c;
-    --shadow:0 1px 2px rgba(0,0,0,.3), 0 12px 40px rgba(0,0,0,.4);
-    --glow:0 0 0 1px rgba(139,125,255,.2), 0 22px 60px -14px rgba(139,125,255,.4);
+    --bg:#0a0a0b; --bg2:#0e0e11; --fg:#ececef; --muted:#9a9ba4; --faint:#616270;
+    --line:#1c1c22; --line2:#26262e; --card:#0f0f12;
+    --accent:#7c76ff; --accent-ink:#9a95ff;
+    --code-bg:#101015; --code-fg:#e6e7ee; --code-line:#22232c; --good:#4ade80;
   }}
-  :root[data-theme="dark"]{--bg:#08080c;--bg2:#0d0d15;--fg:#ececf3;--muted:#9b9bad;--faint:#6a6a7c;--line:#20202b;--card:#101018;--card2:#14141e;--accent:#8b7dff;--accent2:#b57bff;--accent3:#ff6fa5;--accent-ink:#a99bff;--accent-soft:#171531;--code-bg:#12121b;--good:#4ade80;--good-soft:#0f2a1c;--shadow:0 1px 2px rgba(0,0,0,.3),0 12px 40px rgba(0,0,0,.4);--glow:0 0 0 1px rgba(139,125,255,.2),0 22px 60px -14px rgba(139,125,255,.4);}
-  :root[data-theme="light"]{--bg:#fafaf9;--bg2:#f2f2f5;--fg:#101014;--muted:#5a5a68;--faint:#8a8a99;--line:#e7e7ee;--card:#ffffff;--card2:#fbfbfe;--accent:#5b4ff0;--accent2:#9b5cf6;--accent3:#e0518a;--accent-ink:#4b3fd6;--accent-soft:#eeecff;--code-bg:#f5f5fa;--good:#0a7c46;--good-soft:#e4f5ec;--shadow:0 1px 2px rgba(16,16,20,.04),0 8px 30px rgba(16,16,20,.06);--glow:0 0 0 1px rgba(91,79,240,.14),0 18px 50px -12px rgba(91,79,240,.32);}
+  :root[data-theme="dark"]{--bg:#0a0a0b;--bg2:#0e0e11;--fg:#ececef;--muted:#9a9ba4;--faint:#616270;--line:#1c1c22;--line2:#26262e;--card:#0f0f12;--accent:#7c76ff;--accent-ink:#9a95ff;--code-bg:#101015;--code-fg:#e6e7ee;--code-line:#22232c;--good:#4ade80;}
+  :root[data-theme="light"]{--bg:#ffffff;--bg2:#fafafb;--fg:#0d0e12;--muted:#5f616c;--faint:#9a9ca6;--line:#ebebf0;--line2:#e2e2e9;--card:#ffffff;--accent:#4f46e5;--accent-ink:#4038c9;--code-bg:#0d0e13;--code-fg:#e6e7ee;--code-line:#242630;--good:#0a7c46;}
 
   *{box-sizing:border-box}
   html{scroll-behavior:smooth}
-  body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--sans);line-height:1.65;
-    -webkit-font-smoothing:antialiased;overflow-x:hidden;}
+  body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased;}
   ::selection{background:var(--accent);color:#fff}
-  .wrap{max-width:1000px;margin:0 auto;padding:0 24px;}
-  a{color:var(--accent-ink);text-decoration:none;transition:opacity .15s}
-  a:hover{opacity:.75}
-  h1,h2,h3{letter-spacing:-.025em}
-  .grad-text{background:linear-gradient(100deg,var(--accent),var(--accent2) 55%,var(--accent3));
-    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;}
-  code{font-family:var(--mono);font-size:.88em;background:var(--code-bg);padding:.14em .4em;border-radius:6px;border:1px solid var(--line);}
+  .wrap{max-width:940px;margin:0 auto;padding:0 24px}
+  a{color:inherit;text-decoration:none}
+  h1,h2,h3{letter-spacing:-.021em;font-weight:650}
+  code{font-family:var(--mono);font-size:.86em;background:var(--bg2);border:1px solid var(--line);padding:.1em .36em;border-radius:5px}
+  .accent{color:var(--accent-ink)}
+  svg.i{width:18px;height:18px;stroke:currentColor;stroke-width:1.6;fill:none;stroke-linecap:round;stroke-linejoin:round;vertical-align:-3px}
 
-  /* aurora + grain background */
-  .aurora{position:fixed;inset:0;z-index:-2;overflow:hidden;pointer-events:none}
-  .aurora span{position:absolute;border-radius:50%;filter:blur(70px);opacity:.5;animation:float 22s ease-in-out infinite}
-  .aurora .a1{width:520px;height:520px;background:radial-gradient(circle,var(--accent),transparent 68%);top:-160px;left:-120px}
-  .aurora .a2{width:460px;height:460px;background:radial-gradient(circle,var(--accent2),transparent 68%);top:-80px;right:-140px;animation-delay:-7s}
-  .aurora .a3{width:400px;height:400px;background:radial-gradient(circle,var(--accent3),transparent 70%);top:340px;left:40%;opacity:.28;animation-delay:-13s}
-  @keyframes float{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(40px,30px) scale(1.08)}66%{transform:translate(-30px,20px) scale(.95)}}
-  @media (prefers-reduced-motion:reduce){.aurora span{animation:none}}
-  .grain{position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.035;mix-blend-mode:overlay;
-    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");}
+  nav{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 86%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  nav .wrap{display:flex;align-items:center;justify-content:space-between;height:56px}
+  .brand{display:flex;align-items:center;gap:8px;font-weight:600;font-size:.98rem;letter-spacing:-.01em}
+  .brand .mk{width:20px;height:20px;border:1.6px solid var(--fg);border-radius:6px 6px 6px 2px;position:relative}
+  .brand .mk::after{content:"";position:absolute;inset:4px;background:var(--fg);border-radius:3px 3px 3px 1px;opacity:.9}
+  .navr{display:flex;align-items:center;gap:22px;font-size:.88rem}
+  .navr a{color:var(--muted)} .navr a:hover{color:var(--fg)}
+  .tt{background:none;border:1px solid var(--line);border-radius:7px;width:32px;height:29px;cursor:pointer;color:var(--muted);font-size:.85rem}
+  .tt:hover{color:var(--fg);border-color:var(--line2)}
+  @media(max-width:620px){.navr .hide{display:none}}
 
-  /* nav */
-  nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(12px);background:color-mix(in srgb,var(--bg) 78%,transparent);border-bottom:1px solid var(--line);}
-  nav .wrap{display:flex;align-items:center;justify-content:space-between;height:58px}
-  .brand{display:flex;align-items:center;gap:9px;font-weight:700;font-size:1.05rem;letter-spacing:-.02em;color:var(--fg)}
-  .brand .m{font-size:1.3rem}
-  .navr{display:flex;align-items:center;gap:18px;font-size:.9rem}
-  .navr a{color:var(--muted)} .navr a:hover{color:var(--fg);opacity:1}
-  .tt{background:none;border:1px solid var(--line);border-radius:8px;width:34px;height:30px;cursor:pointer;color:var(--muted);font-size:.9rem}
-  @media(max-width:640px){.navr .hide{display:none}}
+  header{padding:88px 0 68px;border-bottom:1px solid var(--line)}
+  .tagrow{display:flex;align-items:center;gap:9px;font-size:.8rem;color:var(--muted);margin-bottom:22px}
+  .tagrow .d{width:5px;height:5px;border-radius:50%;background:var(--good)}
+  .tagrow b{color:var(--fg);font-weight:600}
+  h1.hero{font-size:clamp(2.3rem,5vw,3.4rem);line-height:1.07;font-weight:680;margin:0;max-width:16ch;letter-spacing:-.03em}
+  .sub{font-size:1.13rem;color:var(--muted);max-width:56ch;margin:20px 0 0;line-height:1.55}
+  .sub b{color:var(--fg);font-weight:560}
+  .cta{margin-top:30px;display:flex;gap:11px;flex-wrap:wrap}
+  .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 17px;border-radius:8px;font-weight:550;font-size:.92rem;transition:background .14s,border-color .14s,color .14s}
+  .btn.primary{background:var(--fg);color:var(--bg)} .btn.primary:hover{opacity:.88}
+  .btn.ghost{border:1px solid var(--line2);color:var(--fg)} .btn.ghost:hover{background:var(--bg2)}
+  .metrics{margin-top:40px;display:grid;grid-template-columns:repeat(4,auto);gap:0;border:1px solid var(--line);border-radius:12px;overflow:hidden;width:fit-content;max-width:100%}
+  .metrics div{padding:16px 26px;border-right:1px solid var(--line)}
+  .metrics div:last-child{border-right:0}
+  .metrics .n{font-size:1.5rem;font-weight:680;letter-spacing:-.03em}
+  .metrics .l{font-size:.78rem;color:var(--muted);margin-top:2px}
+  @media(max-width:640px){.metrics{grid-template-columns:1fr 1fr;width:100%}.metrics div:nth-child(2){border-right:0}.metrics div:nth-child(-n+2){border-bottom:1px solid var(--line)}}
 
-  /* hero */
-  header{padding:78px 0 56px;text-align:center;position:relative}
-  .pill{display:inline-flex;align-items:center;gap:8px;font-size:.8rem;font-weight:500;color:var(--muted);
-    border:1px solid var(--line);background:var(--card);border-radius:999px;padding:5px 14px;box-shadow:var(--shadow)}
-  .pill b{color:var(--accent-ink);font-weight:700}
-  .pill .dot{width:7px;height:7px;border-radius:50%;background:var(--good);box-shadow:0 0 0 3px var(--good-soft)}
-  h1.hero{font-size:clamp(2.6rem,6vw,4.4rem);font-weight:800;line-height:1.04;margin:22px auto 0;max-width:14ch}
-  .sub{font-size:clamp(1.05rem,2.3vw,1.32rem);color:var(--muted);max-width:640px;margin:20px auto 0;line-height:1.55}
-  .sub b{color:var(--fg);font-weight:600}
-  .cta{margin-top:32px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
-  .btn{display:inline-flex;align-items:center;gap:8px;padding:12px 22px;border-radius:11px;font-weight:600;font-size:.96rem;transition:transform .12s,box-shadow .2s,opacity .15s}
-  .btn:hover{opacity:1;transform:translateY(-1px)}
-  .btn.primary{background:linear-gradient(100deg,var(--accent),var(--accent2));color:#fff;box-shadow:var(--glow)}
-  .btn.ghost{border:1px solid var(--line);color:var(--fg);background:var(--card);box-shadow:var(--shadow)}
-  .stats{margin:34px auto 0;display:flex;gap:26px;flex-wrap:wrap;justify-content:center;color:var(--faint);font-size:.82rem}
-  .stats b{color:var(--fg);font-weight:700}
+  section{padding:74px 0;border-bottom:1px solid var(--line)}
+  .eyebrow{font-size:.78rem;font-weight:600;letter-spacing:.04em;color:var(--muted);margin:0 0 12px;text-transform:uppercase}
+  h2{font-size:clamp(1.55rem,3vw,2rem);margin:0 0 10px;line-height:1.15;max-width:22ch}
+  .lead{color:var(--muted);margin:0 0 30px;font-size:1.04rem;max-width:62ch;line-height:1.6}
 
-  /* terminal hero card */
-  .term{max-width:620px;margin:44px auto 0;text-align:left;border:1px solid var(--line);border-radius:16px;
-    background:var(--card);box-shadow:var(--glow);overflow:hidden}
-  .term .bar{display:flex;gap:7px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line);background:var(--card2)}
-  .term .bar i{width:11px;height:11px;border-radius:50%;background:var(--line)}
-  .term .bar span{margin-left:8px;font-family:var(--mono);font-size:.76rem;color:var(--faint)}
-  .term pre{margin:0;padding:18px 20px;font-family:var(--mono);font-size:.84rem;line-height:1.85;overflow-x:auto;color:var(--fg)}
-  .term .c{color:var(--faint)} .term .k{color:var(--accent-ink);font-weight:600} .term .g{color:var(--good);font-weight:600} .term .r{color:var(--accent3);font-weight:600}
-  .term .out{color:var(--muted)}
-
-  /* sections */
-  section{padding:66px 0;position:relative}
-  section+section{border-top:1px solid var(--line)}
-  .eyebrow{font-size:.8rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent-ink);margin:0 0 10px}
-  h2{font-size:clamp(1.6rem,3.4vw,2.1rem);font-weight:800;margin:0 0 10px;max-width:20ch}
-  .lead{color:var(--muted);margin:0 0 26px;font-size:1.04rem;max-width:64ch}
-
-  /* code block with copy */
+  /* code */
   .codewrap{position:relative}
-  pre.block{background:var(--code-bg);border:1px solid var(--line);border-radius:13px;padding:18px 20px;overflow-x:auto;
-    font-family:var(--mono);font-size:.86rem;line-height:1.7;margin:0}
-  pre.block .c{color:var(--faint)}
-  .copy{position:absolute;top:10px;right:10px;border:1px solid var(--line);background:var(--card);border-radius:8px;
-    padding:4px 10px;font-size:.74rem;color:var(--muted);cursor:pointer;transition:all .15s}
-  .copy:hover{color:var(--fg);border-color:var(--accent)}
+  pre.block{background:var(--code-bg);color:var(--code-fg);border:1px solid var(--code-line);border-radius:12px;padding:20px 22px;overflow-x:auto;font-family:var(--mono);font-size:.85rem;line-height:1.75;margin:0}
+  pre.block .c{color:#6b6d7c} pre.block .k{color:#a99bff} pre.block .s{color:#7fd0b0} pre.block .g{color:#5ecb8f;font-weight:600} pre.block .r{color:#ff7b9c;font-weight:600}
+  .copy{position:absolute;top:11px;right:11px;border:1px solid var(--code-line);background:#181922;color:#9a9ca6;border-radius:7px;padding:4px 10px;font-size:.72rem;cursor:pointer;font-family:var(--sans)}
+  .copy:hover{color:#fff;border-color:#3a3c48}
 
-  /* feature grid */
-  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:8px}
-  @media(max-width:820px){.grid{grid-template-columns:1fr 1fr}}
-  @media(max-width:560px){.grid{grid-template-columns:1fr}}
-  .feat{border:1px solid var(--line);background:var(--card);border-radius:16px;padding:22px;transition:transform .16s,box-shadow .2s,border-color .2s;position:relative;overflow:hidden}
-  .feat:hover{transform:translateY(-3px);box-shadow:var(--glow);border-color:transparent}
-  .feat .ic{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;font-size:1.15rem;
-    background:var(--accent-soft);margin-bottom:14px}
-  .feat h3{margin:0 0 7px;font-size:1.06rem;font-weight:700}
-  .feat p{margin:0;color:var(--muted);font-size:.92rem;line-height:1.6}
+  /* terminal */
+  .term{border:1px solid var(--line2);border-radius:12px;overflow:hidden;background:var(--code-bg);margin-top:36px}
+  .term .bar{display:flex;align-items:center;gap:7px;padding:11px 15px;border-bottom:1px solid var(--code-line)}
+  .term .bar i{width:10px;height:10px;border-radius:50%;background:#2a2c37}
+  .term .bar span{margin-left:8px;font-family:var(--mono);font-size:.74rem;color:#6b6d7c}
+  .term pre{margin:0;padding:18px 22px;font-family:var(--mono);font-size:.82rem;line-height:1.9;overflow-x:auto;color:var(--code-fg)}
+  .term .c{color:#6b6d7c} .term .k{color:#a99bff} .term .s{color:#7fd0b0} .term .g{color:#5ecb8f;font-weight:600} .term .r{color:#ff7b9c;font-weight:600}
+
+  /* feature list */
+  .feats{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  @media(max-width:640px){.feats{grid-template-columns:1fr}}
+  .feat{padding:26px 28px;border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .feats .feat:nth-child(2n){border-right:0}
+  .feats .feat:nth-last-child(-n+2){border-bottom:0}
+  @media(max-width:640px){.feat{border-right:0}.feats .feat:nth-last-child(1){border-bottom:0}.feats .feat:nth-last-child(2){border-bottom:1px solid var(--line)}}
+  .feat .h{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+  .feat .h .ic{color:var(--accent-ink)}
+  .feat h3{margin:0;font-size:1.02rem;font-weight:600}
+  .feat p{margin:0;color:var(--muted);font-size:.93rem;line-height:1.62}
   .feat code{font-size:.82em}
 
-  /* integrity table */
-  .tablecard{border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:var(--shadow);background:var(--card)}
-  .tablescroll{overflow-x:auto}
-  table{width:100%;border-collapse:collapse;font-size:.94rem;min-width:520px}
-  thead th{background:var(--card2);font-weight:600;text-align:left;padding:14px 18px;color:var(--muted);font-size:.82rem;letter-spacing:.02em;border-bottom:1px solid var(--line)}
-  tbody td{padding:14px 18px;border-bottom:1px solid var(--line)}
-  tbody tr:last-child td{border-bottom:none}
-  tbody tr.hl{background:linear-gradient(90deg,var(--accent-soft),transparent)}
-  td.num{font-family:var(--mono);font-weight:700;text-align:right}
-  td.win{color:var(--good)}
-  .barcell{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-weight:700}
-  .barcell .b{height:7px;border-radius:4px;background:linear-gradient(90deg,var(--accent),var(--accent2))}
-  .barcell .b.mut{background:var(--faint);opacity:.5}
+  /* table */
+  .tablecard{border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .tsc{overflow-x:auto}
+  table{width:100%;border-collapse:collapse;font-size:.93rem;min-width:540px}
+  thead th{background:var(--bg2);text-align:left;font-weight:600;color:var(--muted);font-size:.8rem;padding:13px 18px;border-bottom:1px solid var(--line)}
+  tbody td{padding:14px 18px;border-bottom:1px solid var(--line);vertical-align:middle}
+  tbody tr:last-child td{border-bottom:0}
+  .barcell{display:flex;align-items:center;gap:12px;font-family:var(--mono);font-weight:600}
+  .barcell .b{height:6px;border-radius:3px;background:var(--accent)}
+  .barcell .b.mut{background:var(--faint)}
+  td.ci{font-family:var(--mono);text-align:right;color:var(--muted)}
+  td.ci.win{color:var(--good)}
   .note{font-size:.88rem;color:var(--muted);margin-top:16px;line-height:1.6}
+  .note a{color:var(--accent-ink);text-decoration:underline;text-underline-offset:2px}
 
-  /* tools chips */
-  .tools{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
-  .tool{font-family:var(--mono);font-size:.82rem;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:6px 11px;color:var(--fg);transition:all .15s}
-  .tool:hover{border-color:var(--accent);color:var(--accent-ink)}
+  .tools{display:flex;flex-wrap:wrap;gap:7px;margin-top:4px}
+  .tool{font-family:var(--mono);font-size:.8rem;background:var(--bg2);border:1px solid var(--line);border-radius:7px;padding:5px 10px;color:var(--muted)}
 
-  /* two-col split */
-  .split{display:grid;grid-template-columns:1.05fr .95fr;gap:34px;align-items:center}
-  @media(max-width:760px){.split{grid-template-columns:1fr}}
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center}
+  @media(max-width:740px){.split{grid-template-columns:1fr;gap:26px}}
 
-  footer{padding:54px 0 70px;text-align:center;color:var(--muted);font-size:.9rem;border-top:1px solid var(--line)}
-  footer .flinks{display:flex;gap:20px;justify-content:center;flex-wrap:wrap;margin:14px 0}
+  footer{padding:50px 0 64px}
+  footer .flinks{display:flex;gap:22px;flex-wrap:wrap;font-size:.9rem}
   footer .flinks a{color:var(--muted)} footer .flinks a:hover{color:var(--fg)}
-  .fine{margin-top:16px;color:var(--faint);font-size:.84rem}
+  footer .fine{margin-top:22px;color:var(--faint);font-size:.85rem}
+  footer .fine a{color:var(--muted)}
 </style>
 </head>
 <body>
-<div class="aurora"><span class="a1"></span><span class="a2"></span><span class="a3"></span></div>
-<div class="grain"></div>
 
 <nav><div class="wrap">
-  <a class="brand" href="#top"><span class="m">🧠</span> mnemo</a>
+  <a class="brand" href="#top"><span class="mk"></span> mnemo</a>
   <div class="navr">
     <a class="hide" href="#integrity">Integrity</a>
     <a class="hide" href="#features">Features</a>
@@ -168,27 +145,30 @@
 </div></nav>
 
 <header id="top"><div class="wrap">
-  <span class="pill"><span class="dot"></span> v1.1 · <b>tested</b> · MIT · zero&nbsp;dependencies</span>
-  <h1 class="hero">The agent memory that <span class="grad-text">keeps a corrected fact corrected</span>.</h1>
-  <p class="sub">A zero-dependency memory layer <b>and MCP server</b> for AI agents. Value-ranked recall, consolidation, and a first-class <b>correction &amp; erasure</b> channel — measured, not assumed.</p>
+  <div class="tagrow"><span class="d"></span> v1.1 &nbsp;·&nbsp; <b>tested</b> &nbsp;·&nbsp; MIT &nbsp;·&nbsp; zero dependencies</div>
+  <h1 class="hero">Agent memory that keeps a corrected fact corrected.</h1>
+  <p class="sub">A zero-dependency memory layer <b>and MCP server</b> for AI agents. Value-ranked recall, consolidation, and a first-class <b>correction and erasure</b> channel — measured, not assumed.</p>
   <div class="cta">
-    <a class="btn primary" href="https://github.com/DanceNitra/mnemo">★ Star on GitHub</a>
+    <a class="btn primary" href="https://github.com/DanceNitra/mnemo">Star on GitHub</a>
     <a class="btn ghost" href="https://pypi.org/project/agora-mnemo/">pip install agora-mnemo</a>
   </div>
-  <div class="stats">
-    <span><b>12</b> MCP tools</span><span><b>6</b> framework adapters</span><span><b>0.75</b> vs 0.20 revert (n=20)</span><span>Glama quality <b>A</b></span>
+  <div class="metrics">
+    <div><div class="n">12</div><div class="l">MCP tools</div></div>
+    <div><div class="n">6</div><div class="l">framework adapters</div></div>
+    <div><div class="n">0.75</div><div class="l">revert vs 0.20 (n=20)</div></div>
+    <div><div class="n">A</div><div class="l">Glama quality</div></div>
   </div>
 
   <div class="term">
-    <div class="bar"><i></i><i></i><i></i><span>mnemo — correction that sticks</span></div>
+    <div class="bar"><i></i><i></i><i></i><span>correction that sticks</span></div>
 <pre><span class="c"># store a fact, then correct it</span>
-&gt;&gt;&gt; m.<span class="k">remember</span>(<span class="out">"db region is us-east"</span>, key=<span class="out">"db::region"</span>)
-&gt;&gt;&gt; m.<span class="k">remember</span>(<span class="out">"db region is eu-west"</span>, key=<span class="out">"db::region"</span>)   <span class="c"># correction</span>
-&gt;&gt;&gt; m.<span class="k">recall</span>(<span class="out">"region"</span>)
-    <span class="g">eu-west</span>          <span class="c"># the corrected value — the stale one is retired</span>
+&gt;&gt;&gt; m.<span class="k">remember</span>(<span class="s">"db region is us-east"</span>, key=<span class="s">"db::region"</span>)
+&gt;&gt;&gt; m.<span class="k">remember</span>(<span class="s">"db region is eu-west"</span>, key=<span class="s">"db::region"</span>)   <span class="c"># correction</span>
+&gt;&gt;&gt; m.<span class="k">recall</span>(<span class="s">"region"</span>)
+    <span class="g">eu-west</span>          <span class="c"># the corrected value; the stale one is retired</span>
 
 <span class="c"># an unmarked "go back" that names no value cannot resurrect it</span>
-&gt;&gt;&gt; m.<span class="k">route</span>(<span class="out">"actually, go back to what we had"</span>)
+&gt;&gt;&gt; m.<span class="k">route</span>(<span class="s">"actually, go back to what we had"</span>)
     <span class="r">authorization_required</span>   <span class="c"># the content path can't mint a revert</span></pre>
   </div>
 </div></header>
@@ -198,9 +178,9 @@
   <h2>One file, or an MCP server for any host</h2>
   <p class="lead">Zero required dependencies for the core. Add the MCP extra to run it as a stdio server for Claude Code, Cursor, Windsurf, Codex, or Gemini.</p>
   <div class="codewrap">
-    <button class="copy" onclick="cp(this)">copy</button>
+    <button class="copy" onclick="cp(this)">Copy</button>
     <pre class="block"><span class="c"># library + MCP server</span>
-pip install "agora-mnemo[mcp]"
+pip install <span class="s">"agora-mnemo[mcp]"</span>
 mnemo-mcp                       <span class="c"># speaks MCP over stdio</span></pre>
   </div>
 </div></section>
@@ -208,30 +188,30 @@ mnemo-mcp                       <span class="c"># speaks MCP over stdio</span></
 <section id="integrity"><div class="wrap">
   <p class="eyebrow">Measured, not assumed</p>
   <h2>Correction is a first-class operation — benchmarked across systems</h2>
-  <p class="lead">Any store can save and retrieve. The harder, rarely-benchmarked property is <b>integrity</b>: once a fact is corrected, can the store undo that correction on an unmarked command? Measured against mem0 and Graphiti in their native configs, scored by one ground-truth-blind judge.</p>
-  <div class="tablecard"><div class="tablescroll">
+  <p class="lead">Any store can save and retrieve. The harder, rarely-benchmarked property is integrity: once a fact is corrected, can the store undo that correction on an unmarked command? Measured against mem0 and Graphiti in their native configs, scored by one ground-truth-blind judge.</p>
+  <div class="tablecard"><div class="tsc">
     <table>
       <thead><tr><th>value-obscuring revert · undo a correction from an unmarked "go back" (n=20)</th><th>success</th><th style="text-align:right">95% CI</th></tr></thead>
       <tbody>
-        <tr class="hl"><td><b>mnemo</b> <span style="color:var(--faint)">(route / revert)</span></td><td><div class="barcell"><span class="b" style="width:76px"></span>0.75</div></td><td class="num win">[0.53, 0.89]</td></tr>
-        <tr><td>mem0 2.0.11 <span style="color:var(--faint)">(native, gpt-4o-mini)</span></td><td><div class="barcell"><span class="b mut" style="width:20px"></span>0.20</div></td><td class="num">[0.08, 0.42]</td></tr>
-        <tr><td>Graphiti <span style="color:var(--faint)">(native, live neo4j)</span></td><td><div class="barcell"><span class="b mut" style="width:2px"></span>0.00</div></td><td class="num">[0.00, 0.16]</td></tr>
+        <tr><td><b>mnemo</b> <span style="color:var(--faint)">(route / revert)</span></td><td><div class="barcell"><span class="b" style="width:74px"></span>0.75</div></td><td class="ci win">[0.53, 0.89]</td></tr>
+        <tr><td>mem0 2.0.11 <span style="color:var(--faint)">(native, gpt-4o-mini)</span></td><td><div class="barcell"><span class="b mut" style="width:20px"></span>0.20</div></td><td class="ci">[0.08, 0.42]</td></tr>
+        <tr><td>Graphiti <span style="color:var(--faint)">(native, live neo4j)</span></td><td><div class="barcell"><span class="b mut" style="width:3px"></span>0.00</div></td><td class="ci">[0.00, 0.16]</td></tr>
       </tbody>
     </table>
   </div></div>
-  <p class="note">Only mnemo exposes a channel to undo a correction on command; the CIs against mem0 don't overlap. We <b>lead with the cell we don't win</b>: echo-resurrection is a tie — all three defend a restated stale value. A narrow, adversarial, command-driven cut, not a general "mnemo is better" claim. Run it yourself → <a href="https://github.com/DanceNitra/mnemo/blob/main/probes/INTEGRITY_BENCHMARK.md">the open harness</a>.</p>
+  <p class="note">Only mnemo exposes a channel to undo a correction on command; the CIs against mem0 do not overlap. We lead with the cell we <em>don't</em> win: echo-resurrection is a tie — all three defend a restated stale value. A narrow, adversarial, command-driven cut, not a general "mnemo is better" claim. Run it yourself — <a href="https://github.com/DanceNitra/mnemo/blob/main/probes/INTEGRITY_BENCHMARK.md">the open harness</a>.</p>
 </div></section>
 
 <section id="features"><div class="wrap">
   <p class="eyebrow">What it does</p>
   <h2>A memory that reasons about which version of a fact is true</h2>
-  <div class="grid">
-    <div class="feat"><div class="ic">🎯</div><h3>Value-ranked recall</h3><p>Retrieval by relevance × accrued value, per-type decay, and a lexical+semantic auto-mode (BM25 + embeddings fused by RRF). Zero-dep by default.</p></div>
-    <div class="feat"><div class="ic">↩️</div><h3>Correction &amp; erasure</h3><p><code>revert()</code>, <code>retract_lineage()</code>, <code>echo_guard</code>, <code>forget_subject()</code> — undo, cascade a lineage-aware retraction, prove deletion with a signed tombstone.</p></div>
-    <div class="feat"><div class="ic">🔗</div><h3>Tamper-evident receipts</h3><p><code>verify_writes()</code> over a hash-chained, optionally Ed25519-signed log — plus <code>anchor()</code>, a Certificate-Transparency-style witness that catches a key-holder rewrite.</p></div>
-    <div class="feat"><div class="ic">🛡️</div><h3>Poison-resistant influence</h3><p><code>recall(influence_only=True)</code> restricts what may drive an action to corroborated memories — drops a single-instance retrieval-poisoning hijack toward 0%.</p></div>
-    <div class="feat"><div class="ic">🧹</div><h3>Cross-store erasure audit</h3><p><code>DeletionManifest</code> + <code>ErasureAuditor</code> adversarially re-check whether a "deleted" subject is <em>still reconstructible</em> — in the vector index, cache, and logs, not just the row.</p></div>
-    <div class="feat"><div class="ic">🔌</div><h3>Framework adapters</h3><p>Drop-in backends for OpenAI Agents, AutoGen, LangGraph, LlamaIndex, Google ADK, and Pydantic AI — each carrying the current-truth recall differentiator.</p></div>
+  <div class="feats">
+    <div class="feat"><div class="h"><span class="ic"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></svg></span><h3>Value-ranked recall</h3></div><p>Retrieval by relevance × accrued value, per-type decay, and a lexical+semantic auto-mode (BM25 + embeddings fused by RRF). Zero-dep by default.</p></div>
+    <div class="feat"><div class="h"><span class="ic"><svg class="i" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg></span><h3>Correction &amp; erasure</h3></div><p><code>revert()</code>, <code>retract_lineage()</code>, <code>echo_guard</code>, <code>forget_subject()</code> — undo, cascade a lineage-aware retraction, prove deletion with a signed tombstone.</p></div>
+    <div class="feat"><div class="h"><span class="ic"><svg class="i" viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/><path d="M9 12l2 2 4-4"/></svg></span><h3>Tamper-evident receipts</h3></div><p><code>verify_writes()</code> over a hash-chained, optionally Ed25519-signed log — plus <code>anchor()</code>, a Certificate-Transparency-style witness that catches a key-holder rewrite.</p></div>
+    <div class="feat"><div class="h"><span class="ic"><svg class="i" viewBox="0 0 24 24"><path d="M3 4h18l-7 8v6l-4 2v-8z"/></svg></span><h3>Poison-resistant influence</h3></div><p><code>recall(influence_only=True)</code> restricts what may drive an action to corroborated memories — drops a single-instance retrieval-poisoning hijack toward 0%.</p></div>
+    <div class="feat"><div class="h"><span class="ic"><svg class="i" viewBox="0 0 24 24"><path d="M4 7h16"/><path d="M6 7l1 13h10l1-13"/><path d="M9 7V4h6v3"/></svg></span><h3>Cross-store erasure audit</h3></div><p><code>DeletionManifest</code> + <code>ErasureAuditor</code> adversarially re-check whether a "deleted" subject is <em>still reconstructible</em> — in the vector index, cache, and logs, not just the row.</p></div>
+    <div class="feat"><div class="h"><span class="ic"><svg class="i" viewBox="0 0 24 24"><path d="M9 2v6M15 2v6"/><path d="M7 8h10v4a5 5 0 0 1-10 0z"/><path d="M12 17v5"/></svg></span><h3>Framework adapters</h3></div><p>Drop-in backends for OpenAI Agents, AutoGen, LangGraph, LlamaIndex, Google ADK, and Pydantic AI — each carrying the current-truth recall differentiator.</p></div>
   </div>
 </div></section>
 
@@ -240,7 +220,7 @@ mnemo-mcp                       <span class="c"># speaks MCP over stdio</span></
     <div>
       <p class="eyebrow">Model Context Protocol</p>
       <h2>Plug mnemo into any MCP host</h2>
-      <p class="lead">A stdio MCP server, published to the official registry as <code>io.github.DanceNitra/mnemo</code>. Twelve tools your agent can call directly:</p>
+      <p class="lead">A stdio MCP server, published to the official registry as <code>io.github.DanceNitra/mnemo</code>. Twelve tools your agent can call directly.</p>
       <div class="tools">
         <span class="tool">remember</span><span class="tool">recall</span><span class="tool">route</span>
         <span class="tool">revert</span><span class="tool">forget</span><span class="tool">consolidate</span>
@@ -249,13 +229,13 @@ mnemo-mcp                       <span class="c"># speaks MCP over stdio</span></
       </div>
     </div>
     <div class="codewrap">
-      <button class="copy" onclick="cp(this)">copy</button>
+      <button class="copy" onclick="cp(this)">Copy</button>
       <pre class="block">{
-  <span class="c">"mcpServers"</span>: {
-    <span class="c">"mnemo"</span>: {
-      <span class="c">"command"</span>: "uvx",
-      <span class="c">"args"</span>: ["--from",
-        "agora-mnemo[mcp]", "mnemo-mcp"]
+  <span class="s">"mcpServers"</span>: {
+    <span class="s">"mnemo"</span>: {
+      <span class="s">"command"</span>: <span class="s">"uvx"</span>,
+      <span class="s">"args"</span>: [<span class="s">"--from"</span>,
+        <span class="s">"agora-mnemo[mcp]"</span>, <span class="s">"mnemo-mcp"</span>]
     }
   }
 }</pre>
@@ -265,19 +245,19 @@ mnemo-mcp                       <span class="c"># speaks MCP over stdio</span></
 
 <section id="governance"><div class="wrap">
   <p class="eyebrow">Governance &amp; erasure</p>
-  <h2>Deletion that you can actually verify</h2>
-  <p class="lead">"Delete the row and log it" isn't erasure — the same content survives in the vector index (as a reconstructible embedding), caches, and logs. mnemo ships the primitives to make correction and deletion <b>tamper-evident, authenticated, and cross-store auditable</b> — and is honest about what an in-store receipt can't prove.</p>
-  <div class="grid">
-    <div class="feat"><div class="ic">🧾</div><h3>CT-style anchor</h3><p><code>anchor()</code> / <code>verify_consistency()</code> — an external signed tree head (RFC 6962) that catches an operator who holds the key and rewrites history. Bare hash chains can't.</p></div>
-    <div class="feat"><div class="ic">🔐</div><h3>Authenticated erasure</h3><p><code>forget_subject(authorized_by=…, basis=…)</code> binds a deletion to a principal's Ed25519 signature and records the decision basis — inside the tamper-evident tombstone.</p></div>
-    <div class="feat"><div class="ic">🔎</div><h3>Reconstruction audit</h3><p>The <code>ErasureAuditor</code> re-attempts recovery from surviving vectors after a delete — the "is it still reconstructible?" check DSAR tooling skips. A lower bound; not a proof of destruction.</p></div>
+  <h2>Deletion you can actually verify</h2>
+  <p class="lead">"Delete the row and log it" isn't erasure — the same content survives in the vector index (as a reconstructible embedding), caches, and logs. mnemo ships the primitives to make correction and deletion tamper-evident, authenticated, and cross-store auditable — and is honest about what an in-store receipt can't prove.</p>
+  <div class="feats">
+    <div class="feat"><div class="h"><span class="ic"><svg class="i" viewBox="0 0 24 24"><path d="M12 3v6"/><circle cx="12" cy="12" r="3"/><path d="M12 15v6"/><path d="M7 20h10"/></svg></span><h3>CT-style anchor</h3></div><p><code>anchor()</code> / <code>verify_consistency()</code> — an external signed tree head (RFC 6962) that catches an operator who holds the key and rewrites history. Bare hash chains can't.</p></div>
+    <div class="feat"><div class="h"><span class="ic"><svg class="i" viewBox="0 0 24 24"><circle cx="8" cy="15" r="4"/><path d="M10.8 12.2 20 3"/><path d="M17 6l3 3"/><path d="M15 8l2 2"/></svg></span><h3>Authenticated erasure</h3></div><p><code>forget_subject(authorized_by=…, basis=…)</code> binds a deletion to a principal's Ed25519 signature and records the decision basis — inside the tamper-evident tombstone.</p></div>
+    <div class="feat"><div class="h"><span class="ic"><svg class="i" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></span><h3>Reconstruction audit</h3></div><p>The <code>ErasureAuditor</code> re-attempts recovery from surviving vectors after a delete — the "is it still reconstructible?" check DSAR tooling skips. A lower bound; not a proof of destruction.</p></div>
   </div>
-  <p class="note">Honest scope in <a href="https://github.com/DanceNitra/mnemo/blob/main/SECURITY.md">SECURITY.md</a>: no RCE/ReDoS surface (JSON-only, no pickle/eval), constant-time secret comparison — and two documented residuals (unpinned-signature footgun, opt-in resource caps). First internal security pass, not a formal pentest.</p>
+  <p class="note">Honest scope in <a href="https://github.com/DanceNitra/mnemo/blob/main/SECURITY.md">SECURITY.md</a>: no RCE/ReDoS surface (JSON-only, no pickle/eval), constant-time secret comparison — and two documented residuals (unpinned-signature footgun, opt-in resource caps). A first internal security pass, not a formal pentest.</p>
 </div></section>
 
 <footer><div class="wrap">
-  <p style="font-weight:600;color:var(--fg)">Measured, not assumed — every design rule ships with a runnable probe.</p>
-  <div class="flinks">
+  <p style="font-weight:600;margin:0 0 4px">Measured, not assumed — every design rule ships with a runnable probe.</p>
+  <div class="flinks" style="margin-top:16px">
     <a href="https://github.com/DanceNitra/mnemo">GitHub</a>
     <a href="https://pypi.org/project/agora-mnemo/">PyPI</a>
     <a href="https://doi.org/10.5281/zenodo.21128549">Zenodo DOI</a>
@@ -290,10 +270,8 @@ mnemo-mcp                       <span class="c"># speaks MCP over stdio</span></
 <script>
   function cp(btn){
     var pre = btn.parentElement.querySelector('pre');
-    var t = pre.innerText.replace(/​/g,'');
-    navigator.clipboard.writeText(t).then(function(){
-      var o = btn.textContent; btn.textContent = 'copied ✓';
-      setTimeout(function(){ btn.textContent = o; }, 1400);
+    navigator.clipboard.writeText(pre.innerText).then(function(){
+      var o = btn.textContent; btn.textContent = 'Copied'; setTimeout(function(){ btn.textContent = o; }, 1300);
     });
   }
 </script>
