@@ -3,6 +3,24 @@
 All notable changes to mnemo (`agora-mnemo`). Format loosely follows Keep a Changelog; versioning is semver
 (MAJOR = stable/breaking, MINOR = features, PATCH = fixes).
 
+## 1.3.0
+
+Clean memory — a write-admission gate and an inspector, aimed at agent memory's #1 real-world failure:
+indiscriminate writes (audited stores measured ~98% junk, one fact cloned 800+ times). All read-only or
+opt-in; no change to existing `remember()`/`recall()` behaviour.
+
+- **`admit(text, ..., dup_threshold=0.92, quality=True)`** — decide whether a candidate is worth storing BEFORE
+  it bloats the store. Rejects empty / too-short / non-content (refusals, "no sources ..."), and skips a
+  near-identical active memory (returns its id instead of appending a copy). A value UPDATE (same text, new
+  number) is admitted so consolidation can supersede the stale value. Returns
+  `{admitted, id, reason, duplicate_of, similarity}`. (Reliably kills exact/near-exact re-extraction bloat;
+  paraphrase-level dedup is tunable via a lower `dup_threshold`, trading precision.)
+- **`why_recalled(query, id=None)`** — inspector: the per-candidate score breakdown `recall()` ranks by
+  (semantic cosine, lexical overlap, decayed effective value, corroboration good/bad, stale-derived flag, and
+  the live rank), so "why did this surface / why not" stops being an archaeology dig.
+- **`memory_report()`** — inspector overview: active/superseded, counts by type, consolidated, decayed, and a
+  near-duplicate redundancy estimate — the surface that proves a store did NOT accumulate 800 copies of a fact.
+
 ## 1.2.0
 
 Universal-executor gate — OPT-IN; default (`tool=None`) is byte-identical to 1.1.0 (verified by tests).

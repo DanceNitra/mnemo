@@ -130,6 +130,11 @@ _EXECUTOR_NAME_HINTS = ("execute", "exec", "eval", "shell", "terminal", "bash", 
 _EXECUTOR_PARAM_HINTS = ("command", "cmd", "code", "script", "query", "sql", "expression", "expr", "payload",
                          "shell", "bash", "url", "endpoint", "request")
 
+# non-content boilerplate the admission gate rejects (a refusal/empty is not a memory worth storing)
+_NON_CONTENT = ("no sources were provided", "no sources provided", "i cannot", "i can't help",
+                "as an ai language model", "as an ai", "i'm sorry", "i am sorry", "cannot assist",
+                "no information available", "not enough information", "none provided")
+
 
 def is_universal_executor(tool, signature=None) -> bool:
     """True if `tool` is a verb-polymorphic UNIVERSAL EXECUTOR whose reversibility cannot be decided from its
@@ -185,7 +190,7 @@ def sign_erasure(principal_sk_hex: str, subject: str, request_id) -> str:
     sk = _Ed25519SK.from_private_bytes(bytes.fromhex(principal_sk_hex))
     return sk.sign(erasure_challenge(subject, request_id).encode()).hex()
 
-__version__ = "1.2.0"
+__version__ = "1.3.0"
 
 # Internal sentinel: marks a reaffirm write already authorized by submit_revert() (which verified the
 # signed INTENT). Object identity — no text/content path can ever produce it.
@@ -2988,6 +2993,95 @@ class Mnemo:
                 for r in self.recall(fq, k=k, **recall_kw):
                     seen.setdefault(r["id"], r)
         return list(seen.values())
+
+    # ── clean memory: write-admission gate + inspector (1.3.0) ────────────────────────────────────
+    def admit(self, text: str, tags=None, value: float = 1.0, meta: dict | None = None,
+              mtype: str | None = None, dup_threshold: float = 0.92, min_tokens: int = 2,
+              quality: bool = True, **kw) -> dict:
+        """WRITE-ADMISSION GATE — decide whether a candidate memory is worth storing BEFORE it bloats the store,
+        then store it or point at the existing duplicate. Counters agent memory's #1 real-world failure:
+        indiscriminate writes (audited mem0 stores measured ~98% junk, one line cloned 800+ times). Two checks,
+        both opt-out:
+          - quality: reject empty / too-short / obvious non-content (a refusal or "no sources ..." is not a memory).
+          - dedup: if an ACTIVE memory is near-identical (similarity >= dup_threshold) with no value clash, do NOT
+            append a copy; return that memory's id instead.
+        A value UPDATE (same text, different number) is NOT a duplicate — it is admitted so consolidation can
+        supersede the stale value. Returns {"admitted","id","reason","duplicate_of","similarity"}."""
+        t = (text or "").strip()
+        if quality:
+            if not t:
+                return {"admitted": False, "id": None, "reason": "empty", "duplicate_of": None, "similarity": None}
+            if len(_tokens(t)) < min_tokens:
+                return {"admitted": False, "id": None, "reason": "too_short", "duplicate_of": None,
+                        "similarity": None}
+            low = t.lower()
+            if any(p in low for p in _NON_CONTENT):
+                return {"admitted": False, "id": None, "reason": "non_content", "duplicate_of": None,
+                        "similarity": None}
+        hits = self.recall(t, k=1)
+        if hits:
+            h = hits[0]
+            s = self._similarity(t, h, self._qvec(t) if self.embed else None)
+            if s >= dup_threshold and not _value_clash(t, h["text"]):
+                return {"admitted": False, "id": h["id"], "reason": "duplicate", "duplicate_of": h["id"],
+                        "similarity": round(float(s), 4)}
+        mid = self.remember(t, tags=tags, value=value, meta=meta, mtype=mtype, **kw)
+        return {"admitted": True, "id": mid, "reason": "admitted", "duplicate_of": None, "similarity": None}
+
+    def why_recalled(self, query: str, id: str | None = None, k: int = 12):
+        """INSPECTOR — explain WHY memories rank for a query, so 'why did this surface / why not' stops being an
+        archaeology dig. Returns the per-candidate score breakdown recall() actually ranks by: semantic (cosine),
+        lexical (token overlap), effective_value (decayed rank weight), corroboration (good/bad), the stale-derived
+        flag, and the memory's RANK in the live recall(). With `id`, returns just that record's breakdown plus
+        whether it surfaced in the top-k. Read-only."""
+        now = time.time()
+        qvec = self._qvec(query) if self.embed else None
+        qtok = _tokens(query)
+        ranked = self.recall(query, k=k)
+        rank_of = {r["id"]: i + 1 for i, r in enumerate(ranked)}
+        _full = {x["id"]: x for x in self.items}          # recall() may return vec-less projections
+
+        def _brk(rec):
+            r = _full.get(rec["id"], rec)                 # resolve the full record so the vec is present
+            sem = max(0.0, _cosine(qvec, r["vec"])) if (qvec is not None and r.get("vec")) else 0.0
+            t = self._rec_tokens(r)
+            lex = (len(qtok & t) / min(len(qtok), len(t))) if (qtok and t) else 0.0
+            return {"id": r["id"], "text": (r.get("text") or "")[:80],
+                    "semantic": round(float(sem), 4), "lexical": round(float(lex), 4),
+                    "effective_value": round(self._effective_value(r, now), 4),
+                    "good": float(r.get("good", 0) or 0), "bad": float(r.get("bad", 0) or 0),
+                    "stale_derived": bool(r.get("_stale_derived")), "rank": rank_of.get(r["id"])}
+        if id is not None:
+            rec = next((r for r in self.items if r["id"] == id), None)
+            if rec is None:
+                return {"id": id, "found": False}
+            b = _brk(rec); b["surfaced"] = rec["id"] in rank_of
+            return b
+        return [_brk(r) for r in ranked]
+
+    def memory_report(self, dup_threshold: float = 0.9) -> dict:
+        """INSPECTOR overview — 'what is in memory, and is it clean'. Counts active/superseded, by type,
+        consolidated (linked), decayed (effective value < 10% of stored), and a near-duplicate REDUNDANCY estimate
+        (active memories whose nearest active neighbour is >= dup_threshold, no value clash — sampled at 400 for
+        cost). Read-only; the surface that proves a store did NOT accumulate 800 copies of one fact."""
+        now = time.time()
+        act = [r for r in self.items if r.get("status") == "active"]
+        sup = [r for r in self.items if r.get("status") == "superseded"]
+        from collections import Counter
+        by_type = dict(Counter(r.get("mtype", "episodic") for r in act))
+        linked = sum(1 for r in act if r.get("links"))
+        decayed = sum(1 for r in act if self._effective_value(r, now) < 0.1 * float(r.get("value", 1.0) or 1.0))
+        redundant = 0
+        sample = act if len(act) <= 400 else act[:400]
+        for r in sample:
+            other = [h for h in self.recall(r["text"], k=2) if h["id"] != r["id"]]
+            if other:
+                s = self._similarity(r["text"], other[0], self._qvec(r["text"]) if self.embed else None)
+                if s >= dup_threshold and not _value_clash(r["text"], other[0]["text"]):
+                    redundant += 1
+        return {"total": len(self.items), "active": len(act), "superseded": len(sup), "by_type": by_type,
+                "consolidated": linked, "decayed": decayed, "redundant_estimate": redundant,
+                "redundant_frac": round(redundant / max(1, len(sample)), 3), "sampled": len(sample)}
 
     def consolidate(self, keep: int | None = None, dup_threshold: float = 0.82,
                     hub_coverage: float = 0.12, link_duplicates: bool = True) -> dict:
