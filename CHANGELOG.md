@@ -3,6 +3,19 @@
 All notable changes to mnemo (`agora-mnemo`). Format loosely follows Keep a Changelog; versioning is semver
 (MAJOR = stable/breaking, MINOR = features, PATCH = fixes).
 
+## 1.1.0
+
+Security hardening from the first internal security pass (see SECURITY.md). Both additions are OPT-IN; the
+default behaviour is byte-identical to 1.0.0 (verified by tests).
+
+- **`Mnemo(max_text=N)`** — availability guard: `remember()` truncates a single record's text to N chars and
+  stamps `meta["truncated_from"]`, so one runaway/malicious write can't exhaust memory. Default `None` =
+  unbounded (legacy).
+- **`verify_writes(warn_unpinned=True)`** — surfaces the self-referential-pubkey footgun: when signatures are
+  present but no `expected_pubkey` is pinned, it reports a problem (a store-rewriter can swap sig+key and still
+  pass). Default `False` = legacy. `governance_report()` now also states `proof.signature_authenticity`
+  ("pinned to expected_pubkey" vs "self-referential — pin expected_pubkey or witness anchor() externally").
+
 ## 1.0.0
 
 First stable release. The library matured over the 0.4–0.7 line into a real, shipped product; 1.0.0 marks a

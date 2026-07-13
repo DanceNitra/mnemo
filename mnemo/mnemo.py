@@ -140,7 +140,7 @@ def sign_erasure(principal_sk_hex: str, subject: str, request_id) -> str:
     sk = _Ed25519SK.from_private_bytes(bytes.fromhex(principal_sk_hex))
     return sk.sign(erasure_challenge(subject, request_id).encode()).hex()
 
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 
 # Internal sentinel: marks a reaffirm write already authorized by submit_revert() (which verified the
 # signed INTENT). Object identity — no text/content path can ever produce it.
@@ -181,7 +181,7 @@ class Mnemo:
     def __init__(self, path: str | None = None, embed=None, receipts: bool = False,
                  receipt_key: str | None = None, receipt_pubkey: str | None = None,
                  capacity: int | None = None, revert_authority: str | None = None,
-                 revert_pubkey: str | None = None):
+                 revert_pubkey: str | None = None, max_text: int | None = None):
         """path: optional JSON file to persist to. embed: optional fn(str)->list[float] for semantic
         recall; if omitted, recall uses lexical token overlap (zero dependencies).
 
@@ -200,6 +200,10 @@ class Mnemo:
         # verified two-tier policy (value-protected + recency-aged, Lab 29992a). Lets mnemo run in
         # production without unbounded growth — a gap vs bounded competitors (mem0/Letta).
         self.capacity = capacity
+        # Per-record input cap (OPT-IN, default None = unbounded, byte-identical legacy). When set, remember()
+        # truncates text longer than max_text chars and stamps meta["truncated_from"] with the original length —
+        # an availability guard so a single malicious/runaway write can't exhaust memory. See SECURITY.md.
+        self.max_text = max_text
         # AUTHORIZED REVERT CHANNEL (OPT-IN, default None = legacy: revert()/reaffirm are ungated).
         # When set, restoring a superseded value (revert(), route()'s revert branches, remember(reaffirm=True))
         # requires an out-of-band CAPABILITY = HMAC(revert_authority, key). The content path (route(text)) can
@@ -449,6 +453,12 @@ class Mnemo:
                     key = ex
             except Exception:
                 pass
+        # availability guard (OPT-IN): cap a single record's text so one runaway/malicious write can't exhaust
+        # memory. Truncate rather than reject (don't break the app), and record the original length. SECURITY.md.
+        _trunc_from = None
+        if self.max_text is not None and isinstance(text, str) and len(text) > self.max_text:
+            _trunc_from = len(text)
+            text = text[:self.max_text]
         mid = uuid.uuid4().hex[:10]
         now = time.time()
         rec = {"id": mid, "text": text, "tags": list(tags or []), "value": float(value),
@@ -457,6 +467,8 @@ class Mnemo:
                "source": dict(source) if source else None,   # re-checkable origin (e.g. {"doc": id, "span": [start, end]}) so a recalled fact can be traced back, not trusted blind
                "mtype": mtype or _infer_type(text), "last_access": now,
                "status": "active", "links": [], "meta": dict(meta or {})}
+        if _trunc_from is not None:
+            rec["meta"]["truncated_from"] = _trunc_from
         # TAINT INHERITANCE (provenance that rides through transformation): when this memory is DERIVED from
         # others (a summary, a consolidation, an LLM rewrite), it inherits the union of its parents' canonical
         # sources — transitively, since a parent's own inherited taint is included. Without this, an app-side
@@ -604,7 +616,7 @@ class Mnemo:
                 pass
         return r
 
-    def verify_writes(self, expected_pubkey: str | None = None) -> tuple[bool, list[str]]:
+    def verify_writes(self, expected_pubkey: str | None = None, warn_unpinned: bool = False) -> tuple[bool, list[str]]:
         """Verify the write-receipt chain AND that each stored memory still matches its write receipt.
         Returns (ok, problems). Catches out-of-band edits to the store the normal flow can't see.
         Requires receipts to have been enabled at write time."""
@@ -660,6 +672,13 @@ class Mnemo:
             elif expected_pubkey:
                 problems.append(f"tombstone {j}: unsigned, but a signature was required")
             tprev = t.get("hash")
+        # OPT-IN footgun advisory (default off = byte-identical legacy): a signature verified against the
+        # receipt's OWN pubkey is not operator-adversarial-safe — a store-rewriter can swap sig+pubkey together.
+        # With warn_unpinned=True and signatures present but no expected_pubkey pinned, surface it as a problem.
+        if warn_unpinned and expected_pubkey is None and (
+                any("sig" in r for r in self._receipts) or any("sig" in t for t in self._tombstones)):
+            problems.append("signatures present but expected_pubkey not pinned: a store-rewriter can swap the "
+                            "key and still pass — pass expected_pubkey, or witness anchor() externally")
         return (len(problems) == 0, problems)
 
     def verify_attribution(self) -> dict:
@@ -967,6 +986,10 @@ class Mnemo:
                 "problems": problems,
                 "all_signed": bool(self._tombstones) and all("sig" in t for t in self._tombstones),
                 "expected_pubkey": expected_pubkey,
+                # honest trust level of the signatures (the footgun made visible to the auditor):
+                "signature_authenticity": ("pinned to expected_pubkey" if expected_pubkey else
+                                           "self-referential — a store-rewriter can swap the key; pin "
+                                           "expected_pubkey or witness anchor() externally"),
                 # CT-style anchor: a compact, externally-witnessable commitment to the whole history, so an
                 # auditor can detect an operator (key-holder) rewrite via verify_consistency() against a prior
                 # witnessed anchor — the operator-adversarial hole verify_writes cannot close on its own.
