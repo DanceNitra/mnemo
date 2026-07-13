@@ -6,7 +6,7 @@ authors:
 repository-code: "https://github.com/DanceNitra/mnemo"
 url: "https://dancenitra.github.io/mnemo/"
 license: MIT
-version: 0.7.22
+version: 1.0.0
 keywords:
   - LLM
   - agent memory
