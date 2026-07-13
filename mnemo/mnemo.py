@@ -122,7 +122,25 @@ def sign_revert(principal_sk_hex: str, challenge: str) -> str:
     sk = _Ed25519SK.from_private_bytes(bytes.fromhex(principal_sk_hex))
     return sk.sign(challenge.encode()).hex()
 
-__version__ = "0.7.20"
+
+def erasure_challenge(subject: str, request_id) -> str:
+    """The canonical message an authorizing principal signs to bind an erasure to itself: a right-to-erasure
+    request for `subject` under `request_id`. sign_erasure() signs this; the tombstone carries the signature so
+    an auditor can prove WHO authorized the deletion (the AUTHORITY axis), not just that a free-text id was
+    written."""
+    return "erase:" + _sha256_hex(_canon({"subject": subject, "request_id": request_id}))
+
+
+def sign_erasure(principal_sk_hex: str, subject: str, request_id) -> str:
+    """Principal-side (off the store's box): Ed25519-sign erasure_challenge(subject, request_id). The hex
+    signature goes into forget_subject(..., authorization=), and authorized_by= is the principal's PUBLIC key —
+    together they bind the erasure to an authenticated principal the store did not mint. Needs `cryptography`."""
+    if not _HAVE_ED:
+        raise RuntimeError("signing an erasure needs the `cryptography` package (pip install cryptography)")
+    sk = _Ed25519SK.from_private_bytes(bytes.fromhex(principal_sk_hex))
+    return sk.sign(erasure_challenge(subject, request_id).encode()).hex()
+
+__version__ = "0.7.22"
 
 # Internal sentinel: marks a reaffirm write already authorized by submit_revert() (which verified the
 # signed INTENT). Object identity — no text/content path can ever produce it.
@@ -626,7 +644,7 @@ class Mnemo:
         # verify the DELETION-TOMBSTONE chain too — else a forged tombstone could hide a real out-of-band delete
         tprev = _GENESIS
         for j, t in enumerate(self._tombstones):
-            core = {k: t.get(k) for k in ("seq", "memory_id", "ts", "request_id", "prev")}
+            core = Mnemo._tombstone_core(t)
             if t.get("prev") != tprev:
                 problems.append(f"tombstone {j}: broken chain link (a prior tombstone was altered/removed)")
             if _sha256_hex(_canon(core)) != t.get("hash"):
@@ -837,13 +855,31 @@ class Mnemo:
         self._save(force=True)                               # a deletion is real content change — persist now
         return {"forgotten": len(target), "ids": sorted(target), "scrubbed_links": scrubbed}
 
-    def _emit_tombstone(self, memory_id: str, ts: float, request_id: str | None) -> dict:
-        """Append one hash-chained (optionally signed) deletion marker. Commits to the record's random
-        surrogate id + ts + opaque request_id ONLY — nothing content-derived (a hash of PII is still PII)."""
+    @staticmethod
+    def _tombstone_core(t: dict) -> dict:
+        """The hash-committed fields of a tombstone. Backward-compatible: the AUTHORITY/BASIS block is included
+        ONLY when present, so tombstones written without it hash exactly as before (older stores still verify)."""
+        core = {k: t.get(k) for k in ("seq", "memory_id", "ts", "request_id", "prev")}
+        if t.get("auth"):
+            core["auth"] = t["auth"]
+        return core
+
+    def _emit_tombstone(self, memory_id: str, ts: float, request_id: str | None,
+                        basis: str | None = None, authorized_by: str | None = None,
+                        authorization: str | None = None) -> dict:
+        """Append one hash-chained (optionally signed) deletion marker. Commits to the record's random surrogate
+        id + ts + opaque request_id, PLUS an optional tamper-evident AUTHORITY/BASIS block: `basis` (why the
+        record was erased — the decision basis), `authorized_by` (the authorizing principal's PUBLIC key), and
+        `authorization` (that principal's Ed25519 signature over erasure_challenge(subject, request_id), from
+        sign_erasure()). Still content-free (a hash of PII is still PII). When present, these are inside the
+        committed hash, so an auditor can reconstruct WHO authorized the erasure and ON WHAT BASIS — not just a
+        free-text id — and detect any later tampering with them."""
         prev = self._tombstones[-1]["hash"] if self._tombstones else _GENESIS
         t = {"seq": len(self._tombstones), "memory_id": memory_id, "ts": ts,
              "request_id": request_id, "prev": prev}
-        t["hash"] = _sha256_hex(_canon({k: t[k] for k in ("seq", "memory_id", "ts", "request_id", "prev")}))
+        if basis is not None or authorized_by is not None or authorization is not None:
+            t["auth"] = {"basis": basis, "authorized_by": authorized_by, "authorization": authorization}
+        t["hash"] = _sha256_hex(_canon(Mnemo._tombstone_core(t)))
         if self._receipt_sk and _HAVE_ED:
             sk = _Ed25519SK.from_private_bytes(bytes.fromhex(self._receipt_sk))
             t["pubkey"] = self.receipt_pubkey
@@ -857,7 +893,8 @@ class Mnemo:
                 pass
         return t
 
-    def forget_subject(self, subject: str, request_id: str | None = None) -> dict:
+    def forget_subject(self, subject: str, request_id: str | None = None, basis: str | None = None,
+                       authorized_by: str | None = None, authorization: str | None = None) -> dict:
         """RIGHT-TO-ERASURE across provenance lineage, with a tamper-evident audit of the ACT. Hard-deletes
         every active memory ATTRIBUTABLE to `subject` — its own canonical source OR any record that inherited
         `subject` through derived_from taint (so a summary/consolidation built from the subject's data is erased
@@ -883,7 +920,8 @@ class Mnemo:
         now = time.time()
         res = self.forget(ids=subj_ids)
         for mid in res["ids"]:
-            self._emit_tombstone(mid, now, request_id)
+            self._emit_tombstone(mid, now, request_id, basis=basis,
+                                 authorized_by=authorized_by, authorization=authorization)
         return {"erased": res["forgotten"], "ids": res["ids"],
                 "request_id": request_id, "tombstones": len(res["ids"])}
 
@@ -929,6 +967,10 @@ class Mnemo:
                 "problems": problems,
                 "all_signed": bool(self._tombstones) and all("sig" in t for t in self._tombstones),
                 "expected_pubkey": expected_pubkey,
+                # CT-style anchor: a compact, externally-witnessable commitment to the whole history, so an
+                # auditor can detect an operator (key-holder) rewrite via verify_consistency() against a prior
+                # witnessed anchor — the operator-adversarial hole verify_writes cannot close on its own.
+                "anchor": self.anchor(),
             },
             "scope": ("Erasure is within THIS mnemo store only (not the app's vector store, prompt logs, or "
                       "backups); covers the subject PLUS its derived_from lineage. Tamper-evident integrity "
@@ -936,6 +978,75 @@ class Mnemo:
                       "never the content; its signature is load-bearing only against a non-holder of "
                       "receipt_key. Anchor the chain head externally for operator-adversarial audit."),
         }
+
+    @staticmethod
+    def _chain_core(rec: dict, kind: str) -> dict:
+        if kind == "write":
+            return {k: rec.get(k) for k in ("seq", "ts", "memory_id", "commit", "prev")}
+        return Mnemo._tombstone_core(rec)                                                   # tombstone
+
+    def _recompute_tip(self, records, n: int, kind: str):
+        """Re-derive the hash-chain tip over the FIRST n records from genesis, verifying each record's own
+        hash and prev-link as it goes. Returns the tip hash, or None if the prefix is internally inconsistent
+        (a record whose stored hash doesn't match its recomputed content, or a broken prev-link)."""
+        prev = _GENESIS
+        for r in records[:n]:
+            if r.get("prev") != prev:
+                return None
+            h = _sha256_hex(_canon(Mnemo._chain_core(r, kind)))
+            if h != r.get("hash"):
+                return None
+            prev = h
+        return prev
+
+    def anchor(self, sign=None) -> dict:
+        """Emit a Certificate-Transparency-style SIGNED TREE HEAD — a compact, EXTERNALLY-publishable commitment
+        to the entire write + tombstone history at this instant: {n_writes, writes_tip, n_tombstones,
+        tombstones_tip, ts}. Because each chain is hash-linked, its tip hash commits to every prior entry, so
+        publishing this anchor to a place the operator cannot retroactively alter (a public log, a witness, the
+        auditor's own records) closes the one hole verify_writes/governance_report cannot: an operator who HOLDS
+        receipt_key can rewrite the whole history AND re-sign it so it verifies internally — but they cannot make
+        the rewritten tip equal an anchor an outsider already witnessed. This is the CT model (Laurie-Langley-
+        Kasper RFC 6962): the log is untrusted; external witnesses + consistency proofs make append-only violations
+        detectable without trusting the log operator. `sign(bytes)->hex` (OPT-IN) lets an EXTERNAL witness co-sign
+        the anchor; mnemo deliberately does NOT sign it with receipt_key (that key is the very thing not trusted
+        here). HONEST BOUNDARY: mnemo produces the anchor and the consistency proof; the external WITNESSING (that
+        the auditor recorded a prior anchor out of band) is the auditor's job — without a prior witnessed anchor
+        there is nothing to be consistent WITH."""
+        writes_tip = self._receipts[-1]["hash"] if self._receipts else _GENESIS
+        tomb_tip = self._tombstones[-1]["hash"] if self._tombstones else _GENESIS
+        sth = {"n_writes": len(self._receipts), "writes_tip": writes_tip,
+               "n_tombstones": len(self._tombstones), "tombstones_tip": tomb_tip,
+               "ts": time.time()}
+        sth["sth_hash"] = _sha256_hex(_canon({k: sth[k] for k in
+                                              ("n_writes", "writes_tip", "n_tombstones", "tombstones_tip")}))
+        if sign is not None:
+            try:
+                sth["witness_sig"] = sign(bytes.fromhex(sth["sth_hash"]))
+            except Exception:
+                pass
+        return sth
+
+    def verify_consistency(self, prior_anchor: dict) -> tuple[bool, list[str]]:
+        """Prove the current log is an APPEND-ONLY extension of a previously-witnessed anchor() — the check an
+        auditor runs against an anchor they recorded out of band. Re-derives each chain's tip over its first
+        prior_anchor['n_*'] entries and confirms it equals the anchored tip, AND that the log did not shrink.
+        A mismatch means the operator REWROTE or ROLLED BACK history after the anchor — caught even though they
+        hold receipt_key and the rewrite verifies internally. Returns (ok, problems)."""
+        problems: list[str] = []
+        for kind, records, ntag, tiptag in (("write", self._receipts, "n_writes", "writes_tip"),
+                                            ("tombstone", self._tombstones, "n_tombstones", "tombstones_tip")):
+            n0 = int(prior_anchor.get(ntag, 0))
+            if len(records) < n0:
+                problems.append(f"{kind} log shrank: {len(records)} < anchored {n0} (rolled back / truncated)")
+                continue
+            tip = self._recompute_tip(records, n0, kind)
+            if tip is None:
+                problems.append(f"{kind} chain broken within the first {n0} entries (a prior entry was altered)")
+            elif tip != prior_anchor.get(tiptag):
+                problems.append(f"{kind} history rewritten after the anchor: tip {tip[:12]}.. != "
+                                f"anchored {str(prior_anchor.get(tiptag))[:12]}.. (fork detected)")
+        return (len(problems) == 0, problems)
 
     def retract_lineage(self, subject: str, reason: str = "lineage_corrected") -> dict:
         """Lineage-aware correction: the MIDDLE PATH between a value-only supersession (which leaves records

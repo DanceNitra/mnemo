@@ -6,7 +6,7 @@
 
 *Memory is the mother of the Muses. An agent with no memory has no ideas.*
 
-`pip install agora-mnemo` · [PyPI](https://pypi.org/project/agora-mnemo/) · [Hugging Face](https://huggingface.co/Danchi17/mnemo) · [DOI 10.5281/zenodo.21128549](https://doi.org/10.5281/zenodo.21128549) · [Homepage](https://dancenitra.github.io/mnemo/) · MIT · v0.7.20
+`pip install agora-mnemo` · [PyPI](https://pypi.org/project/agora-mnemo/) · [Hugging Face](https://huggingface.co/Danchi17/mnemo) · [DOI 10.5281/zenodo.21128549](https://doi.org/10.5281/zenodo.21128549) · [Homepage](https://dancenitra.github.io/mnemo/) · MIT · v0.7.22
 
 </div>
 
@@ -39,6 +39,36 @@ Only mnemo exposes a channel to undo a correction on command; mnemo's and mem0's
 capability gap survives at n=20. We lead with the cell we *don't* win: **echo-resurrection is a tie** — all
 three defend against a restated stale value. This is a narrow, adversarial, command-driven cut, not a general
 "mnemo is better" claim; run it yourself or add your system.
+
+## Governance, erasure & audit (0.7.22)
+
+mnemo ships tamper-evident governance primitives — built by auditing mnemo against a governance-evidence
+rubric, finding gaps, and closing them in the open. These are engineering, not novelty: each applies a
+well-known primitive, credited below.
+
+- **`anchor()` + `verify_consistency()`** — a Certificate-Transparency-style external anchor (a signed tree
+  head). The write/tombstone receipts are hash-chained, but an operator who *holds the receipt key* can rewrite
+  and re-chain the whole history so it still verifies internally. `anchor()` emits a compact commitment you
+  publish/witness out of band; `verify_consistency(prior_anchor)` then catches a key-holder rewrite or rollback.
+  *Prior art: RFC 6962 (Laurie-Langley-Kasper 2013); Crosby-Wallach 2009; Schneier-Kelsey 1999.*
+- **`forget_subject(subject, basis=, authorized_by=, authorization=)`** — right-to-erasure across derived
+  lineage, with an erasure tombstone that binds the act to an **authenticated principal** (Ed25519 signature
+  over the request, via `sign_erasure()`) and records the **decision basis** — both inside the tamper-evident
+  hash. An auditor verifies *who* authorized the deletion and *on what basis*, not a free-text id.
+- **`DeletionManifest`** (`mnemo.deletion_manifest`) — a **cross-store** erasure record: register every place a
+  subject's data lives (memory store, vector index, logs) as an `ErasureTarget`; it erases each, re-checks
+  residual recoverability, and is honest by construction — marks erasure `complete` only if *every* target
+  verified the data absent, and names leaking stores instead of certifying a false "deleted".
+- **`ErasureAuditor`** (`mnemo.erasure_auditor`) — after your app runs its deletion, adversarially re-attempts
+  **recovery** of the subject's values from each store (verbatim scan for text/caches; **NN-inversion** for a
+  vector index whose embeddings may survive). Answers "is the content still *reconstructible*?" — the check DSAR
+  tooling skips — not just "was the row deleted?". *A retained embedding reconstructs the content: Morris et al.,
+  "Text Embeddings Reveal (Almost) As Much As Text", EMNLP 2023; Ghost Vectors, arXiv 2606.18497.*
+
+Honest scope: these attest and audit the erasure ACT and residual recoverability across REGISTERED stores; they
+do not prove physical destruction, do not cover unregistered stores or backups, and the vector-recovery check is
+a lower bound on embedding inversion. When a store leaks, the fix is hard-delete + reindex or crypto-shredding
+(destroy the key, not the row — EDPB 05/2019; NIST SP 800-88).
 
 ## Install
 
