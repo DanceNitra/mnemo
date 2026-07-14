@@ -3330,8 +3330,13 @@ class Mnemo:
         3. keep-budget: mark the lowest-value surplus `superseded`.
 
         hub_coverage: a memory covering ≥ this fraction of the common vocabulary is a hub (0 disables).
-        link_duplicates: the dup pass is O(n²); pass False to skip it on large stores."""
-        active = [r for r in self.items if r["status"] == "active"]
+        link_duplicates: the dup pass is O(n²); pass False to skip it on large stores.
+
+        TENANT ISOLATION: on a tenant-bound store/view the dream pass operates ONLY on that tenant's rows, so
+        one tenant's consolidation can never link, hub-flag, supersede, or evict another tenant's memory. An
+        unbound store consolidates across everything (admin/legacy)."""
+        active = [r for r in self.items if r["status"] == "active"
+                  and (self.tenant is None or r.get("tenant") == self.tenant)]
         hubs = 0
         if hub_coverage and len(active) >= 50:
             toks, common = self._common_vocab(active)
@@ -3447,7 +3452,9 @@ class Mnemo:
         """Cheap greedy single-pass clustering of ACTIVE memories by similarity (O(n·#clusters)).
         Highest-value member is the cluster representative; each memory joins the most-similar
         cluster above the threshold, else starts its own. Lexical or semantic per the store's mode."""
-        active = sorted([r for r in self.items if r["status"] == "active"], key=lambda r: -r["value"])
+        active = sorted([r for r in self.items if r["status"] == "active"
+                         and (self.tenant is None or r.get("tenant") == self.tenant)],   # tenant-scoped clustering
+                        key=lambda r: -r["value"])
         cents: list[dict] = []
         for r in active:
             rvec = self._qvec(r["text"])
@@ -3564,7 +3571,8 @@ class Mnemo:
         """Flag mutually-incompatible memories among RELATED ones (similarity-gated) for human review.
         `incompatible(a_text, b_text)->bool` defaults to a negation/polarity heuristic."""
         inc = incompatible or _negation_clash
-        active = [r for r in self.items if r["status"] == "active"]
+        active = [r for r in self.items if r["status"] == "active"
+                  and (self.tenant is None or r.get("tenant") == self.tenant)]   # tenant-scoped
         flags = []
         for i, a in enumerate(active):
             avec = self._qvec(a["text"])             # embed each anchor once, not once per partner
@@ -3598,7 +3606,8 @@ class Mnemo:
         contradiction-on-assert (Doyle 1979) / AGM consistency-on-revision — brought into a zero-dependency
         memory store as a native, dependency-free primitive; the packaging is the point, not the idea."""
         inc = incompatible or (lambda a, b: _value_clash(a, b) or _negation_clash(a, b))
-        active = [r for r in self.items if r.get("status") == "active"]
+        active = [r for r in self.items if r.get("status") == "active"
+                  and (self.tenant is None or r.get("tenant") == self.tenant)]   # tenant-scoped conflict check
         hits, seen = [], set()
         if key is not None:                                    # (1) value change on a managed key
             for r in active:
@@ -3762,6 +3771,11 @@ class _TenantView:
     def forget_pii(self, *a, **k):      return Mnemo.forget_pii(self, *a, **k)
     def pii_report(self, *a, **k):      return Mnemo.pii_report(self, *a, **k)
     def remember_dedup(self, *a, **k):  return Mnemo.remember_dedup(self, *a, **k)
+    def consolidate(self, *a, **k):     return Mnemo.consolidate(self, *a, **k)
+    def consolidate_clusters(self, *a, **k): return Mnemo.consolidate_clusters(self, *a, **k)
+    def contradictions(self, *a, **k):  return Mnemo.contradictions(self, *a, **k)
+    def check_conflict(self, *a, **k):  return Mnemo.check_conflict(self, *a, **k)
+    def _cluster_active(self, *a, **k): return Mnemo._cluster_active(self, *a, **k)
     def _supersede_by_key(self, *a, **k): return Mnemo._supersede_by_key(self, *a, **k)
     def _tenant_rows(self, *a, **k):    return Mnemo._tenant_rows(self, *a, **k)
 

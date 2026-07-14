@@ -69,6 +69,35 @@ def test_forget_subject_is_tenant_scoped():
     assert len(store.items) == 1 and store.items[0].get("tenant") == "t2"
 
 
+def test_consolidation_does_not_cross_tenants():
+    # The dream pass (consolidate) links/dedups/supersedes; on a tenant view it must not touch other tenants.
+    store = Mnemo()
+    a = store.for_tenant("t1")
+    b = store.for_tenant("t2")
+    phrase = "restart the api gateway nightly at midnight utc per the runbook"
+    a.remember("t1: " + phrase)
+    b.remember("t2: " + phrase)            # near-duplicate across tenants -> would link if unscoped
+    a.consolidate(dup_threshold=0.5)
+    # no t1 row may link to a t2 row
+    t2_ids = {r["id"] for r in store.items if r.get("tenant") == "t2"}
+    for r in store.items:
+        if r.get("tenant") == "t1":
+            assert not (set(r.get("links") or []) & t2_ids)
+    # and t2's row is untouched (still active, no foreign toggle pointer)
+    t2row = [r for r in store.items if r.get("tenant") == "t2"][0]
+    assert t2row["status"] == "active"
+
+
+def test_unbound_consolidate_links_across_when_no_tenants():
+    # severe-test control: without tenants, the SAME corpus DOES link (proves the guard above prevents a real leak)
+    m = Mnemo()
+    phrase = "restart the api gateway nightly at midnight utc per the runbook"
+    m.remember("alpha: " + phrase)
+    m.remember("beta: " + phrase)
+    m.consolidate(dup_threshold=0.5)
+    assert sum(len(r.get("links") or []) for r in m.items) > 0
+
+
 def test_legacy_unbound_is_byte_identical():
     # No tenant anywhere -> no `tenant` key stamped, legacy supersession intact.
     m = Mnemo()
