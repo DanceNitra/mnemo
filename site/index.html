@@ -30,7 +30,7 @@
           "name": "mnemo",
           "applicationCategory": "DeveloperApplication",
           "operatingSystem": "Windows, macOS, Linux",
-          "softwareVersion": "1.4.0",
+          "softwareVersion": "1.5.0",
           "description": "A zero-dependency memory layer and MCP server for AI agents. Value-ranked recall, consolidation, and a first-class correction and erasure channel.",
           "license": "https://opensource.org/licenses/MIT",
           "url": "https://dancenitra.github.io/mnemo/",
@@ -101,7 +101,7 @@
         <!-- Beat 0 — hero -->
         <section class="panel panel--hero" data-beat="0">
           <div class="panel__inner reveal">
-            <p class="eyebrow">v1.4 · MIT · zero dependencies</p>
+            <p class="eyebrow">v1.5 · MIT · zero dependencies</p>
             <h1 class="hero__title">
               Agent memory that keeps a<br />
               <span class="glow-text">corrected fact corrected.</span>
@@ -171,7 +171,7 @@
           <li><b class="count" data-count="6">0</b><span>framework adapters</span></li>
           <li><b class="count" data-count="0.75" data-decimals="2">0</b><span>revert success (vs 0.20, n=20)</span></li>
           <li><b>A</b><span>Glama quality</span></li>
-          <li><b>v1.4</b><span>current release</span></li>
+          <li><b>v1.5</b><span>current release</span></li>
           <li><b>0</b><span>runtime dependencies</span></li>
         </ul>
       </section>
@@ -203,7 +203,7 @@
         </div>
         <div class="bench reveal" id="bench">
           <div class="bench__row" data-value="0.75" data-lo="0.53" data-hi="0.89" data-self="1">
-            <div class="bench__label">mnemo <span>1.4</span></div>
+            <div class="bench__label">mnemo <span>1.5</span></div>
             <div class="bench__track"><div class="bench__fill"></div><div class="bench__ci"></div></div>
             <div class="bench__num">0.75</div>
           </div>
@@ -239,8 +239,8 @@
           </article>
           <article class="card spotlight">
             <div class="card__icon" data-i="correct"></div>
-            <h3>Correction &amp; erasure</h3>
-            <p>A first-class channel: <code>revert</code>, <code>retract_lineage</code>, <code>echo_guard</code>, <code>forget_subject</code> — a corrected fact stays corrected.</p>
+            <h3>Correction, erasure &amp; time-travel</h3>
+            <p>A first-class channel: <code>revert</code>, <code>retract_lineage</code>, <code>echo_guard</code>, <code>forget_subject</code>. Bitemporal <code>as_of(when, as_recorded)</code> and <code>believed_at</code> reconstruct what the agent believed at any moment — a corrected fact stays corrected, and history stays auditable.</p>
           </article>
           <article class="card spotlight">
             <div class="card__icon" data-i="receipt"></div>
@@ -314,8 +314,8 @@
             <p>An RFC 6962 signed tree head over the write log. <code>anchor()</code> plus <code>verify_consistency()</code> catches a key-holder who rewrites history.</p>
           </article>
           <article class="card spotlight">
-            <h3>Authenticated erasure</h3>
-            <p><code>forget_subject</code> is bound to an Ed25519 principal with a decision basis. Deletion is an authorized act with a signed, chained tombstone.</p>
+            <h3>Authenticated erasure + proof</h3>
+            <p><code>forget_subject</code> is bound to an Ed25519 principal with a decision basis, and <code>compliance_receipt()</code> emits a signed, verifiable proof-of-erasure — the artifact a DPO hands a regulator under GDPR Art. 17.</p>
           </article>
           <article class="card spotlight">
             <h3>Reconstruction audit</h3>
