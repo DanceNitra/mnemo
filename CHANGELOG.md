@@ -3,6 +3,28 @@
 All notable changes to mnemo (`agora-mnemo`). Format loosely follows Keep a Changelog; versioning is semver
 (MAJOR = stable/breaking, MINOR = features, PATCH = fixes).
 
+## 1.6.0
+
+Hard tenant isolation + a PII floor — logical multi-tenancy enforced by the store, fail-closed.
+
+- **Tenant isolation, bound to the store (not a per-call arg).** `Mnemo(tenant="acme")` binds a store to one
+  tenant; `store.for_tenant(id)` hands out logically-isolated views over ONE shared physical store (shared
+  items/file/caches, no duplication). Every write is tenant-stamped; recall, keyed supersession, the echo
+  guard, erasure, **and the consolidation/dedup/contradictions/conflict paths** are hard-filtered to the
+  acting tenant — so no forgotten parameter can leak or mutate another tenant's data. An unbound store is the
+  admin view (sees all). Honest scope: logical in-process isolation, not a security boundary between hostile
+  tenants. Measured receipt: `probes/tenant_isolation_probe.py` (cross-tenant read leak 0/20 with name+value
+  detection, cross-tenant supersession 0, consolidation cross-links 0 — control shows 10 when unscoped —
+  poisoning 0, over-erasure 0).
+- **PII layer (a floor, not a DLP).** `detect_pii` / `redact_pii` module functions (regex; SSN/credit-card
+  matched before the broad phone pattern); `remember(pii=...)` tagging or store-wide `pii_detect=True`;
+  `recall(redact_pii=True)` masks PII in the RETURNED text only (the stored record is untouched);
+  `forget_pii()` sweeps + tombstones PII rows for data minimization; `pii_report()` audits exposure. Regex
+  catches structured formats and essentially no names — use a real DLP for detection; this is a
+  zero-dependency default for reducing raw PII flow into prompts.
+- README: 2-minute Quickstart up top; runnable `examples/` directory (basics, correction & erasure,
+  bring-your-own-embedder semantic recall).
+
 ## 1.5.0
 
 Provable forget + bitemporal audit — the governance/temporal pillar.

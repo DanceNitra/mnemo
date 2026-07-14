@@ -6,7 +6,7 @@
 
 *Memory is the mother of the Muses. An agent with no memory has no ideas.*
 
-`pip install agora-mnemo` · [PyPI](https://pypi.org/project/agora-mnemo/) · [Hugging Face](https://huggingface.co/Danchi17/mnemo) · [DOI 10.5281/zenodo.21128549](https://doi.org/10.5281/zenodo.21128549) · [Homepage](https://dancenitra.github.io/mnemo/) · MIT · v1.1.0
+`pip install agora-mnemo` · [PyPI](https://pypi.org/project/agora-mnemo/) · [Hugging Face](https://huggingface.co/Danchi17/mnemo) · [DOI 10.5281/zenodo.21128549](https://doi.org/10.5281/zenodo.21128549) · [Homepage](https://dancenitra.github.io/mnemo/) · MIT · v1.6.0
 
 </div>
 
@@ -19,6 +19,42 @@ the four things agent memory actually needs, the way that held up running in pro
 Most "agent memory" libraries are demos. This one is extracted from a system that has used it daily
 to curate a 6,000-note knowledge base, and whose consolidation behaviour we have **measured**, not
 assumed (see *Provenance* below).
+
+## Quickstart (2 minutes)
+
+```bash
+pip install agora-mnemo          # zero required dependencies
+```
+
+```python
+from mnemo import Mnemo
+
+m = Mnemo("memory.json")                      # persists to JSON; drop the path for pure in-memory
+
+m.remember("The API rate limit is 1000 req/min", key="api::rate_limit")
+m.remember("User prefers dark mode",            key="ui::theme")
+
+m.recall("what is the rate limit")            # -> ["The API rate limit is 1000 req/min"]
+
+# Correction is first-class: writing the same key supersedes the old value — no config, no LLM call.
+m.remember("The API rate limit is 5000 req/min", key="api::rate_limit")
+m.recall("rate limit")                        # -> ["The API rate limit is 5000 req/min"]  (only the current value)
+
+m.history("api::rate_limit")                  # -> full audit trail: [1000 -> 5000], oldest to newest
+```
+
+That is the whole loop most agents need: **remember, recall, correct, and audit** — in one zero-dependency
+file. Add `embed=your_model` for semantic recall; everything below is depth (governance, poison-resistance,
+bitemporal, multi-tenancy) you can reach for when you need it.
+
+Runnable examples live in [`examples/`](examples/): [basics](examples/01_basics.py) ·
+[correction & erasure](examples/02_correction_and_erasure.py) · [semantic recall](examples/03_semantic_recall.py).
+
+**Jump to:** [Correction (measured)](#correction-is-a-first-class-operation-measured-across-systems) ·
+[Governance & erasure](#governance-erasure--audit) · [Install](#install) ·
+[MCP server](#use-it-as-an-mcp-server-any-claude--cursor--agent-client) ·
+[The four operations](#the-four-operations) · [Five rules](#five-rules-it-wont-break-each-one-cost-us-to-learn) ·
+[Provenance & receipts](#provenance--why-these-rules-with-receipts) · [Threat model](#threat-model--layered-defense-adversarial-memory-integrity)
 
 ## Correction is a first-class operation (measured across systems)
 
@@ -40,7 +76,7 @@ capability gap survives at n=20. We lead with the cell we *don't* win: **echo-re
 three defend against a restated stale value. This is a narrow, adversarial, command-driven cut, not a general
 "mnemo is better" claim; run it yourself or add your system.
 
-## Governance, erasure & audit (0.7.22)
+## Governance, erasure & audit
 
 mnemo ships tamper-evident governance primitives — built by auditing mnemo against a governance-evidence
 rubric, finding gaps, and closing them in the open. These are engineering, not novelty: each applies a
