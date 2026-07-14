@@ -16,6 +16,7 @@ from .mnemo import (  # noqa: F401
     is_universal_executor,
     detect_pii,
     redact_pii,
+    new_encryption_key,
     __version__,
 )
 
@@ -30,5 +31,6 @@ __all__ = [
     "is_universal_executor",
     "detect_pii",
     "redact_pii",
+    "new_encryption_key",
     "__version__",
 ]

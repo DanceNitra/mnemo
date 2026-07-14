@@ -3,6 +3,24 @@
 All notable changes to mnemo (`agora-mnemo`). Format loosely follows Keep a Changelog; versioning is semver
 (MAJOR = stable/breaking, MINOR = features, PATCH = fixes).
 
+## 1.7.0
+
+Encryption-at-rest + crypto-shredding — the confidentiality leg of the governance layer (integrity +
+provenance + erasure + **confidentiality**). Standard primitives only; we do not roll our own crypto.
+
+- **`Mnemo(path=..., encrypt_key=...)`** (raw 32-byte key from `new_encryption_key()`) or **`encrypt_passphrase=...`**
+  (scrypt-stretched) encrypts the store at rest with **AES-256-GCM** (AEAD: confidentiality + tamper-detection),
+  a fresh random 96-bit nonce per save, file layout `MAGIC(5)+salt(16)+nonce(12)+ciphertext` with the header
+  authenticated as AAD. Opt-in, default OFF → byte-identical plaintext-JSON legacy. mnemo never persists the
+  key. A wrong key / tampered file **fails loud** (never a silent empty store). Needs the `cryptography` package.
+- **`shred()`** — crypto-shredding: destroy the in-memory key so the on-disk ciphertext (and every at-rest
+  backup of it) becomes permanently unrecoverable (NIST SP 800-88 key-destruction "Purge"), clearing plaintext
+  from RAM. Supports a GDPR Art.17 erasure workflow.
+- **Honest scope (documented, not overclaimed):** protects the store AT REST (a read file / stolen disk /
+  backup); does NOT protect a compromised running process (key + plaintext in RAM), the key holder, or against
+  malware — it is not end-to-end and not runtime protection. Prior art credited: SQLCipher, NIST SP 800-88,
+  age/Fernet. Receipt: `probes/encryption_at_rest_probe.py`; 10 tests in `tests/test_encryption.py`.
+
 ## 1.6.0
 
 Hard tenant isolation + a PII floor — logical multi-tenancy enforced by the store, fail-closed.

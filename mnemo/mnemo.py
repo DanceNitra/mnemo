@@ -62,6 +62,66 @@ try:                                  # OPTIONAL: only needed to SIGN write rece
 except Exception:
     _HAVE_ED = False
 
+try:                                  # OPTIONAL: only needed for encryption-at-rest (see encrypt_key=...).
+    from cryptography.hazmat.primitives.ciphers.aead import AESGCM as _AESGCM
+    from cryptography.hazmat.primitives.kdf.scrypt import Scrypt as _Scrypt
+    _HAVE_AEAD = True
+except Exception:
+    _HAVE_AEAD = False
+
+# ENCRYPTION-AT-REST + CRYPTO-SHREDDING (OPT-IN). Standard, vetted primitives only — we do NOT roll our own
+# crypto. The store file is AES-256-GCM (AEAD: confidentiality + tamper-detection) with a fresh random 96-bit
+# nonce PER SAVE (we re-encrypt the whole blob each save, so no nonce is ever reused with the same key). File
+# layout: MAGIC(5) + salt(16) + nonce(12) + ciphertext(+16B GCM tag); the MAGIC|salt|nonce header is fed as
+# AEAD associated data so a tampered header fails decryption. A raw 32-byte key is used directly; a passphrase
+# is stretched with scrypt (memory-hard). HONEST SCOPE (do not overclaim): this protects the store AT REST —
+# someone who reads the file, a stolen disk, or a backup. It does NOT protect a COMPROMISED RUNNING PROCESS
+# (the key + plaintext live in RAM), the key holder, or against malware/keyloggers; it is not end-to-end and
+# not runtime memory protection. CRYPTO-SHREDDING (shred()): destroying the key makes the ciphertext — and
+# every at-rest copy/backup of it — permanently unrecoverable (NIST SP 800-88 recognises key-destruction as a
+# valid "Purge"). Honest caveats: it cannot reach plaintext already copied to RAM/OS-swap, or any store that
+# was persisted UNENCRYPTED before a key was set. It SUPPORTS a GDPR Art.17 erasure workflow; it does not by
+# itself "guarantee compliance". Prior art credited: SQLCipher (embedded-DB at-rest AES), NIST SP 800-88
+# (cryptographic erasure), the `age`/Fernet file-encryption model (whose format we deliberately diverge from).
+_MNEMO_ENC_MAGIC = b"MNMO\x01"        # versioned so the on-disk format can migrate
+
+
+def new_encryption_key() -> bytes:
+    """A fresh random 32-byte (AES-256) key for Mnemo(encrypt_key=...). Store it yourself (a secrets manager /
+    OS keystore); mnemo never persists the key. Losing it = the store is unrecoverable (that IS crypto-shred)."""
+    return os.urandom(32)
+
+
+def _derive_key(passphrase: str, salt: bytes) -> bytes:
+    if not _HAVE_AEAD:
+        raise RuntimeError("encryption needs the `cryptography` package (pip install cryptography)")
+    return _Scrypt(salt=salt, length=32, n=2 ** 15, r=8, p=1).derive(passphrase.encode("utf-8"))
+
+
+def _encrypt_blob(key: bytes, plaintext: bytes, salt: bytes) -> bytes:
+    """AES-256-GCM encrypt `plaintext`; salt is carried only so a passphrase can be re-derived on load."""
+    if not _HAVE_AEAD:
+        raise RuntimeError("encryption needs the `cryptography` package (pip install cryptography)")
+    nonce = os.urandom(12)
+    header = _MNEMO_ENC_MAGIC + salt + nonce
+    ct = _AESGCM(key).encrypt(nonce, plaintext, header)   # header authenticated as AAD
+    return header + ct
+
+
+def _parse_enc_header(blob: bytes):
+    """-> (salt, nonce, header, ciphertext) or raise ValueError if not a mnemo-encrypted blob."""
+    if blob[:5] != _MNEMO_ENC_MAGIC:
+        raise ValueError("not a mnemo-encrypted store")
+    salt, nonce = blob[5:21], blob[21:33]
+    return salt, nonce, blob[:33], blob[33:]
+
+
+def _decrypt_blob(key: bytes, blob: bytes) -> bytes:
+    if not _HAVE_AEAD:
+        raise RuntimeError("encryption needs the `cryptography` package (pip install cryptography)")
+    salt, nonce, header, ct = _parse_enc_header(blob)
+    return _AESGCM(key).decrypt(nonce, ct, header)        # raises on wrong key / tampering
+
 _GENESIS = "0" * 64
 
 
@@ -251,7 +311,7 @@ def sign_erasure(principal_sk_hex: str, subject: str, request_id) -> str:
     sk = _Ed25519SK.from_private_bytes(bytes.fromhex(principal_sk_hex))
     return sk.sign(erasure_challenge(subject, request_id).encode()).hex()
 
-__version__ = "1.6.0"
+__version__ = "1.7.0"
 
 # Internal sentinel: marks a reaffirm write already authorized by submit_revert() (which verified the
 # signed INTENT). Object identity — no text/content path can ever produce it.
@@ -293,7 +353,8 @@ class Mnemo:
                  receipt_key: str | None = None, receipt_pubkey: str | None = None,
                  capacity: int | None = None, revert_authority: str | None = None,
                  revert_pubkey: str | None = None, max_text: int | None = None,
-                 tenant: str | None = None, pii_detect: bool = False):
+                 tenant: str | None = None, pii_detect: bool = False,
+                 encrypt_key: bytes | None = None, encrypt_passphrase: str | None = None):
         """path: optional JSON file to persist to. embed: optional fn(str)->list[float] for semantic
         recall; if omitted, recall uses lexical token overlap (zero dependencies).
 
@@ -510,11 +571,35 @@ class Mnemo:
         self._save_min_s = 5.0
         self._last_save = 0.0
         self._dirty = False
+        # ENCRYPTION-AT-REST (OPT-IN, default None -> plaintext JSON, byte-identical legacy). encrypt_key is a
+        # raw 32-byte AES-256 key (from new_encryption_key()); encrypt_passphrase is stretched with scrypt.
+        # mnemo NEVER persists the key/passphrase — you hold it; lose it and the store is unrecoverable (that IS
+        # crypto-shred). See the module-level note for the honest threat model + shred(). The key is resolved
+        # lazily against the on-disk salt so an existing encrypted store reloads with the same passphrase.
+        if encrypt_key is not None and (not isinstance(encrypt_key, (bytes, bytearray)) or len(encrypt_key) != 32):
+            raise ValueError("encrypt_key must be exactly 32 bytes (use mnemo.new_encryption_key())")
+        self._enc_rawkey = bytes(encrypt_key) if encrypt_key is not None else None
+        self._enc_passphrase = encrypt_passphrase
+        self._enc_salt = None                    # filled from the file header on load, or minted on first save
+        self._encrypted = bool(encrypt_key is not None or encrypt_passphrase is not None)
+        if self._encrypted and not _HAVE_AEAD:
+            raise RuntimeError("encryption needs the `cryptography` package (pip install cryptography)")
         if self.path and self.path.exists():
-            try:
-                self.items = json.loads(self.path.read_text(encoding="utf-8"))
-            except Exception:
-                self.items = []
+            raw = self.path.read_bytes()
+            if raw[:5] == _MNEMO_ENC_MAGIC:                           # encrypted store -> decrypt or FAIL LOUD
+                if not self._encrypted:
+                    raise ValueError("store is encrypted; pass encrypt_key= or encrypt_passphrase= to open it")
+                self._enc_salt = raw[5:21]                            # reuse the store's salt (passphrase re-derivation)
+                try:
+                    self.items = json.loads(_decrypt_blob(self._resolve_key(), raw))
+                except Exception as e:                                # wrong key / tampered / truncated -> never
+                    raise ValueError("cannot decrypt store (wrong key/passphrase, or the file was tampered)") from e
+                #                                                       silently return [] (would risk overwriting real data)
+            else:
+                try:
+                    self.items = json.loads(raw.decode("utf-8"))     # legacy plaintext JSON
+                except Exception:
+                    self.items = []
         # OPT-IN write receipts (default OFF -> zero behavior change; no sidecar created)
         self.receipts_enabled = bool(receipts or receipt_key)
         self._receipt_sk = receipt_key
@@ -3642,6 +3727,43 @@ class Mnemo:
         return {k: {"count": v["count"], "value": round(v["value"], 2),
                     "avg": round(v["value"] / v["count"], 2)} for k, v in out.items()}
 
+    def _resolve_key(self) -> bytes:
+        """The 32-byte AES key for this store. A raw key is used directly; a passphrase is scrypt-derived
+        against the store's salt (from the file header on load, or minted on first save) and cached so scrypt
+        isn't re-run on every save."""
+        if self._enc_rawkey is not None:
+            if self._enc_salt is None:
+                self._enc_salt = b"\x00" * 16          # raw key needs no KDF salt; fixed placeholder in the header
+            return self._enc_rawkey
+        if self._enc_passphrase is not None:
+            if self._enc_salt is None:
+                self._enc_salt = os.urandom(16)
+            if getattr(self, "_enc_derived", None) is None:
+                self._enc_derived = _derive_key(self._enc_passphrase, self._enc_salt)
+            return self._enc_derived
+        raise RuntimeError("no encryption key configured (was the store shredded?)")
+
+    def shred(self) -> dict:
+        """CRYPTO-SHRED: destroy the in-memory key so the encrypted store on disk — and EVERY at-rest copy or
+        backup of that ciphertext — becomes permanently unreadable (NIST SP 800-88 recognises key-destruction as
+        a 'Purge'). Requires an encrypted store; also clears the plaintext records from RAM. Returns a
+        content-free receipt. HONEST LIMITS (do not sell as more): it cannot reach plaintext already copied
+        elsewhere (another process's RAM, OS swap/hibernation, prior logs), nor any copy that was saved
+        UNENCRYPTED before a key was set. It SUPPORTS a right-to-erasure (GDPR Art.17) workflow; it does not by
+        itself certify compliance. The ciphertext file is left in place on purpose — the point of crypto-shred is
+        that you do NOT have to reach every copy; without the key they are all equally dead."""
+        if not self._encrypted:
+            raise RuntimeError("shred() requires an encrypted store (encrypt_key= / encrypt_passphrase=)")
+        self._enc_rawkey = None
+        self._enc_passphrase = None
+        self._enc_derived = None
+        n = len(self.items)
+        self.items = []
+        self._mat = None
+        self._tok_cache = {}
+        return {"shredded": True, "records_dropped": n, "ts": time.time(),
+                "note": "encryption key destroyed; the store at rest (and its backups) is now unrecoverable"}
+
     def _save(self, force: bool = False):
         if not self.path:
             return
@@ -3662,7 +3784,11 @@ class Mnemo:
             # concurrent-writer-safe — last writer wins, never a torn JSON file).
             data = json.dumps(slim, ensure_ascii=False, indent=1)
             tmp = self.path.with_name(self.path.name + ".tmp")
-            tmp.write_text(data, encoding="utf-8")
+            if self._encrypted:                                   # AES-256-GCM at rest (never a plaintext tmp)
+                key = self._resolve_key()                         # sets self._enc_salt on first save
+                tmp.write_bytes(_encrypt_blob(key, data.encode("utf-8"), self._enc_salt))
+            else:
+                tmp.write_text(data, encoding="utf-8")
             os.replace(tmp, self.path)
             self._last_save = now
             self._dirty = False
