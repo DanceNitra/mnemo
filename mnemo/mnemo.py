@@ -135,6 +135,67 @@ _NON_CONTENT = ("no sources were provided", "no sources provided", "i cannot", "
                 "as an ai language model", "as an ai", "i'm sorry", "i am sorry", "cannot assist",
                 "no information available", "not enough information", "none provided")
 
+# PII DETECTION (zero-dependency regex heuristic). Ordered by specificity so a more-specific pattern
+# (SSN, credit card) claims a span BEFORE a broader one (phone) can eat it. This is a lightweight DLP
+# HEURISTIC for tagging + masking, NOT a compliance-grade detector: it has false negatives (obfuscated
+# or non-Western formats, names, addresses) and false positives (an order id shaped like a card). Use it
+# to reduce raw-PII exposure into LLM prompts and to drive data-minimization sweeps, not as a guarantee
+# that a record is PII-free. Detection is deterministic and embedder-free. Order matters — see redact_pii.
+_PII_PATTERNS = (
+    ("ssn",         re.compile(r"\b\d{3}-\d{2}-\d{4}\b")),
+    ("email",       re.compile(r"\b[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}\b")),
+    ("credit_card", re.compile(r"\b(?:\d[ \-]?){13,16}\b")),
+    ("ipv4",        re.compile(r"\b(?:(?:25[0-5]|2[0-4]\d|1?\d?\d)\.){3}(?:25[0-5]|2[0-4]\d|1?\d?\d)\b")),
+    ("phone",       re.compile(r"(?<![\w.])\+?\d[\d\s\-().]{7,}\d(?![\w.])")),
+)
+
+
+def detect_pii(text: str) -> dict:
+    """Scan `text` and return {pii_type: [matched_substrings]} for every heuristic hit. Zero-dependency,
+    deterministic. Ordered so specific patterns (SSN/credit-card) match before the broad phone pattern can
+    absorb their digits. A HEURISTIC, not a guarantee — see _PII_PATTERNS. Returns {} when nothing matches."""
+    found: dict = {}
+    if not isinstance(text, str) or not text:
+        return found
+    spans: list = []                                  # claimed [start, end) so a broad pattern can't re-match
+    for label, pat in _PII_PATTERNS:
+        for m in pat.finditer(text):
+            s, e = m.start(), m.end()
+            if any(s < ce and cs < e for cs, ce in spans):   # overlaps an already-claimed (more specific) span
+                continue
+            spans.append((s, e))
+            found.setdefault(label, []).append(m.group(0))
+    return found
+
+
+def redact_pii(text: str, types=None, mask: str = "[{}]") -> tuple:
+    """Return (masked_text, {type: count}) with every detected PII span replaced by a typed placeholder
+    (default '[EMAIL]', '[SSN]', ...). `types`: optional iterable to restrict which PII types are masked
+    (default all). Non-destructive on the input string; operates right-to-left so offsets stay valid. Same
+    heuristic bounds as detect_pii — masks what it detects, no more."""
+    if not isinstance(text, str) or not text:
+        return text, {}
+    want = set(types) if types is not None else None
+    hits: list = []                                   # (start, end, label)
+    spans: list = []
+    for label, pat in _PII_PATTERNS:
+        if want is not None and label not in want:
+            continue
+        for m in pat.finditer(text):
+            s, e = m.start(), m.end()
+            if any(s < ce and cs < e for cs, ce in spans):
+                continue
+            spans.append((s, e))
+            hits.append((s, e, label))
+    counts: dict = {}
+    for s, e, label in sorted(hits, key=lambda h: h[0], reverse=True):
+        text = text[:s] + mask.format(label.upper()) + text[e:]
+        counts[label] = counts.get(label, 0) + 1
+    return text, counts
+
+
+redact_pii_fn = redact_pii   # stable module alias: recall()'s `redact_pii` bool param shadows the function name
+
 
 def is_universal_executor(tool, signature=None) -> bool:
     """True if `tool` is a verb-polymorphic UNIVERSAL EXECUTOR whose reversibility cannot be decided from its
@@ -190,7 +251,7 @@ def sign_erasure(principal_sk_hex: str, subject: str, request_id) -> str:
     sk = _Ed25519SK.from_private_bytes(bytes.fromhex(principal_sk_hex))
     return sk.sign(erasure_challenge(subject, request_id).encode()).hex()
 
-__version__ = "1.5.0"
+__version__ = "1.6.0"
 
 # Internal sentinel: marks a reaffirm write already authorized by submit_revert() (which verified the
 # signed INTENT). Object identity — no text/content path can ever produce it.
@@ -231,7 +292,8 @@ class Mnemo:
     def __init__(self, path: str | None = None, embed=None, receipts: bool = False,
                  receipt_key: str | None = None, receipt_pubkey: str | None = None,
                  capacity: int | None = None, revert_authority: str | None = None,
-                 revert_pubkey: str | None = None, max_text: int | None = None):
+                 revert_pubkey: str | None = None, max_text: int | None = None,
+                 tenant: str | None = None, pii_detect: bool = False):
         """path: optional JSON file to persist to. embed: optional fn(str)->list[float] for semantic
         recall; if omitted, recall uses lexical token overlap (zero dependencies).
 
@@ -245,6 +307,31 @@ class Mnemo:
         so a third party can verify it with the public key only. (Standalone version: agora-agent-receipts.)"""
         self.path = Path(path) if path else None
         self.embed = embed
+        # HARD TENANT ISOLATION (OPT-IN, default None -> unbound -> byte-identical legacy). Binding a store to
+        # a tenant (Mnemo(tenant="acme")) makes isolation a STORE PROPERTY, not a per-call argument a caller can
+        # forget: every remember() is stamped with this tenant, and every read/supersession/erasure the store
+        # performs is HARD-filtered to it. The guarantee is FAIL-CLOSED and non-bypassable from the content path:
+        #   - recall() returns ONLY this tenant's records (a wrong/absent tenant sees nothing, never another
+        #     tenant's data) — unlike the soft `scope=` recall arg, which sees everything if the caller omits it;
+        #   - keyed supersession + the echo guard compare only WITHIN this tenant, so tenant A writing key
+        #     "billing::plan" can never retire tenant B's same-key fact (cross-tenant write-through is closed);
+        #   - forget_subject()/forget_pii()/pii_report() only ever touch this tenant's rows.
+        # An UNBOUND store (tenant=None) is the admin/migration view: it sees + supersedes across everything
+        # (legacy behavior) and its writes carry no tenant tag, so they are invisible to any tenant-bound store.
+        # HONEST SCOPE: this isolates within ONE mnemo store (logical multi-tenancy — the right model when many
+        # agents share a process); it is NOT a substitute for separate stores/encryption keys when tenants are
+        # mutually hostile and the process itself is the trust boundary. Mixing tenant-tagged and untagged writes
+        # in one store is a migration state, not a steady one. Reversible: tenant=None. Receipt:
+        # mnemo/probes/tenant_isolation_probe.py (measured cross-tenant leak 0/N).
+        self.tenant = str(tenant) if tenant is not None else None
+        # PII AUTO-DETECTION (OPT-IN, default OFF -> zero behavior change). When True, remember() runs the
+        # zero-dependency regex detector (detect_pii) over each write and stamps rec['pii'] = [types...] so PII
+        # records can be masked in-use (recall(redact_pii=True)), swept (forget_pii), and audited (pii_report).
+        # A HEURISTIC (false negatives on obfuscated/non-Western formats + names/addresses; false positives on
+        # PII-shaped ids), NOT a DLP guarantee — it REDUCES raw-PII exposure into LLM prompts + drives
+        # data-minimization, it does not certify a record PII-free. Callers can also force/override per write with
+        # remember(..., pii=True | ["email", ...]). Reversible: pii_detect=False.
+        self.pii_detect = bool(pii_detect)
         # Bounded working set (OPT-IN, default None = unbounded append-only, byte-identical legacy).
         # When set, remember() hard-evicts the lowest-value ACTIVE memories past `capacity` using the
         # verified two-tier policy (value-protected + recency-aged, Lab 29992a). Lets mnemo run in
@@ -464,7 +551,8 @@ class Mnemo:
                  mtype: str | None = None, valid_from: float | None = None,
                  source: dict | None = None, key: str | None = None,
                  derived_from: list | None = None, attestation=None, derived: bool = False,
-                 object: str | None = None, reaffirm: bool = False, capability: str | None = None) -> str:
+                 object: str | None = None, reaffirm: bool = False, capability: str | None = None,
+                 pii=None) -> str:
         """Append-only raw capture. Stamped with an absolute UTC time; never edited afterward.
         mtype in {episodic, semantic, procedural} sets the decay prior (episodic fades fast,
         semantic slow, procedural barely); inferred from the text if not given. Pass it explicitly
@@ -519,6 +607,23 @@ class Mnemo:
                "status": "active", "links": [], "meta": dict(meta or {})}
         if _trunc_from is not None:
             rec["meta"]["truncated_from"] = _trunc_from
+        # TENANT STAMP: bind this write to the store's tenant so recall/supersession/erasure can isolate it.
+        # Unbound stores (tenant=None) leave no tag -> byte-identical legacy.
+        if self.tenant is not None:
+            rec["tenant"] = self.tenant
+        # PII TAG: record which PII types this write carries, for masking (recall(redact_pii=True)),
+        # data-minimization sweeps (forget_pii), and audit (pii_report). `pii` overrides/forces detection:
+        #   pii=True -> auto-detect types; pii=["email",...] -> use these types verbatim; pii=False -> tag none;
+        #   pii=None (default) -> auto-detect iff the store has pii_detect=True. Detection is on the ORIGINAL text.
+        _pii_types = None
+        if pii is False:
+            _pii_types = []
+        elif isinstance(pii, (list, tuple, set)):
+            _pii_types = sorted({str(p) for p in pii})
+        elif pii is True or (pii is None and self.pii_detect):
+            _pii_types = sorted(detect_pii(text).keys())
+        if _pii_types:
+            rec["pii"] = _pii_types
         # TAINT INHERITANCE (provenance that rides through transformation): when this memory is DERIVED from
         # others (a summary, a consolidation, an LLM rewrite), it inherits the union of its parents' canonical
         # sources — transitively, since a parent's own inherited taint is included. Without this, an app-side
@@ -816,9 +921,10 @@ class Mnemo:
         if not k:
             return
         vf_new = rec.get("valid_from", rec["ts"])
+        tv = rec.get("tenant")                         # tenant isolation: only same-tenant records collide on a key
         if self.echo_guard and not reaffirm:
             new_sig = self._obj_sig(rec)
-            same_key = [r for r in self.items if r is not rec and r.get("key") == k]
+            same_key = [r for r in self.items if r is not rec and r.get("key") == k and r.get("tenant") == tv]
             active = [r for r in same_key if r.get("status") == "active"]
             # OBJECT-LESS CLOBBER GUARD: on a key managed with explicit objects (a value ledger), a keyed
             # write carrying NO object cannot displace an object-bearing value — measured hole: a value-free
@@ -847,7 +953,7 @@ class Mnemo:
                 m["superseded_by_policy"] = "echo_guard"
                 return                                 # current value preserved; skip normal supersession
         for r in self.items:
-            if r is rec or r.get("status") != "active" or r.get("key") != k:
+            if r is rec or r.get("status") != "active" or r.get("key") != k or r.get("tenant") != tv:
                 continue
             vf_r = r.get("valid_from", r["ts"])
             if vf_r <= vf_new:                 # r is the older value -> retire it
@@ -983,7 +1089,8 @@ class Mnemo:
         # match the subject against canonical sources; accept either the raw string the caller wrote or its
         # entity-resolved form (_canon_source collapses "user-42"/"user_42"/"User 42" -> one canonical id).
         cand = {subject, Mnemo._canon_source(subject)}
-        subj_ids = [r["id"] for r in self.items if cand & Mnemo._rec_sources(r)]
+        subj_ids = [r["id"] for r in self.items if cand & Mnemo._rec_sources(r)
+                    and (self.tenant is None or r.get("tenant") == self.tenant)]   # tenant isolation on erasure
         if not subj_ids:
             return {"erased": 0, "ids": [], "request_id": request_id, "tombstones": 0}
         now = time.time()
@@ -993,6 +1100,83 @@ class Mnemo:
                                  authorized_by=authorized_by, authorization=authorization)
         return {"erased": res["forgotten"], "ids": res["ids"],
                 "request_id": request_id, "tombstones": len(res["ids"])}
+
+    def _tenant_rows(self) -> list:
+        """The records THIS store is allowed to touch: all rows for an unbound (admin) store, else only the
+        bound tenant's rows. The one place tenant scoping is resolved for the whole-store audit/sweep methods."""
+        if self.tenant is None:
+            return list(self.items)
+        return [r for r in self.items if r.get("tenant") == self.tenant]
+
+    def pii_report(self) -> dict:
+        """Audit view of PII exposure across this store (tenant-scoped when bound): how many ACTIVE records
+        carry each detected PII type, and their ids. Reads the `pii` tags stamped at write time (pii_detect /
+        remember(pii=...)); it does NOT re-scan text here, so it reflects exactly what was tagged. Use it to
+        drive a data-minimization review or a forget_pii() sweep. Read-only; returns no raw PII values.
+
+        Returns {records_with_pii, by_type: {type: count}, ids: {type: [id,...]}}."""
+        by_type: dict = {}
+        ids: dict = {}
+        n = 0
+        for r in self._tenant_rows():
+            if r.get("status") != "active":
+                continue
+            types = r.get("pii")
+            if not types:
+                continue
+            n += 1
+            for t in types:
+                by_type[t] = by_type.get(t, 0) + 1
+                ids.setdefault(t, []).append(r["id"])
+        return {"records_with_pii": n, "by_type": by_type, "ids": ids}
+
+    def forget_pii(self, types=None, subject: str | None = None, request_id: str | None = None,
+                   basis: str | None = None) -> dict:
+        """DATA-MINIMIZATION SWEEP: hard-delete (+ tombstone) every record carrying a PII tag, optionally
+        restricted to specific `types` (e.g. ['email','ssn']) and/or a `subject` (a canonical source string,
+        as in forget_subject). Tenant-scoped when the store is bound. Like forget_subject this genuinely REMOVES
+        content and records a content-free, hash-chained tombstone per erased row so verify_writes() reads the
+        deletion as deliberate, not tampering. Same HONEST SCOPE as forget_subject: erases within THIS mnemo
+        store only, not the app's vector store / logs / backups; not a compliance certification.
+
+        Returns {erased, ids, request_id, tombstones}."""
+        want = set(types) if types is not None else None
+        cand = None
+        if subject is not None:
+            cand = {subject, Mnemo._canon_source(subject)}
+        target = []
+        for r in self._tenant_rows():
+            tags = r.get("pii")
+            if not tags:
+                continue
+            if want is not None and not (want & set(tags)):
+                continue
+            if cand is not None and not (cand & Mnemo._rec_sources(r)):
+                continue
+            target.append(r["id"])
+        if not target:
+            return {"erased": 0, "ids": [], "request_id": request_id, "tombstones": 0}
+        now = time.time()
+        res = self.forget(ids=target)
+        for mid in res["ids"]:
+            self._emit_tombstone(mid, now, request_id, basis=basis or "pii_minimization")
+        return {"erased": res["forgotten"], "ids": res["ids"],
+                "request_id": request_id, "tombstones": len(res["ids"])}
+
+    def for_tenant(self, tenant: str):
+        """Return a TENANT VIEW over THIS store (one physical store, many logically-isolated tenants). The view
+        SHARES this store's items, caches, file, and config by reference — so `store.for_tenant('a')` and
+        `store.for_tenant('b')` read/write ONE store with no clobber — but every write it makes is stamped with
+        its tenant and every read/supersession/erasure it performs is hard-filtered to it (fail-closed, exactly
+        like a tenant-bound Mnemo). Typical use: the operator holds the unbound `store` (admin/migration view)
+        and hands each request a `store.for_tenant(user_id)` handle that cannot see another tenant's data.
+
+            store = Mnemo(path="all.json")
+            acme = store.for_tenant("acme"); acme.remember("secret", key="k", object="s")
+            globex = store.for_tenant("globex")
+            acme.recall("secret")     # -> only acme rows; globex.recall(...) never sees them
+        """
+        return _TenantView(self, str(tenant))
 
     def erasure_report(self) -> dict:
         """Audit view of deliberate erasures: total tombstones + each {memory_id, ts, request_id}. Read-only;
@@ -1853,7 +2037,8 @@ class Mnemo:
                prefer=None, prefer_trust: float = 1.0,
                prefer_max_boost: float | None = None, near: dict | None = None,
                tie_recent: float | None = None,
-               with_status: bool = False, with_warrant: bool = False) -> list[dict]:
+               with_status: bool = False, with_warrant: bool = False,
+               redact_pii: bool = False) -> list[dict]:
         """Top-k memories by RELEVANCE × VALUE — high-value memories outrank merely-similar ones.
         Memories the dream pass flagged as hubs (universal matchers) are skipped unless include_hubs.
 
@@ -2002,6 +2187,11 @@ class Mnemo:
                 return include_hubs
             return include_superseded            # superseded / other non-active
         pool = [r for r in self.items if _eligible(r)]
+        # HARD TENANT ISOLATION (fail-closed, non-bypassable): a tenant-bound store sees ONLY its own tenant's
+        # records, always — this is enforced here on the STORE, not via a caller argument, so no forgotten
+        # parameter can leak another tenant's data. An unbound store (tenant=None) is the admin view (sees all).
+        if self.tenant is not None:
+            pool = [r for r in pool if r.get("tenant") == self.tenant]
         # Scope/namespace isolation: when a scope is requested, recall ONLY sees memories tagged with that scope
         # (meta['scope']) BEFORE ranking — a shared store (e.g. many agents / tenants in one Mnemo) cannot bleed
         # one scope's memories into another's recall. scope=None (default) sees everything (legacy behavior).
@@ -2224,6 +2414,15 @@ class Mnemo:
                     _o["warrant"] = "corroborated"
                 else:
                     _o["warrant"] = "unwarranted"
+            if r.get("pii"):
+                _o["pii"] = list(r["pii"])          # surface which PII types this record carries (audit/branch)
+            # PII MASKING (OPT-IN redact_pii): mask detected PII in the RETURNED text only — the stored record is
+            # untouched, so an agent gets usable context without raw PII flowing into an LLM prompt. Heuristic
+            # (detect_pii bounds); pair with pii_detect/forget_pii for data-minimization, not as a guarantee.
+            if redact_pii:
+                _o["text"], _masked = redact_pii_fn(_o["text"])
+                if _masked:
+                    _o["pii_masked"] = _masked
             out.append(_o)
         # AUTO-STAMP LINEAGE: remember what this recall surfaced, so a derived write built from it (a summary
         # written next) can inherit these as parents. Store-carried lineage from the recall->write flow.
@@ -3526,6 +3725,45 @@ def _value_clash(a: str, b: str) -> bool:
     # (_WORD requires length >= 3), so a multi-digit value ('...is 123') would otherwise spuriously make
     # the skeletons differ and miss the update. Strip numbers first, exactly as before this guard existed.
     return _tokens(_NUM.sub("", a)) == _tokens(_NUM.sub("", b))   # identical apart from the one value
+
+
+class _TenantView:
+    """A logically-isolated view over a shared Mnemo store (see Mnemo.for_tenant). It carries its OWN `tenant`
+    but forwards EVERY other attribute to the parent store, so all data + config are shared by reference (one
+    items list, one file, one cache) while the tenant-sensitive operations run bound to THIS view's tenant.
+
+    Implementation: the handful of tenant-aware Mnemo methods are re-bound onto the view (so `self.tenant` inside
+    them is the VIEW's tenant), and their tenant-aware internal helpers (_supersede_by_key, _tenant_rows) are
+    re-bound too; everything else (`items`, `_save`, `_qvec`, `embed`, config flags, ...) resolves to the parent
+    via __getattr__, so reads/writes land on the shared store. Non-tenant methods (consolidate, credit, verify_*,
+    anchor, route, ...) are used as-is on the parent through __getattr__ and are unaffected by tenancy."""
+    __slots__ = ("_parent", "tenant")
+
+    def __init__(self, parent: "Mnemo", tenant: str):
+        object.__setattr__(self, "_parent", parent)
+        object.__setattr__(self, "tenant", tenant)
+
+    def __getattr__(self, name):                 # anything not on the view -> the shared parent store
+        return getattr(self._parent, name)
+
+    def __setattr__(self, name, value):          # config writes go to the shared parent (tenant is slot-local)
+        if name == "tenant":
+            object.__setattr__(self, name, value)
+        else:
+            setattr(self._parent, name, value)
+
+    def for_tenant(self, tenant: str):           # re-scope from the same shared store
+        return _TenantView(self._parent, str(tenant))
+
+    # tenant-sensitive surface: rebound so `self` is the VIEW (its tenant), state stays the parent's
+    def remember(self, *a, **k):        return Mnemo.remember(self, *a, **k)
+    def recall(self, *a, **k):          return Mnemo.recall(self, *a, **k)
+    def forget_subject(self, *a, **k):  return Mnemo.forget_subject(self, *a, **k)
+    def forget_pii(self, *a, **k):      return Mnemo.forget_pii(self, *a, **k)
+    def pii_report(self, *a, **k):      return Mnemo.pii_report(self, *a, **k)
+    def remember_dedup(self, *a, **k):  return Mnemo.remember_dedup(self, *a, **k)
+    def _supersede_by_key(self, *a, **k): return Mnemo._supersede_by_key(self, *a, **k)
+    def _tenant_rows(self, *a, **k):    return Mnemo._tenant_rows(self, *a, **k)
 
 
 if __name__ == "__main__":
