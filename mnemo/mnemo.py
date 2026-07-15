@@ -311,7 +311,7 @@ def sign_erasure(principal_sk_hex: str, subject: str, request_id) -> str:
     sk = _Ed25519SK.from_private_bytes(bytes.fromhex(principal_sk_hex))
     return sk.sign(erasure_challenge(subject, request_id).encode()).hex()
 
-__version__ = "1.7.0"
+__version__ = "1.8.0"
 
 # Internal sentinel: marks a reaffirm write already authorized by submit_revert() (which verified the
 # signed INTENT). Object identity — no text/content path can ever produce it.
@@ -1153,8 +1153,24 @@ class Mnemo:
                 pass
         return t
 
+    def register_erasure_target(self, target) -> "Mnemo":
+        """Register an APP-SIDE store (the app's vector index, an embedding/response cache, a retrieval log)
+        for cross-store right-to-erasure. Targets implement the two-method ErasureTarget protocol
+        (mnemo.deletion_manifest): erase(subject) and still_recoverable(subject, values). Once any target is
+        registered, forget_subject() cascades the erasure through every target and returns a hash-chained
+        DeletionManifest that is honest BY CONSTRUCTION: 'complete' only if every store (this one included)
+        verified the data no longer recoverable, and it NAMES the stores that still leak. Targets are live
+        client adapters, so they are RAM-only: re-register on every process start. Motivated by a measured
+        gap: a copy the app embedded into its own vector index survives every memory store's native delete
+        (erasure_fanout_probe: 8/8) — the store alone cannot fix that; a registered fan-out can."""
+        if not hasattr(self, "_erasure_targets"):
+            self._erasure_targets = []
+        self._erasure_targets.append(target)
+        return self
+
     def forget_subject(self, subject: str, request_id: str | None = None, basis: str | None = None,
-                       authorized_by: str | None = None, authorization: str | None = None) -> dict:
+                       authorized_by: str | None = None, authorization: str | None = None,
+                       values=None) -> dict:
         """RIGHT-TO-ERASURE across provenance lineage, with a tamper-evident audit of the ACT. Hard-deletes
         every active memory ATTRIBUTABLE to `subject` — its own canonical source OR any record that inherited
         `subject` through derived_from taint (so a summary/consolidation built from the subject's data is erased
@@ -1178,13 +1194,57 @@ class Mnemo:
                     and (self.tenant is None or r.get("tenant") == self.tenant)]   # tenant isolation on erasure
         if not subj_ids:
             return {"erased": 0, "ids": [], "request_id": request_id, "tombstones": 0}
+        # capture the sensitive values BEFORE deletion so the cross-store residue check has something to
+        # verify against (caller-supplied `values` win; else the erased records' own text/object strings).
+        targets = list(getattr(self, "_erasure_targets", []))
+        if targets and values is None:
+            ids_set = set(subj_ids)
+            values = []
+            for r in self.items:
+                if r["id"] in ids_set:
+                    for v in (r.get("text"), r.get("object")):
+                        if v and str(v).strip():
+                            values.append(str(v))
         now = time.time()
         res = self.forget(ids=subj_ids)
         for mid in res["ids"]:
             self._emit_tombstone(mid, now, request_id, basis=basis,
                                  authorized_by=authorized_by, authorization=authorization)
-        return {"erased": res["forgotten"], "ids": res["ids"],
-                "request_id": request_id, "tombstones": len(res["ids"])}
+        out = {"erased": res["forgotten"], "ids": res["ids"],
+               "request_id": request_id, "tombstones": len(res["ids"])}
+        if targets:
+            out["manifest"] = self._erasure_manifest(subject, values or [], targets, request_id,
+                                                     basis, authorized_by, already_erased=res["forgotten"])
+        return out
+
+    def _erasure_manifest(self, subject: str, values: list, targets: list, request_id, basis,
+                          authorized_by, already_erased: int) -> dict:
+        """Cascade a subject erasure through the registered app-side targets and return the hash-chained
+        DeletionManifest. This store itself is always the FIRST target (self-check on the same instrument):
+        after the purge above, is any captured value still recoverable from items/recall? Honest scope is
+        carried inside the manifest; see deletion_manifest.DeletionManifest."""
+        from .deletion_manifest import DeletionManifest, ErasureTarget
+
+        store = self
+        n_erased = already_erased
+
+        class _SelfTarget(ErasureTarget):
+            name = "mnemo-store"
+
+            def erase(self, subj):                       # already purged by forget_subject
+                return {"erased": n_erased}
+
+            def still_recoverable(self, subj, vals):
+                blob = " ".join((r.get("text") or "") + " " + str(r.get("object") or "")
+                                for r in store.items).lower()
+                return any(v.lower() in blob for v in (vals or []) if v)
+
+        man = DeletionManifest()
+        man.register(_SelfTarget())
+        for t in targets:
+            man.register(t)
+        return man.execute(subject, values, request_id=request_id, basis=basis,
+                           authorized_by=authorized_by)
 
     def _tenant_rows(self) -> list:
         """The records THIS store is allowed to touch: all rows for an unbound (admin) store, else only the

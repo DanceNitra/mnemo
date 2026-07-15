@@ -3,6 +3,29 @@
 All notable changes to mnemo (`agora-mnemo`). Format loosely follows Keep a Changelog; versioning is semver
 (MAJOR = stable/breaking, MINOR = features, PATCH = fixes).
 
+## 1.8.0
+
+Cross-store erasure becomes a first-class operation. Motivated by a measured gap (audit report, July 2026):
+a copy the application embedded into its OWN vector index survives every memory store's native delete (8/8 in
+our cell, mnemo included) — the store alone cannot fix that, because it cannot see infrastructure it was never
+told about. 1.8.0 wires the fan-out into the erasure path:
+
+- **`register_erasure_target(target)`** — register app-side stores (the app's vector index, embedding/response
+  caches, retrieval logs) implementing the two-method `ErasureTarget` protocol (`erase(subject)`,
+  `still_recoverable(subject, values)`). Targets are live client adapters, so they are RAM-only: re-register on
+  process start.
+- **`forget_subject(...)` cascades**: with targets registered it erases the store (as before), then every
+  registered target, re-checks residual recoverability per target, and returns a hash-chained **`manifest`**
+  in its result — honest by construction: `complete` is True only if EVERY store (mnemo itself included, as the
+  first self-checked target) verified the value no longer recoverable, and leaking stores are NAMED in
+  `residual_targets`. Check values are captured automatically from the erased records (or pass `values=[...]`).
+- Measured (deterministic cell, n=8): unwired external index leaks 8/8 after a store-native delete; wired it
+  erases 0/8 with 8/8 `complete` manifests whose chains verify; a deliberately broken wiring produces ZERO
+  falsely-complete receipts and names the leak 8/8. The receipt cannot lie about the fan-out it was given.
+- **Honest scope (unchanged philosophy):** the manifest covers only REGISTERED targets — unknown copies stay
+  unknown; it attests recoverability at check time, not physical destruction, and does not cover backups or
+  embedding inversion of retained vectors. New tests: `tests/test_erasure_manifest_integration.py` (6).
+
 ## 1.7.0
 
 Encryption-at-rest + crypto-shredding — the confidentiality leg of the governance layer (integrity +

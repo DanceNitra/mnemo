@@ -91,10 +91,14 @@ well-known primitive, credited below.
   lineage, with an erasure tombstone that binds the act to an **authenticated principal** (Ed25519 signature
   over the request, via `sign_erasure()`) and records the **decision basis** — both inside the tamper-evident
   hash. An auditor verifies *who* authorized the deletion and *on what basis*, not a free-text id.
-- **`DeletionManifest`** (`mnemo.deletion_manifest`) — a **cross-store** erasure record: register every place a
-  subject's data lives (memory store, vector index, logs) as an `ErasureTarget`; it erases each, re-checks
-  residual recoverability, and is honest by construction — marks erasure `complete` only if *every* target
-  verified the data absent, and names leaking stores instead of certifying a false "deleted".
+- **Cross-store erasure, first-class (1.8.0)** — a copy the app embedded into its *own* vector index survives
+  every memory store's native delete (8/8 in our measured cell, mnemo included). The fix:
+  `register_erasure_target(target)` your app-side stores (vector index, caches, logs — the two-method
+  `ErasureTarget` protocol), and `forget_subject()` cascades the erasure through every one and returns a
+  hash-chained **manifest** — honest by construction: `complete` only if *every* store (mnemo self-checked
+  first) verified the value no longer recoverable, leaking stores NAMED. Measured: unwired 8/8 leak → wired
+  0/8 with verifying chains; a broken wiring cannot produce a clean receipt (0/8 falsely complete).
+  `DeletionManifest` (`mnemo.deletion_manifest`) remains usable standalone.
 - **`ErasureAuditor`** (`mnemo.erasure_auditor`) — after your app runs its deletion, adversarially re-attempts
   **recovery** of the subject's values from each store (verbatim scan for text/caches; **NN-inversion** for a
   vector index whose embeddings may survive). Answers "is the content still *reconstructible*?" — the check DSAR
