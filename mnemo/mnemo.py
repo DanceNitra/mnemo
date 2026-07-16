@@ -294,6 +294,19 @@ def sign_revert(principal_sk_hex: str, challenge: str) -> str:
     return sk.sign(challenge.encode()).hex()
 
 
+def sign_support(source_sk_hex: str, challenge: str) -> str:
+    """Source-side, OFF the memory store's box: Ed25519-sign a support challenge string obtained from
+    Mnemo.support_challenge_for(key, toward). The hex signature is passed to observe(..., support=[(source_
+    pubkey_hex, sig_hex), ...]). The store verifies it against the allowlist but can never mint it, so a
+    content-path attacker cannot fabricate a corroborating ground — self-minted identities count zero. The
+    challenge binds the CURRENT record id and tenant, so a captured signature cannot be replayed after the
+    value legitimately changes (and changes back) or across tenants. Needs `cryptography`."""
+    if not _HAVE_ED:
+        raise RuntimeError("signing a support ground needs the `cryptography` package (pip install cryptography)")
+    sk = _Ed25519SK.from_private_bytes(bytes.fromhex(source_sk_hex))
+    return sk.sign(challenge.encode()).hex()
+
+
 def erasure_challenge(subject: str, request_id) -> str:
     """The canonical message an authorizing principal signs to bind an erasure to itself: a right-to-erasure
     request for `subject` under `request_id`. sign_erasure() signs this; the tombstone carries the signature so
@@ -311,7 +324,7 @@ def sign_erasure(principal_sk_hex: str, subject: str, request_id) -> str:
     sk = _Ed25519SK.from_private_bytes(bytes.fromhex(principal_sk_hex))
     return sk.sign(erasure_challenge(subject, request_id).encode()).hex()
 
-__version__ = "1.9.3"
+__version__ = "1.9.4"
 
 # Internal sentinel: marks a reaffirm write already authorized by submit_revert() (which verified the
 # signed INTENT). Object identity — no text/content path can ever produce it.
@@ -354,7 +367,8 @@ class Mnemo:
                  capacity: int | None = None, revert_authority: str | None = None,
                  revert_pubkey: str | None = None, max_text: int | None = None,
                  tenant: str | None = None, pii_detect: bool = False,
-                 encrypt_key: bytes | None = None, encrypt_passphrase: str | None = None):
+                 encrypt_key: bytes | None = None, encrypt_passphrase: str | None = None,
+                 support_authorities: list | None = None):
         """path: optional JSON file to persist to. embed: optional fn(str)->list[float] for semantic
         recall; if omitted, recall uses lexical token overlap (zero dependencies).
 
@@ -429,6 +443,19 @@ class Mnemo:
         # never MINT an authorization -> even a compromised on-box harness cannot forge a revert. Closes the
         # symmetric mode's residual (whoever holds the HMAC secret can mint). Both need cryptography for Ed25519.
         self.revert_pubkey = revert_pubkey
+        # SIGNED-GROUNDS AUTHORITIES (1.9.4, marintkael r/RAG round 3). His residual on support-keyed reopen:
+        # novelty-of-support is spoofable because the support strings ride the same read path the attacker owns
+        # -> minting two DISTINCT fabricated strings still corroborates. When support_authorities is set (an
+        # allowlist of Ed25519 public-key hexes held OUT of the content path), a novel support ground counts
+        # toward the reopen threshold ONLY if it carries a valid signature by an allowlisted authority over the
+        # canonical (key, contradicted-value) challenge, and independence is then measured by DISTINCT VERIFIED
+        # KEYS, not distinct strings. So the fabricated-grounds attack moves from 'mint two strings' to 'forge
+        # two Ed25519 signatures under allowlisted keys you do not hold'. Opt-in: None = byte-identical string
+        # behaviour. Honest limit (unchanged): a signature attests SOURCE, not TRUTH — a key-holder can honestly
+        # sign a false contradiction; what it buys is that Sybil variants of one source collapse to one key.
+        # None = legacy string mode; a list (INCLUDING an empty one) = signed mode. An empty allowlist is
+        # fail-CLOSED: no key can verify, so nothing corroborates (never a silent fall-through to spoofable strings).
+        self.support_authorities = list(support_authorities) if support_authorities is not None else None
         # in-stream revert nonce ledger (0.7.12): consumed on EVALUATION, landed or not. Landed intents also
         # persist their nonce in the record meta, so single-use survives a reload; a conflicted-but-unlanded
         # nonce is only held in memory (honest boundary: after a restart it would conflict again, not land).
@@ -1189,6 +1216,47 @@ class Mnemo:
     def _as_list(x):
         return list(x) if isinstance(x, (list, tuple, set)) else [x]
 
+    def support_challenge_for(self, key: str, toward) -> str:
+        """The exact message an attesting source signs to corroborate an observe() contradiction of `key`'s
+        current value toward `toward` (None = value-obscuring revert). Mirrors revert_challenge: it binds the
+        CURRENT active record id and the tenant, so a captured signature cannot be replayed after the value
+        legitimately changes and changes back (cross-time) or across tenants sharing one allowlist. Surface this
+        to the signer; sign_support() signs it."""
+        cur = self._current_active(key)
+        cur_id = cur["id"] if cur else ""
+        return "support:" + _sha256_hex(_canon({
+            "key": str(key), "toward": (toward if toward is not None else "__revert__"),
+            "cur": cur_id, "tenant": self.tenant or ""}))
+
+    def _verify_support(self, pubkey_hex, sig_hex, challenge: str) -> bool:
+        """A signed support ground counts only if its key is allowlisted AND its Ed25519 signature verifies over
+        the current, tenant-and-record-bound challenge. The store verifies but can never mint it."""
+        if not self.support_authorities or pubkey_hex not in self.support_authorities:
+            return False
+        if not _HAVE_ED:
+            raise RuntimeError("verifying a signed support ground needs the `cryptography` package")
+        try:
+            _Ed25519PK.from_public_bytes(bytes.fromhex(pubkey_hex)).verify(
+                bytes.fromhex(sig_hex), challenge.encode())
+            return True
+        except Exception:
+            return False
+
+    def _verified_support_keys(self, support, key, toward) -> set:
+        """The set of DISTINCT allowlisted authority keys that validly signed THIS contradiction (bound to the
+        current record + tenant) — Sybil resistance relative to the allowlist: self-minted keys/strings count
+        zero. Items are (pubkey_hex, sig_hex). NOTE: distinct keys prove distinctness, not epistemic
+        independence (two colluding/commonly-owned allowlisted keys pass) — that judgement stays with whoever
+        curates the allowlist."""
+        challenge = self.support_challenge_for(key, toward)
+        out = set()
+        for item in self._as_list(support):
+            if isinstance(item, (tuple, list)) and len(item) == 2:
+                pk, sg = item
+                if self._verify_support(pk, sg, challenge):
+                    out.add(pk)
+        return out
+
     def observe(self, text: str, key: str, object: str | None = None, support=None,
                 meta: dict | None = None) -> dict:
         """READ-PATH contradiction check (marintkael's mirror of the Fellegi-Sunter clerical-review band, r/RAG
@@ -1229,13 +1297,37 @@ class Mnemo:
         if agrees:
             if support is not None:                     # an agreeing observation's grounds are now 'seen'
                 seen = set(m.get("_support_seen", []))
-                m["_support_seen"] = list(seen | {self._support_sig(s) for s in self._as_list(support)})
+                now = (self._verified_support_keys(support, key, object) if self.support_authorities is not None
+                       else {self._support_sig(s) for s in self._as_list(support)})
+                m["_support_seen"] = list(seen | now)
                 self._save(force=True)
             return {"reopened": False, "key": str(key), "pending": 0, "need": self.reopen_corroboration,
                     "surfaced_prior": None, "review_id": None, "agreed": True}
         prior = self._latest_superseded_object(key, cur)
+        if support is not None and self.support_authorities is not None:
+            # SIGNED-GROUNDS (marintkael round 3): only a ground signed by a DISTINCT allowlisted authority over
+            # support_challenge(key, toward) corroborates; the fabricated-grounds attack moves from 'mint two
+            # strings' to 'forge two signatures under keys you do not hold'.
+            seen = set(m.get("_support_seen", []))
+            verified = self._verified_support_keys(support, key, object)
+            novel = verified - seen
+            m["_support_seen"] = list(seen | verified)
+            if not novel:
+                self._save(force=True)
+                return {"reopened": False, "key": str(key), "pending": len(verified),
+                        "need": self.reopen_corroboration, "surfaced_prior": prior, "review_id": None,
+                        "echo": True, "verified_grounds": len(verified)}
+            vsig = self._obj_sig({"object": object, "text": text}) if object is not None else "__revert__"
+            nov = m.setdefault("_reopen_support", {})
+            accrued = set(nov.get(vsig, [])) | novel
+            nov[vsig] = list(accrued)
+            self._save(force=True)
+            if len(accrued) >= self.reopen_corroboration:
+                return self._do_reopen(cur, prior, "signed_support_contradiction", object, meta)
+            return {"reopened": False, "key": str(key), "pending": len(accrued),
+                    "need": self.reopen_corroboration, "surfaced_prior": prior, "review_id": None}
         if support is not None:
-            # SUPPORT-KEYED: an echo (no novel grounds) is silenced even though it disagrees on value.
+            # SUPPORT-KEYED (string): an echo (no novel grounds) is silenced even though it disagrees on value.
             seen = set(m.get("_support_seen", []))
             sigs = {self._support_sig(s) for s in self._as_list(support) if self._support_sig(s)}
             novel = sigs - seen
@@ -4305,6 +4397,7 @@ class _TenantView:
     def observe(self, *a, **k):         return Mnemo.observe(self, *a, **k)
     def reopened(self, *a, **k):        return Mnemo.reopened(self, *a, **k)
     def resolve_reopened(self, *a, **k): return Mnemo.resolve_reopened(self, *a, **k)
+    def support_challenge_for(self, *a, **k): return Mnemo.support_challenge_for(self, *a, **k)
     def _current_active(self, *a, **k): return Mnemo._current_active(self, *a, **k)
     def _tenant_rows(self, *a, **k):    return Mnemo._tenant_rows(self, *a, **k)
 
