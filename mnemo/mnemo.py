@@ -453,9 +453,21 @@ class Mnemo:
         # two Ed25519 signatures under allowlisted keys you do not hold'. Opt-in: None = byte-identical string
         # behaviour. Honest limit (unchanged): a signature attests SOURCE, not TRUTH — a key-holder can honestly
         # sign a false contradiction; what it buys is that Sybil variants of one source collapse to one key.
-        # None = legacy string mode; a list (INCLUDING an empty one) = signed mode. An empty allowlist is
-        # fail-CLOSED: no key can verify, so nothing corroborates (never a silent fall-through to spoofable strings).
-        self.support_authorities = list(support_authorities) if support_authorities is not None else None
+        # None = legacy string mode; a list OR dict (incl. empty) = signed mode, fail-CLOSED (no key verifies ->
+        # nothing corroborates; never a silent fall-through to spoofable strings). PROVENANCE-CLASSES (1.9.5):
+        # pass a dict {pubkey_hex: class_label} so keys sharing an upstream model/feed share a CLASS, and the
+        # reopen threshold counts DISTINCT CLASSES, not raw keys — two commonly-sourced signers then count as one
+        # (addresses the correlated-sources critique: distinct keys prove distinctness, not independence). A plain
+        # list is the special case where every key is its own class (byte-identical 1.9.4 signed behaviour).
+        self.support_authorities = support_authorities
+        if support_authorities is None:
+            self._support_pubkeys, self._support_class = None, {}
+        elif isinstance(support_authorities, dict):
+            self._support_pubkeys = set(support_authorities)
+            self._support_class = {str(k): str(v) for k, v in support_authorities.items()}
+        else:
+            self._support_pubkeys = set(support_authorities)
+            self._support_class = {str(k): str(k) for k in support_authorities}   # each key = its own class
         # in-stream revert nonce ledger (0.7.12): consumed on EVALUATION, landed or not. Landed intents also
         # persist their nonce in the record meta, so single-use survives a reload; a conflicted-but-unlanded
         # nonce is only held in memory (honest boundary: after a restart it would conflict again, not land).
@@ -1231,7 +1243,7 @@ class Mnemo:
     def _verify_support(self, pubkey_hex, sig_hex, challenge: str) -> bool:
         """A signed support ground counts only if its key is allowlisted AND its Ed25519 signature verifies over
         the current, tenant-and-record-bound challenge. The store verifies but can never mint it."""
-        if not self.support_authorities or pubkey_hex not in self.support_authorities:
+        if not self._support_pubkeys or pubkey_hex not in self._support_pubkeys:
             return False
         if not _HAVE_ED:
             raise RuntimeError("verifying a signed support ground needs the `cryptography` package")
@@ -1242,19 +1254,19 @@ class Mnemo:
         except Exception:
             return False
 
-    def _verified_support_keys(self, support, key, toward) -> set:
-        """The set of DISTINCT allowlisted authority keys that validly signed THIS contradiction (bound to the
-        current record + tenant) — Sybil resistance relative to the allowlist: self-minted keys/strings count
-        zero. Items are (pubkey_hex, sig_hex). NOTE: distinct keys prove distinctness, not epistemic
-        independence (two colluding/commonly-owned allowlisted keys pass) — that judgement stays with whoever
-        curates the allowlist."""
+    def _verified_support_classes(self, support, key, toward) -> set:
+        """The set of DISTINCT PROVENANCE CLASSES that validly signed THIS contradiction (bound to the current
+        record + tenant). Self-minted keys/strings count zero (Sybil resistance relative to the allowlist), and
+        keys declared to share a class collapse to one — so the threshold counts independent-ish SOURCES, not raw
+        keys. Items are (pubkey_hex, sig_hex). Honest limit: 'class' is a DECLARED grouping by whoever curates
+        the allowlist; the store enforces it but cannot verify two classes are truly causally independent."""
         challenge = self.support_challenge_for(key, toward)
         out = set()
         for item in self._as_list(support):
             if isinstance(item, (tuple, list)) and len(item) == 2:
                 pk, sg = item
                 if self._verify_support(pk, sg, challenge):
-                    out.add(pk)
+                    out.add(self._support_class.get(pk, pk))
         return out
 
     def observe(self, text: str, key: str, object: str | None = None, support=None,
@@ -1297,7 +1309,7 @@ class Mnemo:
         if agrees:
             if support is not None:                     # an agreeing observation's grounds are now 'seen'
                 seen = set(m.get("_support_seen", []))
-                now = (self._verified_support_keys(support, key, object) if self.support_authorities is not None
+                now = (self._verified_support_classes(support, key, object) if self.support_authorities is not None
                        else {self._support_sig(s) for s in self._as_list(support)})
                 m["_support_seen"] = list(seen | now)
                 self._save(force=True)
@@ -1309,7 +1321,7 @@ class Mnemo:
             # support_challenge(key, toward) corroborates; the fabricated-grounds attack moves from 'mint two
             # strings' to 'forge two signatures under keys you do not hold'.
             seen = set(m.get("_support_seen", []))
-            verified = self._verified_support_keys(support, key, object)
+            verified = self._verified_support_classes(support, key, object)
             novel = verified - seen
             m["_support_seen"] = list(seen | verified)
             if not novel:
