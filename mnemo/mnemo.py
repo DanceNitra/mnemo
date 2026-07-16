@@ -403,6 +403,14 @@ class Mnemo:
         # instead of superseding (see remember + candidates/promote_candidate). Default 0.7; only active when a
         # caller actually passes identity_confidence, so byte-identical legacy otherwise.
         self.fork_below = 0.7
+        # READ-PATH REOPEN CORROBORATION (marintkael, r/RAG 2026-07-16). The confident wrong-merge is
+        # unattackable at WRITE time — you cannot out-confidence your own confidence at the moment you write.
+        # observe() is the mirror of the clerical-review band: a POST-write review trigger that reopens a
+        # high-confidence settled interval when independent evidence CONTRADICTS it. To not flood on the benign
+        # 'user restates a preference they forgot they changed' echo, a NAMED contradiction must be corroborated
+        # by >= this many independent observations before it reopens; a single stray restatement stays below it.
+        # (A value-obscuring revert — object=None, 'go back' — is an explicit action and reopens on first sight.)
+        self.reopen_corroboration = 2
         # Per-record input cap (OPT-IN, default None = unbounded, byte-identical legacy). When set, remember()
         # truncates text longer than max_text chars and stamps meta["truncated_from"] with the original length —
         # an availability guard so a single malicious/runaway write can't exhaust memory. See SECURITY.md.
@@ -1167,6 +1175,126 @@ class Mnemo:
             m["discard_basis"] = basis
         self._save(force=True)
         return {"discarded": cid}
+
+    def _current_active(self, key: str):
+        tv = self.tenant
+        return next((r for r in self.items if r.get("key") == str(key) and r.get("status") == "active"
+                     and (tv is None or r.get("tenant") == tv)), None)
+
+    def observe(self, text: str, key: str, object: str | None = None, meta: dict | None = None) -> dict:
+        """READ-PATH contradiction check (marintkael's mirror of the Fellegi-Sunter clerical-review band, r/RAG
+        2026-07-16). Ingest an OBSERVATION (evidence, NOT an authoritative write) about `key`. If it CONTRADICTS
+        the current high-confidence settled value — a different `object`, or object=None for a value-obscuring
+        revert ('go back', names nothing) — then, once the contradiction is corroborated by >=
+        reopen_corroboration independent observations (a single stray restatement stays below threshold and is
+        ignored), REOPEN the interval: the authoritative record is flagged status->'reopened' (still returned by
+        recall, but surfaced by reopened() for steward review) with the prior superseded value offered to
+        reaffirm. Unlike remember(), observe() NEVER supersedes or writes an authoritative value — it can only
+        open a settled record to review; resolution stays with resolve_reopened()/an authoritative write. This
+        catches the confident wrong-merge LATE (write-time never catches it) and finally gives the
+        value-obscuring revert something to key on. Returns {reopened, key, pending, need, surfaced_prior,
+        review_id}. NOTE: it does NOT decide the reopened case — legit-vs-injected still needs authority."""
+        cur = self._current_active(key)
+        if cur is None:
+            return {"reopened": False, "key": str(key), "pending": 0, "need": self.reopen_corroboration,
+                    "surfaced_prior": None, "review_id": None, "no_current": True}
+        # only HIGH-confidence settled records are guarded (a low-confidence record's disagreement is expected)
+        ic = cur.get("identity_confidence")
+        if not (ic is None or ic >= self.fork_below):
+            return {"reopened": False, "key": str(key), "pending": 0, "need": self.reopen_corroboration,
+                    "surfaced_prior": None, "review_id": None, "low_confidence": True}
+        agrees = object is not None and self._obj_sig({"object": object, "text": text}) == self._obj_sig(cur)
+        if agrees:
+            return {"reopened": False, "key": str(key), "pending": 0, "need": self.reopen_corroboration,
+                    "surfaced_prior": None, "review_id": None, "agreed": True}
+        m = cur.setdefault("meta", {})
+        prior = self._latest_superseded_object(key, cur)
+        # value-obscuring revert (object=None): explicit action, reopen on first sight
+        if object is None:
+            return self._do_reopen(cur, prior, "value_obscuring_revert", None, meta)
+        # named contradiction: corroboration-gate
+        sig = self._obj_sig({"object": object, "text": text})
+        contra = m.setdefault("_reopen_contra", {})
+        contra[sig] = int(contra.get(sig, 0)) + 1
+        self._save(force=True)
+        if contra[sig] >= self.reopen_corroboration:
+            return self._do_reopen(cur, prior, "corroborated_contradiction", object, meta)
+        return {"reopened": False, "key": str(key), "pending": contra[sig],
+                "need": self.reopen_corroboration, "surfaced_prior": prior, "review_id": None}
+
+    def _latest_superseded_object(self, key: str, cur: dict):
+        tv = cur.get("tenant")
+        sup = [r for r in self.items if r.get("key") == str(key) and r.get("status") == "superseded"
+               and r.get("tenant") == tv and self._obj_sig(r) != self._obj_sig(cur)]
+        sup.sort(key=lambda r: r.get("superseded_ts", r.get("ts", 0)))
+        return sup[-1].get("object") if sup else None
+
+    def _do_reopen(self, cur: dict, prior, reason: str, contra_object, meta) -> dict:
+        m = cur.setdefault("meta", {})
+        # flag, NOT a status change: the record stays 'active' so recall() still returns it as the current best
+        # guess (an agent left with nothing is worse), it is only surfaced by reopened() for steward review.
+        cur["reopened"] = True
+        cur["reopened_ts"] = time.time()
+        m["reopened_reason"] = reason
+        m["reopened_surfaced_prior"] = prior
+        if contra_object is not None:
+            m["reopened_contradiction"] = contra_object
+        if meta:
+            m.setdefault("reopened_meta", {}).update(meta)
+        m.pop("_reopen_contra", None)
+        self._save(force=True)
+        return {"reopened": True, "key": cur.get("key"), "pending": self.reopen_corroboration,
+                "need": self.reopen_corroboration, "surfaced_prior": prior, "review_id": cur["id"]}
+
+    def reopened(self, key: str | None = None) -> list:
+        """The POST-write review queue: settled records reopened because corroborated evidence contradicted them
+        (the mirror of candidates(), which holds a match BEFORE the write). Each entry shows the still-current
+        value, why it reopened, and the prior value offered to reaffirm. Read-only, tenant-scoped."""
+        tv = self.tenant
+        out = []
+        for r in self.items:
+            if not r.get("reopened") or r.get("status") != "active":
+                continue
+            if tv is not None and r.get("tenant") != tv:
+                continue
+            if key is not None and r.get("key") != str(key):
+                continue
+            m = r.get("meta", {})
+            out.append({"id": r["id"], "key": r.get("key"), "object": r.get("object"), "text": r.get("text"),
+                        "reason": m.get("reopened_reason"), "surfaced_prior": m.get("reopened_surfaced_prior"),
+                        "contradiction": m.get("reopened_contradiction")})
+        return out
+
+    def resolve_reopened(self, rid: str, decision: str, capability: str | None = None) -> dict:
+        """STEWARD DECISION on a reopened interval. decision='keep_current' clears the flag (false alarm ->
+        status back to active). decision='reaffirm_prior' restores the surfaced prior value via the authorized
+        revert path (remember(reaffirm=True)) — so it takes the revert capability when one is configured, exactly
+        like promote_candidate (the content path must not launder a restore to authority). Returns a summary."""
+        rec = next((r for r in self.items if r["id"] == rid and r.get("reopened")
+                    and r.get("status") == "active"), None)
+        if rec is None:
+            raise KeyError(f"no reopened record with id {rid}")
+        if self.tenant is not None and rec.get("tenant") != self.tenant:
+            raise KeyError(f"no reopened record with id {rid}")
+        if decision == "keep_current":
+            rec.pop("reopened", None)
+            rec.pop("reopened_ts", None)
+            m = rec.get("meta", {})
+            for kk in ("reopened_reason", "reopened_surfaced_prior", "reopened_contradiction", "reopened_meta"):
+                m.pop(kk, None)
+            self._save(force=True)
+            return {"resolved": rid, "decision": "keep_current", "key": rec.get("key")}
+        if decision == "reaffirm_prior":
+            prior = rec.get("meta", {}).get("reopened_surfaced_prior")
+            if prior is None:
+                raise ValueError("no surfaced prior value to reaffirm")
+            key = rec.get("key")
+            rec.pop("reopened", None)                       # unflag; the reaffirm write will supersede it
+            new_id = self.remember(f"the {key} is {prior}", key=key, object=prior, reaffirm=True,
+                                   capability=capability)
+            return {"resolved": rid, "decision": "reaffirm_prior", "key": key, "reaffirmed_object": prior,
+                    "new_id": new_id}
+        raise ValueError("decision must be 'keep_current' or 'reaffirm_prior'")
 
     def remember_dedup(self, text: str, tags=None, value: float = 1.0, meta: dict | None = None,
                        mtype: str | None = None, dup_threshold: float = 0.95) -> str:
@@ -4130,6 +4258,10 @@ class _TenantView:
     def candidates(self, *a, **k):      return Mnemo.candidates(self, *a, **k)
     def promote_candidate(self, *a, **k): return Mnemo.promote_candidate(self, *a, **k)
     def discard_candidate(self, *a, **k): return Mnemo.discard_candidate(self, *a, **k)
+    def observe(self, *a, **k):         return Mnemo.observe(self, *a, **k)
+    def reopened(self, *a, **k):        return Mnemo.reopened(self, *a, **k)
+    def resolve_reopened(self, *a, **k): return Mnemo.resolve_reopened(self, *a, **k)
+    def _current_active(self, *a, **k): return Mnemo._current_active(self, *a, **k)
     def _tenant_rows(self, *a, **k):    return Mnemo._tenant_rows(self, *a, **k)
 
 
