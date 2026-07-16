@@ -53,6 +53,7 @@ Runnable examples live in [`examples/`](examples/): [basics](examples/01_basics.
 **Jump to:** [Correction (measured)](#correction-is-a-first-class-operation-measured-across-systems) ·
 [Governance & erasure](#governance-erasure--audit) · [Install](#install) ·
 [MCP server](#use-it-as-an-mcp-server-any-claude--cursor--agent-client) ·
+[Framework integrations](#framework-integrations) ·
 [The four operations](#the-four-operations) · [Five rules](#five-rules-it-wont-break-each-one-cost-us-to-learn) ·
 [Provenance & receipts](#provenance--why-these-rules-with-receipts) · [Threat model](#threat-model--layered-defense-adversarial-memory-integrity)
 
@@ -693,6 +694,24 @@ logs, or backups); it is an integrity primitive, **not** a compliance certificat
 load-bearing only against a party who does not hold `receipt_key`. Prior art: crypto-shredding; Cassandra /
 event-sourcing tombstones; GDPR Art. 30 erasure logs; Crosby-Wallach / Certificate-Transparency
 tamper-evident logs. Receipt: `mnemo/probes/forget_subject_tombstone_probe.py` (8/8).
+
+## Framework integrations
+
+mnemo drops into the major agent frameworks as their **native memory type**, so an agent gets value-ranked
+recall plus **correction-integrity** (a corrected fact does not resurrect on a later read) without changing its
+code. Each adapter lives under `mnemo.integrations.*` and is an opt-in extra — `import mnemo` stays
+zero-dependency, and the framework is imported lazily only when you use its adapter.
+
+| framework | mnemo class | install |
+|---|---|---|
+| [OpenAI Agents SDK](#drop-in-memory-for-the-openai-agents-sdk-mnemosession-0620) | `MnemoSession` | `pip install "agora-mnemo[openai-agents]"` |
+| [AutoGen](#current-truth-memory-for-autogen-mnemomemory-070) | `MnemoMemory` | `pip install "agora-mnemo[autogen]"` |
+| [LangGraph / LangMem](#langgraph-store-with-queryable-history-mnemostore-071) | `MnemoStore` | `pip install "agora-mnemo[langgraph]"` |
+| [LlamaIndex](#current-truth-long-term-memory-for-llamaindex-mnemomemoryblock-073) | `MnemoMemoryBlock` | `pip install "agora-mnemo[llamaindex]"` |
+| [Google ADK](#persistent-memory-for-google-adk-mnemomemoryservice-074) | `MnemoMemoryService` | `pip install "agora-mnemo[google-adk]"` |
+| [Pydantic AI](#memory-as-tools-for-pydantic-ai-mnemo_toolset-078) | `mnemo_toolset` | `pip install "agora-mnemo[pydantic-ai]"` |
+
+Details for each below.
 
 ### Drop-in memory for the OpenAI Agents SDK: `MnemoSession` (0.6.20+)
 `mnemo.integrations.openai_agents.MnemoSession` is a persistent [`Session`](https://openai.github.io/openai-agents-python/sessions/)
