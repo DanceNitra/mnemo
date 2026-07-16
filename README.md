@@ -76,6 +76,36 @@ capability gap survives at n=20. We lead with the cell we *don't* win: **echo-re
 three defend against a restated stale value. This is a narrow, adversarial, command-driven cut, not a general
 "mnemo is better" claim; run it yourself or add your system.
 
+### After the write: a read-path review trigger (1.9.2–1.9.4)
+
+Supersession and revert handle correction at *write* time. But a store can also be *confidently wrong* — a
+value settles, and later a contradicting observation arrives that write-time gating already accepted or
+rejected. You do not want to silently trust every contradiction (an attacker or a stray transcript line can
+mint them) nor silently ignore it (a real correction never gets seen). `observe()` is the mirror of a
+write-time hold-for-review: it **reopens a settled record for steward review** on a *corroborated*
+contradiction, and never on a lone one.
+
+```python
+m.remember("the region is Frankfurt", key="svc/region", object="Frankfurt")
+m.remember("correction: it's now Ohio", key="svc/region", object="Ohio")
+
+m.observe("someone says Berlin", key="svc/region", object="Berlin", support=["slack-8842"])  # 1 ground -> held
+m.observe("Berlin again",        key="svc/region", object="Berlin", support=["slack-8842"])  # same ground -> echo
+m.observe("Berlin, per audit",   key="svc/region", object="Berlin", support=["audit-Q3"])    # 2nd ground -> REOPEN
+
+m.reopened()                       # the review queue; recall() still returns Ohio meanwhile
+m.resolve_reopened(id, "keep_current")   # steward: false alarm  (or "reaffirm_prior" to restore via revert)
+```
+
+Corroboration counts **distinct novel grounds** in `support`, so replaying one ground is an echo, not a vote.
+`observe()` only *flags* — it never supersedes; the steward decides. Distinguishing a legitimate contradiction
+from an injected one is an **authority** call, not a content call: `Mnemo(support_authorities=[...])` requires
+grounds to be **Ed25519-signed by an allowlisted key** (self-minted grounds then count zero, and a
+`{pubkey: class}` mapping counts distinct provenance *classes*, so two keys sharing one upstream source count
+once). Honest limit, credited: this is exogenous-trust-root / anti-Sybil (Douceur 2002; DKIM / W3C VC — a
+signature attests *source*, not *truth*); it makes the steward's independence judgement *enforceable*, it does
+not certify independence. Runnable: [`examples/05_review_trigger.py`](examples/05_review_trigger.py).
+
 ## Governance, erasure & audit
 
 mnemo ships tamper-evident governance primitives — built by auditing mnemo against a governance-evidence
