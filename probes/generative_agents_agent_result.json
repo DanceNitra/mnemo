@@ -1,0 +1,32 @@
+{
+ "ok": true,
+ "model": "deepseek-v4-flash",
+ "scale": 1000,
+ "k": 8,
+ "rows": [
+  {
+   "contra": 0.2,
+   "scale": 1000,
+   "n_queries": 9,
+   "errors": 0,
+   "ga_agent_acc": 1.0,
+   "mnemo_agent_acc": 1.0
+  },
+  {
+   "contra": 0.5,
+   "scale": 1000,
+   "n_queries": 19,
+   "errors": 0,
+   "ga_agent_acc": 0.947,
+   "mnemo_agent_acc": 1.0
+  },
+  {
+   "contra": 0.9,
+   "scale": 1000,
+   "n_queries": 37,
+   "errors": 0,
+   "ga_agent_acc": 0.838,
+   "mnemo_agent_acc": 1.0
+  }
+ ]
+}
