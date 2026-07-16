@@ -135,6 +135,37 @@ def route(text: str, key: str = "", object: str = "", context: str = "", policy:
 
 
 @mcp.tool()
+def observe(text: str, key: str, object: str = "", support: list[str] | None = None) -> dict:
+    """READ-PATH review trigger — the mirror of a write-time hold-for-review. Feed it an OBSERVATION (evidence,
+    NOT an authoritative write) that CONTRADICTS a settled memory: a different value for `key`, or object=""
+    for a value-obscuring revert ("go back to what we had", names no value). Instead of silently trusting or
+    ignoring it, this REOPENS that settled record for review — but only once the contradiction is CORROBORATED,
+    so a lone stray restatement stays an echo and does not reopen. `support` (a list of the distinct grounds the
+    observation rests on) is what corroboration counts: a restatement whose grounds were already seen is an
+    echo; it takes >= reopen_corroboration distinct novel grounds to reopen. observe() NEVER supersedes or
+    writes — it only flags; a steward closes the review with resolve_reopened(). Use it for contradicting
+    evidence you don't want to act on blindly. Returns {reopened, key, pending, need, surfaced_prior, review_id}."""
+    return _MEM.observe(text, key=key, object=object or None, support=support)
+
+
+@mcp.tool()
+def reopened(key: str = "") -> list[dict]:
+    """The POST-write review queue: settled records that observe() reopened because corroborated evidence
+    contradicted them. Each entry shows the still-current value, why it reopened, and the prior value offered to
+    reaffirm. Read-only; pass `key` to scope to one record."""
+    return _MEM.reopened(key=key or None)
+
+
+@mcp.tool()
+def resolve_reopened(id: str, decision: str, capability: str = "") -> dict:
+    """Steward decision to close a reopened review. decision="keep_current" clears the flag (a false alarm, the
+    current value stands); decision="reaffirm_prior" restores the surfaced prior value through the authorized
+    revert path (it takes the revert `capability` when a revert authority is configured, so the content path
+    cannot launder a restore). Returns {resolved, decision, key, ...}."""
+    return _MEM.resolve_reopened(id, decision, capability=capability or None)
+
+
+@mcp.tool()
 def recall(query: str, k: int = 6) -> list[dict]:
     """Retrieve the top-k memories by RELEVANCE × accrued VALUE (not recency). Use this to load
     relevant prior knowledge before reasoning. Returns text, tags, value, and a relevance score."""
