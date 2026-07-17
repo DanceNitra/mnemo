@@ -675,10 +675,13 @@ main {
 }
 .mcp__grid {
   display: grid;
-  grid-template-columns: 1.15fr 0.85fr;
+  /* left column may shrink (min-width 0 lets the long command scroll instead of pushing the grid);
+     the orbit column keeps enough room for the rings to actually orbit */
+  grid-template-columns: minmax(0, 1fr) minmax(360px, 0.95fr);
   gap: 50px;
   align-items: center;
 }
+.mcp__copy { min-width: 0; }
 .code-block {
   margin-top: 28px;
   border: 1px solid var(--line);

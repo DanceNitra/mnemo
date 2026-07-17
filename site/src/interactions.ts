@@ -206,18 +206,19 @@ function initCopy() {
 }
 
 /* ---------- MCP orbit chips ---------- */
+// The actual 15 tools the MCP server exposes (verified via tools/list) — not library-only APIs.
 const MCP_TOOLS = [
-  'remember', 'recall', 'route', 'revert',
-  'retract_lineage', 'echo_guard', 'forget_subject', 'consolidate',
-  'verify_writes', 'anchor', 'verify_consistency', 'governance_report',
+  'remember', 'recall', 'revert', 'route', 'observe',
+  'reopened', 'resolve_reopened', 'consolidate', 'sleep', 'consolidate_clusters',
+  'contradictions', 'check_conflict', 'value_by_cohort', 'credit', 'forget',
 ];
 function initOrbit() {
   const orbit = document.getElementById('orbit');
   if (!orbit) return;
   const rings = [
-    { r: 0.23, count: 4, dur: 26 },
-    { r: 0.36, count: 4, dur: -34 },
-    { r: 0.49, count: 4, dur: 44 },
+    { r: 0.23, count: 5, dur: 26 },
+    { r: 0.36, count: 5, dur: -34 },
+    { r: 0.49, count: 5, dur: 44 },
   ];
   let idx = 0;
   rings.forEach((ring) => {
@@ -229,7 +230,8 @@ function initOrbit() {
       const chip = document.createElement('div');
       chip.className = 'orbit__chip';
       chip.textContent = MCP_TOOLS[idx++ % MCP_TOOLS.length];
-      const angle = (i / ring.count) * Math.PI * 2;
+      // stagger each ring's start angle so chips never align radially (no 3-o'clock pile-up)
+      const angle = (i / ring.count) * Math.PI * 2 + rings.indexOf(ring) * 0.45;
       const x = 50 + Math.cos(angle) * ring.r * 100;
       const y = 50 + Math.sin(angle) * ring.r * 100;
       chip.style.left = `${x}%`;
