@@ -6,12 +6,12 @@
     <title>mnemo — Agent memory that keeps a corrected fact corrected</title>
     <meta
       name="description"
-      content="A zero-dependency memory layer and MCP server for AI agents. Value-ranked recall, consolidation, and a first-class correction and erasure channel — measured, not assumed."
+      content="The self-correcting memory layer for AI agents: when a fact is corrected, mnemo serves the new value and resists the old one resurfacing. Zero-dependency, with an MCP server — measured, not assumed."
     />
     <meta name="theme-color" content="#0a0a0b" />
     <link rel="canonical" href="https://dancenitra.github.io/mnemo/" />
     <meta property="og:title" content="mnemo — Agent memory that keeps a corrected fact corrected" />
-    <meta property="og:description" content="A zero-dependency memory layer and MCP server for AI agents. Correction and erasure as a first-class channel — measured, not assumed." />
+    <meta property="og:description" content="The self-correcting memory layer for AI agents. Correction and erasure as a first-class channel — measured, not assumed." />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://dancenitra.github.io/mnemo/" />
     <meta property="og:image" content="https://dancenitra.github.io/mnemo/og.png" />
@@ -30,8 +30,8 @@
           "name": "mnemo",
           "applicationCategory": "DeveloperApplication",
           "operatingSystem": "Windows, macOS, Linux",
-          "softwareVersion": "1.7.0",
-          "description": "A zero-dependency memory layer and MCP server for AI agents. Value-ranked recall, consolidation, and a first-class correction and erasure channel.",
+          "softwareVersion": "1.9.9",
+          "description": "The self-correcting memory layer for AI agents: zero-dependency, with an MCP server. Value-ranked recall, consolidation, and a first-class correction and erasure channel.",
           "license": "https://opensource.org/licenses/MIT",
           "url": "https://dancenitra.github.io/mnemo/",
           "downloadUrl": "https://pypi.org/project/agora-mnemo/",
@@ -105,14 +105,15 @@
         <!-- Beat 0 — hero -->
         <section class="panel panel--hero" data-beat="0">
           <div class="panel__inner reveal">
-            <p class="eyebrow">v1.7 · MIT · zero dependencies</p>
+            <p class="eyebrow">v1.9.9 · MIT · zero dependencies</p>
             <h1 class="hero__title">
               Agent memory that keeps a<br />
               <span class="glow-text">corrected fact corrected.</span>
             </h1>
             <p class="hero__sub">
-              A zero-dependency memory layer and MCP server for AI agents. Value-ranked recall,
-              consolidation, and a first-class correction and erasure channel — measured, not assumed.
+              The self-correcting memory layer for AI agents — zero dependencies, with an MCP server.
+              Value-ranked recall, consolidation, and a first-class correction and erasure channel —
+              measured, not assumed.
             </p>
             <div class="hero__cta">
               <a class="btn btn--primary magnetic" href="https://github.com/DanceNitra/mnemo" target="_blank" rel="noopener">
@@ -171,11 +172,11 @@
       <!-- Stat strip -->
       <section class="strip" id="stats">
         <ul class="strip__grid">
-          <li><b class="count" data-count="12">0</b><span>MCP tools</span></li>
+          <li><b class="count" data-count="15">0</b><span>MCP tools</span></li>
           <li><b class="count" data-count="6">0</b><span>framework adapters</span></li>
           <li><b class="count" data-count="0.75" data-decimals="2">0</b><span>revert success (vs 0.20, n=20)</span></li>
           <li><b>A</b><span>Glama quality</span></li>
-          <li><b>v1.7</b><span>current release</span></li>
+          <li><b>v1.9.9</b><span>current release</span></li>
           <li><b>0</b><span>runtime dependencies</span></li>
         </ul>
       </section>
@@ -244,7 +245,7 @@
           <article class="card spotlight">
             <div class="card__icon" data-i="correct"></div>
             <h3>Correction, erasure &amp; time-travel</h3>
-            <p>A first-class channel: <code>revert</code>, <code>retract_lineage</code>, <code>echo_guard</code>, <code>forget_subject</code>. Bitemporal <code>as_of(when, as_recorded)</code> and <code>believed_at</code> reconstruct what the agent believed at any moment — a corrected fact stays corrected, and history stays auditable.</p>
+            <p>A first-class channel: <code>revert</code>, <code>retract_lineage</code>, <code>echo_guard</code>, <code>forget_subject</code>. And a read-path review trigger — <code>observe()</code> reopens a settled fact on a corroborated contradiction, recall marks it <code>under_review</code> so the agent can hedge, and a steward resolves it. Bitemporal <code>as_of</code> reconstructs what the agent believed at any moment.</p>
           </article>
           <article class="card spotlight">
             <div class="card__icon" data-i="receipt"></div>
@@ -254,7 +255,7 @@
           <article class="card spotlight">
             <div class="card__icon" data-i="poison"></div>
             <h3>Poison-resistant influence</h3>
-            <p>Corroboration-gated influence with <code>recall(influence_only=True)</code> so one laundered write can't dominate the answer.</p>
+            <p>Corroboration-gated influence with <code>recall(influence_only=True)</code> so one laundered write can't dominate the answer. <code>credit_requires_warrant</code> closes the self-graded loop (a memory can't vouch for itself), and grounds can be Ed25519-signed so forged corroboration counts zero.</p>
           </article>
           <article class="card spotlight">
             <div class="card__icon" data-i="audit"></div>
@@ -263,8 +264,8 @@
           </article>
           <article class="card spotlight">
             <div class="card__icon" data-i="adapter"></div>
-            <h3>Framework adapters</h3>
-            <p>Drop-in for OpenAI Agents, AutoGen, LangGraph, LlamaIndex, Google ADK, and Pydantic AI.</p>
+            <h3>Adapters &amp; multi-tenancy</h3>
+            <p>Drop-in for OpenAI Agents, AutoGen, LangGraph, LlamaIndex, Google ADK, and Pydantic AI. Fail-closed tenant isolation with a PII floor scopes every cross-record operation.</p>
           </article>
         </div>
       </section>
