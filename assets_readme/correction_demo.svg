@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 322" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="14">
+  <style>
+    .bg{fill:#0d1117}.chrome{fill:#161b22}.dot{opacity:.9}
+    .p{fill:#7d8590}.c{fill:#e6edf3}.k{fill:#79c0ff}.s{fill:#a5d6ff}.ok{fill:#3fb950}.warn{fill:#d29922}.dim{fill:#484f58}
+    .l{opacity:0}
+    .l1{animation:a .01s 0.3s forwards}.l2{animation:a .01s 1.0s forwards}.l3{animation:a .01s 1.7s forwards}
+    .l4{animation:a .01s 2.6s forwards}.l5{animation:a .01s 3.6s forwards}.l6{animation:a .01s 4.4s forwards}
+    .l7{animation:a .01s 5.4s forwards}.l8{animation:a .01s 6.3s forwards}
+    @keyframes a{to{opacity:1}}
+    @media (prefers-reduced-motion: reduce){.l{opacity:1;animation:none}}
+  </style>
+  <rect class="bg" width="720" height="322" rx="8"/>
+  <rect class="chrome" width="720" height="34" rx="8"/><rect class="chrome" y="20" width="720" height="14"/>
+  <circle class="dot" cx="20" cy="17" r="5" fill="#f85149"/><circle class="dot" cx="38" cy="17" r="5" fill="#d29922"/><circle class="dot" cx="56" cy="17" r="5" fill="#3fb950"/>
+  <text x="360" y="21" text-anchor="middle" class="p" font-size="12">a corrected fact stays corrected</text>
+
+  <g class="l l1">
+    <text x="20" y="62"><tspan class="p">&gt;&gt;&gt;</tspan><tspan class="c" dx="8">m = Mnemo(</tspan><tspan class="s">"memory.json"</tspan><tspan class="c">);  m.echo_guard = </tspan><tspan class="k">True</tspan></text>
+  </g>
+  <g class="l l2">
+    <text x="20" y="90"><tspan class="p">&gt;&gt;&gt;</tspan><tspan class="c" dx="8">m.remember(</tspan><tspan class="s">"the region is Frankfurt"</tspan><tspan class="c">, key=</tspan><tspan class="s">"svc/region"</tspan><tspan class="c">, object=</tspan><tspan class="s">"Frankfurt"</tspan><tspan class="c">)</tspan></text>
+  </g>
+  <g class="l l3">
+    <text x="20" y="118"><tspan class="p">&gt;&gt;&gt;</tspan><tspan class="c" dx="8">m.remember(</tspan><tspan class="s">"correction: the region is Ohio"</tspan><tspan class="c">, key=</tspan><tspan class="s">"svc/region"</tspan><tspan class="c">, object=</tspan><tspan class="s">"Ohio"</tspan><tspan class="c">)</tspan></text>
+  </g>
+  <g class="l l4">
+    <text x="20" y="146"><tspan class="p">&gt;&gt;&gt;</tspan><tspan class="c" dx="8">m.recall(</tspan><tspan class="s">"region"</tspan><tspan class="c">)</tspan></text>
+    <text x="20" y="168"><tspan class="k">'correction: the region is Ohio'</tspan><tspan class="dim" dx="10"># the old value is superseded, not served</tspan></text>
+  </g>
+  <g class="l l5">
+    <text x="20" y="202"><tspan class="warn"># later, a stray line restates the OLD value — it is now the newest write in the store</tspan></text>
+  </g>
+  <g class="l l6">
+    <text x="20" y="224"><tspan class="p">&gt;&gt;&gt;</tspan><tspan class="c" dx="8">m.remember(</tspan><tspan class="s">"reminder: the region is Frankfurt"</tspan><tspan class="c">, key=</tspan><tspan class="s">"svc/region"</tspan><tspan class="c">, object=</tspan><tspan class="s">"Frankfurt"</tspan><tspan class="c">)</tspan></text>
+  </g>
+  <g class="l l7">
+    <text x="20" y="252"><tspan class="p">&gt;&gt;&gt;</tspan><tspan class="c" dx="8">m.recall(</tspan><tspan class="s">"region"</tspan><tspan class="c">)</tspan></text>
+    <text x="20" y="274"><tspan class="k">'correction: the region is Ohio'</tspan></text>
+  </g>
+  <g class="l l8">
+    <text x="20" y="302"><tspan class="ok">✓ still Ohio — the restatement landed retired (echo_guard); a stale value cannot resurrect</tspan></text>
+  </g>
+</svg>

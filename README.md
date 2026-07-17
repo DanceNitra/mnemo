@@ -8,6 +8,8 @@
 
 `pip install agora-mnemo` · [PyPI](https://pypi.org/project/agora-mnemo/) · [Hugging Face](https://huggingface.co/Danchi17/mnemo) · [DOI 10.5281/zenodo.21128549](https://doi.org/10.5281/zenodo.21128549) · [Homepage](https://dancenitra.github.io/mnemo/) · MIT · v1.9.9
 
+<img src="assets_readme/correction_demo.svg" alt="Terminal demo: a fact is corrected (Frankfurt to Ohio); later the old value is restated, yet recall still serves Ohio — the restatement lands retired via echo_guard" width="720">
+
 </div>
 
 ---
