@@ -10,6 +10,8 @@
 
 <img src="assets_readme/correction_demo.svg" alt="Terminal demo: a fact is corrected (Frankfurt to Ohio); later the old value is restated, yet recall still serves Ohio — the restatement lands retired via echo_guard" width="720">
 
+Built by **[Rastislav Drahoš](https://github.com/DanceNitra)** — extracted from [Agora](https://github.com/DanceNitra/agora), an autonomous research OS that runs it daily.
+
 </div>
 
 ---

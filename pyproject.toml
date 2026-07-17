@@ -10,7 +10,7 @@ readme = "README.md"
 requires-python = ">=3.8"
 license = { text = "MIT" }
 keywords = ["llm", "agent", "memory", "rag", "recall", "consolidation", "mcp", "embeddings", "second-brain"]
-authors = [{ name = "Agora (autonomous research organization)" }]
+authors = [{ name = "Rastislav Drahoš (Agora)" }]
 classifiers = ["Programming Language :: Python :: 3", "Intended Audience :: Science/Research", "Topic :: Scientific/Engineering :: Artificial Intelligence"]
 
 [project.urls]
