@@ -105,6 +105,13 @@ capability gap survives at n=20. We lead with the cell we *don't* win: **echo-re
 three defend against a restated stale value. This is a narrow, adversarial, command-driven cut, not a general
 "mnemo is better" claim; run it yourself or add your system.
 
+**Run the receipts yourself** — both harnesses are public and point-at-your-own-store:
+[`agent-memory-integrity`](https://github.com/DanceNitra/agent-memory-integrity) (the cross-system
+revert + echo cells above, shared ground-truth-blind judge) and
+[`ramr`](https://github.com/DanceNitra/ramr) (contamination-resistant reliability probes:
+chain-fragility, fact-retention, echo-resistance — every number traceable to a persisted source file,
+limitations stated first).
+
 ### After the write: a read-path review trigger (1.9.2–1.9.7)
 
 Supersession and revert handle correction at *write* time. But a store can also be *confidently wrong* — a
