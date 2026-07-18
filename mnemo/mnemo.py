@@ -324,7 +324,7 @@ def sign_erasure(principal_sk_hex: str, subject: str, request_id) -> str:
     sk = _Ed25519SK.from_private_bytes(bytes.fromhex(principal_sk_hex))
     return sk.sign(erasure_challenge(subject, request_id).encode()).hex()
 
-__version__ = "1.9.9"
+__version__ = "1.11.0"
 
 # Internal sentinel: marks a reaffirm write already authorized by submit_revert() (which verified the
 # signed INTENT). Object identity — no text/content path can ever produce it.
@@ -4422,6 +4422,80 @@ class _TenantView:
     def support_challenge_for(self, *a, **k): return Mnemo.support_challenge_for(self, *a, **k)
     def _current_active(self, *a, **k): return Mnemo._current_active(self, *a, **k)
     def _tenant_rows(self, *a, **k):    return Mnemo._tenant_rows(self, *a, **k)
+
+
+# --------------------------------------------------------------------------------------------------------------
+# Ready-made write-path extractors (set `m.extractor = ...`). The extractor derives a (key, object) from free
+# text so supersession/echo_guard/revert engage WITHOUT the caller passing an explicit key. mnemo ships two:
+#   - regex_extractor : DETERMINISTIC, no LLM, no dependency — keeps the zero-LLM-on-write moat. Conservative
+#     by design (returns None unless a clear subject/relation pattern matches), because a mis-derived key
+#     mis-supersedes; a returned None just falls back to a plain append.
+#   - make_llm_extractor(call_fn) : OPT-IN factory. Wraps YOUR llm(prompt)->str call to extract (key, object).
+#     This PUTS AN LLM ON THE WRITE PATH — you trade determinism/zero-cost for auto-capture of unstructured text.
+# Both are fail-open (Mnemo.remember swallows extractor exceptions and appends the raw text).
+
+_EX_REL = re.compile(
+    r"^\s*(?:correction|update|note|fyi)?\s*[:,-]?\s*"          # optional correction marker, stripped
+    r"(?:the\s+)?(?P<subject>[A-Za-z0-9 ._/@'-]{2,60}?)"        # subject
+    r"(?:'s|s')\s+(?P<rel>[A-Za-z0-9 ._-]{2,40}?)"              # possessive relation:  "X's Y"
+    r"\s+(?:is|was|are|were|=|:|now|became|changed to)\s+"
+    r"(?P<obj>.+?)\s*\.?\s*$", re.I)
+_EX_OF = re.compile(
+    r"^\s*(?:correction|update|note|fyi)?\s*[:,-]?\s*"
+    r"the\s+(?P<rel>[A-Za-z0-9 ._-]{2,40}?)\s+of\s+(?P<subject>[A-Za-z0-9 ._/@'-]{2,60}?)"   # "the Y of X"
+    r"\s+(?:is|was|are|were|=|:|now)\s+(?P<obj>.+?)\s*\.?\s*$", re.I)
+_EX_IS = re.compile(
+    r"^\s*(?:correction|update|note|fyi)?\s*[:,-]?\s*"
+    r"(?:the\s+)?(?P<subject>[A-Za-z0-9 ._/@'-]{2,60}?)"        # "X is Y"
+    r"\s+(?:is|was|are|were|=|:|now|became|changed to)\s+"
+    r"(?P<obj>.+?)\s*\.?\s*$", re.I)
+
+
+def regex_extractor(text):
+    """text -> (key, object) | None. Deterministic, no LLM. Recognizes 'X's Y is Z', 'the Y of X is Z', and
+    'X is Z' (with optional leading correction/update/now markers). key is a canonical 'subject::relation' (or
+    just 'subject' for the plain copula) so a reworded restatement maps to the SAME key. Returns None (=> plain
+    append) when nothing matches confidently."""
+    if not text:
+        return None
+    for rx, keyed in ((_EX_REL, True), (_EX_OF, True), (_EX_IS, False)):
+        mt = rx.match(text)
+        if mt:
+            subj = " ".join(mt.group("subject").lower().split())
+            obj = mt.group("obj").strip().strip(".").strip()
+            obj = re.sub(r"^(?:now|actually|currently|really)\s+", "", obj, flags=re.I).strip()   # copula adverb
+            if not subj or not obj or len(obj) > 200:
+                return None
+            if keyed:
+                rel = " ".join(mt.group("rel").lower().split())
+                return (f"{subj}::{rel}", obj)
+            return (subj, obj)
+    return None
+
+
+def make_llm_extractor(call_fn, prompt_prefix=None):
+    """Wrap YOUR `call_fn(prompt) -> str` into an extractor. OPT-IN: this puts an LLM on the write path (you lose
+    the deterministic/zero-cost core). The LLM must return a JSON object {"key": ..., "object": ...}; anything
+    else (or an exception) yields None -> plain append. Example: m.extractor = make_llm_extractor(my_llm)."""
+    prefix = prompt_prefix or (
+        "Extract the single (subject::relation, value) fact from the text as JSON "
+        '{"key": "<subject::relation>", "object": "<current value>"}. If there is no clear single fact, '
+        'reply {"key": null}. Text:\n')
+
+    def _ex(text):
+        try:
+            raw = call_fn(prefix + (text or ""))
+            i, j = raw.find("{"), raw.rfind("}")
+            if i < 0 or j < 0:
+                return None
+            d = json.loads(raw[i:j + 1])
+            k = d.get("key")
+            if not k:
+                return None
+            return (str(k), str(d.get("object")) if d.get("object") is not None else None)
+        except Exception:
+            return None
+    return _ex
 
 
 if __name__ == "__main__":

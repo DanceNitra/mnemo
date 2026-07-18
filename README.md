@@ -1,14 +1,18 @@
 <div align="center">
 
+<img src="assets_readme/hero_banner.png" alt="mnemo — a glowing digital memory layer resting on a robust machined-steel base" width="800">
+
 # Mnemosyne · `mnemo`
 
 **The self-correcting memory layer for AI agents.**
 
-*When a fact changes, mnemo serves the correction — and won't let the stale value creep back in. Extracted from an autonomous research OS that has run it daily over ~6,000 notes.*
+*Correct a fact once and it stays corrected: mnemo serves the new value and refuses to let the old one creep
+back — deterministically, with no LLM on the write path. Extracted from an autonomous research OS that has run
+it daily over ~6,000 notes.*
 
-`pip install agora-mnemo` · [PyPI](https://pypi.org/project/agora-mnemo/) · [Hugging Face](https://huggingface.co/Danchi17/mnemo) · [DOI 10.5281/zenodo.21128549](https://doi.org/10.5281/zenodo.21128549) · [Homepage](https://dancenitra.github.io/mnemo/) · MIT · v1.9.9
+`pip install agora-mnemo` · [PyPI](https://pypi.org/project/agora-mnemo/) · [Hugging Face](https://huggingface.co/Danchi17/mnemo) · [DOI](https://doi.org/10.5281/zenodo.21128549) · [Homepage](https://dancenitra.github.io/mnemo/) · MIT · v1.11.0
 
-<img src="assets_readme/correction_demo.svg" alt="Terminal demo: a fact is corrected (Frankfurt to Ohio); later the old value is restated, yet recall still serves Ohio — the restatement lands retired via echo_guard" width="720">
+<img src="assets_readme/correction_demo.svg" alt="A fact is corrected; later the old value is restated, yet recall still serves the correction — the restatement lands retired via echo_guard" width="720">
 
 Built by **[Rastislav Drahoš](https://github.com/DanceNitra)** — extracted from [Agora](https://github.com/DanceNitra/agora), an autonomous research OS that runs it daily.
 
@@ -16,13 +20,56 @@ Built by **[Rastislav Drahoš](https://github.com/DanceNitra)** — extracted fr
 
 ---
 
-`mnemo` is the recall + consolidation core of [Agora](https://github.com/DanceNitra/agora) — an
-autonomous research system — distilled into **a single file with no required dependencies**. It does
-the four things agent memory actually needs, the way that held up running in production for weeks.
+## Why mnemo — the one thing no other agent memory does
 
-Most "agent memory" libraries are demos. This one is extracted from a system that has used it daily
-to curate a 6,000-note knowledge base, and whose consolidation behaviour we have **measured**, not
-assumed (see *Provenance* below).
+Every mainstream agent-memory library puts an **LLM on the write path**: it calls a model to extract, summarize,
+or build a graph *every time you store something*. mem0 runs LLM fact-extraction on `add()` by default; Zep/Graphiti
+runs LLM entity/edge extraction on every `add_episode()`. That one choice is why their stored state is
+**non-deterministic**, costs a model call per write, and can silently drop a fact.
+
+**mnemo has no LLM on the write path.** Storing a fact is a deterministic, zero-cost operation — and *that* is
+what makes three things possible the mainstream libraries don't offer:
+
+- **Corrections that stick.** Write a new value for a key and it *supersedes* the old one; `echo_guard` blocks a
+  later restatement of the retired value from resurfacing. No config, no model call.
+- **Revert on command.** `m.revert(key)` rolls a corrected fact back to its predecessor. Of the leading systems
+  we checked — mem0, Zep/Graphiti, Letta, Cognee, Memobase, MemoryScope, LangMem, txtai — **none exposes a
+  revert-to-predecessor command** (mem0's `history()` is a read-only log; Graphiti invalidates but never
+  un-invalidates; Letta has no undo).
+- **Provable erasure.** `forget_subject` removes a value from *every* surface and leaves a tamper-evident, signed
+  receipt. Among mainstream agent-memory libraries this is unique: mem0 keeps the deleted value in its SQLite
+  history table (only a full `reset()` purges it); Graphiti stamps the old edge `invalid_at` and *keeps* it.
+
+| | LLM on write | corrections stick | revert to predecessor | erasure leaves no residue |
+|---|---|---|---|---|
+| **mnemo** | **no — deterministic** | ✅ supersession + echo_guard | ✅ `revert(key)` | ✅ all surfaces + signed receipt |
+| mem0 | yes (by default) | LLM decides ADD/UPDATE | ✗ history is read-only | ✗ deleted value kept in history |
+| Zep / Graphiti | yes | temporal invalidation | ✗ no un-invalidate | ✗ invalidated edge retained |
+| Letta / MemGPT | yes | LLM rewrites the block | ✗ no undo | ✗ |
+
+*(Every competitor cell was checked against that project's current source/docs — see [the integrity
+benchmark](mnemo/probes/INTEGRITY_BENCHMARK.md), which also names each system that shares an individual property.
+Cryptographic deletion receipts do exist in purpose-built provenance systems like Engram and Heartwood; the claim
+here is scoped to mainstream agent-memory libraries.)*
+
+The mechanism underneath — **no LLM on the write path** — is the part a competitor can't copy without abandoning
+its extraction design. That is the moat.
+
+## And it doesn't cost you recall
+
+Integrity would be hollow if mnemo retrieved worse. It doesn't. On the standard **LOCOMO** benchmark (full set,
+n=1536), with the built-in tuned recipe (a semantic embedder + hybrid recall + a soft speaker prefilter),
+mnemo's **retrieval-recall@25 is 0.78** (a supporting turn is retrieved) / **0.65** (all supporting turns) —
+top-tier, and measured the honest way: **LLM-free and reproducible**, with no LLM judge to inflate it. Run it:
+`python mnemo/probes/retrieval_recall_locomo.py`.
+
+*(We deliberately don't headline an LLM-judged end-to-end QA score. Those are judge-dependent and not comparable
+across harnesses — mem0 reports 66.9% and Zep 71.2% under their own judges — so a cross-system "we win" claim
+would need running them through this harness, which we haven't done. What we publish is our own reproducible
+number.)*
+
+**Every number in this README traces to a runnable probe in [`mnemo/probes/`](mnemo/probes/). Nothing is
+asserted that you can't reproduce.**
 
 ## Quickstart (2 minutes)
 
@@ -34,25 +81,20 @@ pip install agora-mnemo          # zero required dependencies
 from mnemo import Mnemo
 
 m = Mnemo("memory.json")                      # persists to JSON; drop the path for pure in-memory
-
 m.remember("The API rate limit is 1000 req/min", key="api::rate_limit")
-m.remember("User prefers dark mode",            key="ui::theme")
-
 m.recall("what is the rate limit")            # -> ["The API rate limit is 1000 req/min"]
 
 # Correction is first-class: writing the same key supersedes the old value — no config, no LLM call.
 m.remember("The API rate limit is 5000 req/min", key="api::rate_limit")
-m.recall("rate limit")                        # -> ["The API rate limit is 5000 req/min"]  (only the current value)
-
-m.history("api::rate_limit")                  # -> full audit trail: [1000 -> 5000], oldest to newest
+m.recall("rate limit")                        # -> ["...5000 req/min"]  (only the current value)
+m.revert("api::rate_limit")                   # roll back to the predecessor, on command
+m.history("api::rate_limit")                  # full audit trail, oldest to newest
 ```
 
-That is the whole loop most agents need: **remember, recall, correct, and audit** — in one zero-dependency
-file. Add `embed=your_model` for semantic recall; everything below is depth (governance, poison-resistance,
-bitemporal, multi-tenancy) you can reach for when you need it.
-
-Runnable examples live in [`examples/`](examples/): [basics](examples/01_basics.py) ·
-[correction & erasure](examples/02_correction_and_erasure.py) · [semantic recall](examples/03_semantic_recall.py).
+New in **1.11.0**: ready-made write-path extractors (`regex_extractor`, deterministic; `make_llm_extractor`,
+opt-in) so supersession engages over free text without an explicit key, and a first-class **LangChain**
+integration (`from mnemo.integrations.langchain import MnemoRetriever` — a retriever that never hands a
+superseded fact back to your chain). `pip install "agora-mnemo[langchain]"`.
 
 ## Give your agent this memory in 60 seconds (MCP)
 
@@ -86,6 +128,27 @@ recall serves the current value, a restated stale value can't resurrect it (`ech
 [Framework integrations](#framework-integrations) ·
 [The four operations](#the-four-operations) · [Five rules](#five-rules-it-wont-break-each-one-cost-us-to-learn) ·
 [Provenance & receipts](#provenance--why-these-rules-with-receipts) · [Threat model](#threat-model--layered-defense-adversarial-memory-integrity)
+
+## Claude Code: deterministic auto-capture memory (1.10.0)
+
+One command turns mnemo into persistent memory for Claude Code, the same auto-capture the popular coding-memory
+plugins do, but with **no LLM on the write path**, so a corrected fact supersedes the stale one and cannot come
+back:
+
+```bash
+pip install agora-mnemo
+python -m mnemo.claude_code --install     # writes the hooks into ./.claude/settings.json
+```
+
+That is it. `PostToolUse` captures your edits and commands into a deterministic, keyed store; `UserPromptSubmit`
+injects the current-state memory before Claude answers; `SessionStart` shows what the project already knows. The
+store is a local JSON file at `.mnemo/coding_memory.json` you can read, grep, or delete.
+
+Why it differs from the LLM-summarizing coding memories: you change an API signature, rename a symbol, move a
+file, and mnemo keeps only the current state (keyed by file). Next session Claude recalls the new signature,
+never the old one, and a stale line reappearing in a diff or paste cannot resurrect it (`echo_guard`). Same
+convenience, but corrections stick, capture is reproducible, and a secret can be provably erased. Remove with
+`python -m mnemo.claude_code --uninstall`.
 
 ## Correction is a first-class operation (measured across systems)
 

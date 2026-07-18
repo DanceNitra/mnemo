@@ -3,6 +3,34 @@
 All notable changes to mnemo (`agora-mnemo`). Format loosely follows Keep a Changelog; versioning is semver
 (MAJOR = stable/breaking, MINOR = features, PATCH = fixes).
 
+## 1.11.0
+
+Three additive features, no breaking changes.
+
+**Ready-made write-path extractors.** `regex_extractor` (deterministic, no LLM — keeps the zero-LLM-on-write
+core) and `make_llm_extractor(call_fn)` (opt-in; puts an LLM on the write path in exchange for auto-capture of
+unstructured text). Set `m.extractor = regex_extractor` and supersession/echo_guard/revert engage over free text
+without the caller passing an explicit `key`. Both fail-open (a returned `None` falls back to a plain append).
+
+**LangChain integration.** `mnemo.integrations.langchain` ships `MnemoRetriever` (a `BaseRetriever` whose
+results are supersession-filtered — a corrected fact is never retrieved back into the prompt) and
+`MnemoChatMessageHistory`. Opt-in extra: `pip install "agora-mnemo[langchain]"`.
+
+**Tuned recall recipe + a measured LOCOMO number.** `mnemo/examples/recall_recipe_locomo.py` shows the built-in
+levers (an embedder → lexical+semantic hybrid RRF; a soft speaker/entity prefilter via `recall(prefer=...)`) that
+put mnemo in the top tier on retrieval. Measured on the full LOCOMO benchmark (n=1536), LLM-free and reproducible:
+retrieval-recall@25 = 0.783 (any evidence turn) / 0.648 (all). Run `mnemo/probes/retrieval_recall_locomo.py`.
+
+## 1.10.0
+
+Claude Code integration: deterministic, no-LLM auto-capture of coding-agent memory. `python -m
+mnemo.claude_code --install` writes lifecycle hooks (`PostToolUse` / `UserPromptSubmit` / `SessionStart`) into
+`.claude/settings.json`. `PostToolUse` captures Edit/Write/MultiEdit/Bash events into a deterministic keyed
+store (`file:<path>`), so a corrected fact supersedes the stale one and `echo_guard` blocks its resurrection;
+`UserPromptSubmit` injects the current-state memory; `SessionStart` digests the project's known files. No LLM on
+the write path (unlike the LLM-summarizing coding memories, which drop facts, leak on erasure, and are
+non-reproducible). Fail-open hooks, local JSON store at `.mnemo/coding_memory.json`, `--uninstall` to remove.
+
 ## 1.9.0
 
 Identity-confidence gate on supersession, with a candidate reconciliation queue. Prompted by a sharp reader

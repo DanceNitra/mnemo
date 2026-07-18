@@ -1,0 +1,143 @@
+#!/usr/bin/env python3
+"""mnemo <-> Claude Code: deterministic, no-LLM auto-capture of coding-agent memory.
+
+Other coding-agent memories (Claude-Mem, agentmemory) auto-capture your session via lifecycle hooks but
+LLM-summarize on the write path, which drops facts, leaks on erasure, and is non-reproducible. This does the
+same auto-capture with NO LLM: it writes tool events into a deterministic, keyed mnemo store, so a corrected
+fact (a changed API signature, a renamed symbol, a moved file) SUPERSEDES the stale one and cannot be resurrected
+by an echo. Persistent across sessions, provably erasable, zero-dependency. The store is a local JSON file at
+<project>/.mnemo/coding_memory.json.
+
+Use it two ways:
+  python -m mnemo.claude_code --install     # write the hooks block into ./.claude/settings.json
+  python -m mnemo.claude_code               # (as a hook) reads a Claude Code event on stdin and acts on it
+
+Hook events handled (dispatched by hook_event_name on stdin JSON):
+  PostToolUse       -> capture Edit/Write/MultiEdit/Bash deterministically, keyed by file path.
+  UserPromptSubmit  -> recall memory relevant to the prompt; print it (Claude Code injects stdout as context).
+  SessionStart      -> print a short digest of the project's known files (latest state only).
+Fail-open: any error exits 0 with no output, so the hook never blocks the agent.
+"""
+import sys, os, json, hashlib
+
+
+def _store(cwd):
+    from mnemo import Mnemo
+    d = os.path.join(cwd or os.getcwd(), ".mnemo")
+    os.makedirs(d, exist_ok=True)
+    m = Mnemo(path=os.path.join(d, "coding_memory.json"))
+    m.echo_guard = True
+    return m
+
+
+def _rel(p, cwd):
+    try:
+        return os.path.relpath(p, cwd) if cwd and p else p
+    except Exception:
+        return p
+
+
+def _excerpt(s, n=180):
+    s = (s or "").strip().replace("\n", " ")
+    return (s[:n] + "…") if len(s) > n else s
+
+
+def capture(ev):
+    cwd = ev.get("cwd") or os.getcwd()
+    tool = ev.get("tool_name", "")
+    ti = ev.get("tool_input", {}) or {}
+    m = _store(cwd)
+    if tool in ("Edit", "MultiEdit", "Write"):
+        fp = _rel(ti.get("file_path", ""), cwd)
+        if not fp:
+            return
+        new = ti.get("new_string") or ti.get("content") or ""
+        m.remember(f"{fp} :: current state -> {_excerpt(new)}", key=f"file:{fp}", object=_excerpt(new, 80),
+                   mtype="semantic", tags=["file", "edit"])
+    elif tool == "Bash":
+        cmd = _excerpt(ti.get("command", ""), 200)
+        if cmd:
+            m.remember(f"ran: {cmd}", key=f"cmd:{hashlib.sha1(cmd.encode()).hexdigest()[:10]}",
+                       object=cmd[:60], mtype="episodic", tags=["bash"])
+    m._save()
+
+
+def recall(ev):
+    q = ev.get("prompt") or ev.get("user_prompt") or ""
+    if not q.strip():
+        return
+    hits = _store(ev.get("cwd") or os.getcwd()).recall(q, k=5)
+    if hits:
+        lines = "\n".join(f"- {h['text']}" for h in hits)
+        print(f"[mnemo] relevant project memory (deterministic, corrections already applied):\n{lines}")
+
+
+def session_start(ev):
+    m = _store(ev.get("cwd") or os.getcwd())
+    files = [it for it in getattr(m, "items", []) if "file" in (it.get("tags") or [])
+             and it.get("status") != "superseded"][:8]
+    if files:
+        lines = "\n".join(f"- {it['text']}" for it in files)
+        print(f"[mnemo] this project's current known files (latest state only):\n{lines}")
+
+
+_HOOK = {"hooks": [{"type": "command", "command": "python -m mnemo.claude_code"}]}
+
+
+def install(cwd=None):
+    """Write the three hooks into ./.claude/settings.json (merging, not clobbering)."""
+    cwd = cwd or os.getcwd()
+    d = os.path.join(cwd, ".claude")
+    os.makedirs(d, exist_ok=True)
+    p = os.path.join(d, "settings.json")
+    cfg = {}
+    if os.path.exists(p):
+        try:
+            cfg = json.load(open(p, encoding="utf-8"))
+        except Exception:
+            cfg = {}
+    hooks = cfg.setdefault("hooks", {})
+    for evt in ("PostToolUse", "UserPromptSubmit", "SessionStart"):
+        existing = json.dumps(hooks.get(evt, []))
+        if "mnemo.claude_code" not in existing:
+            hooks.setdefault(evt, []).append(dict(_HOOK))
+    json.dump(cfg, open(p, "w", encoding="utf-8"), indent=2)
+    print(f"mnemo: installed Claude Code hooks into {p}")
+    print("Restart Claude Code in this project. Memory lands in ./.mnemo/coding_memory.json (deterministic, "
+          "no LLM, provably erasable). Run `python -m mnemo.claude_code --uninstall` to remove.")
+
+
+def uninstall(cwd=None):
+    p = os.path.join(cwd or os.getcwd(), ".claude", "settings.json")
+    if not os.path.exists(p):
+        return
+    cfg = json.load(open(p, encoding="utf-8"))
+    for evt, arr in list(cfg.get("hooks", {}).items()):
+        cfg["hooks"][evt] = [h for h in arr if "mnemo.claude_code" not in json.dumps(h)]
+    json.dump(cfg, open(p, "w", encoding="utf-8"), indent=2)
+    print(f"mnemo: removed Claude Code hooks from {p}")
+
+
+def main():
+    if "--install" in sys.argv:
+        install(); return
+    if "--uninstall" in sys.argv:
+        uninstall(); return
+    try:
+        ev = json.load(sys.stdin)
+    except Exception:
+        return
+    try:
+        name = ev.get("hook_event_name", "")
+        if name == "PostToolUse":
+            capture(ev)
+        elif name == "UserPromptSubmit":
+            recall(ev)
+        elif name == "SessionStart":
+            session_start(ev)
+    except Exception:
+        pass
+
+
+if __name__ == "__main__":
+    main()
