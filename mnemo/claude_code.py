@@ -97,11 +97,59 @@ def _excerpt(s, n=180):
     return (s[:n] + "…") if len(s) > n else s
 
 
+# ── one-time, opt-out star nudge (shown ONCE after mnemo has proven its worth) ─────────────────────
+_NUDGE_AFTER = 25   # writes before the (single) star ask fires — a milestone of demonstrated value
+
+
+def _nudge_path(cwd):
+    return os.path.join(cwd or os.getcwd(), ".mnemo", "nudge.json")
+
+
+def _nudge_state(cwd):
+    try:
+        return json.load(open(_nudge_path(cwd), encoding="utf-8"))
+    except Exception:
+        return {"writes": 0, "shown": False}
+
+
+def _bump_writes(cwd):
+    """Count a capture toward the value milestone (best-effort, fail-open)."""
+    try:
+        st = _nudge_state(cwd)
+        st["writes"] = int(st.get("writes", 0)) + 1
+        json.dump(st, open(_nudge_path(cwd), "w", encoding="utf-8"))
+    except Exception:
+        pass
+
+
+def _maybe_nudge(cwd):
+    """Print the star ask exactly once, after mnemo has actually been useful. Opt out with
+    MNEMO_NO_NUDGE=1. Never blocks and never repeats."""
+    if os.environ.get("MNEMO_NO_NUDGE", "").strip() in ("1", "true", "yes"):
+        return
+    try:
+        st = _nudge_state(cwd)
+        if st.get("shown") or int(st.get("writes", 0)) < _NUDGE_AFTER:
+            return
+        # ASCII-only on purpose: hook stdout can be a non-UTF-8 console (e.g. Windows cp1250), where an
+        # emoji would garble or drop the line. The word "star" carries it; the README badge carries the glyph.
+        print(
+            f"\n[mnemo] A small ask: mnemo has quietly remembered {st['writes']} things for you here so far.\n"
+            "If it's been useful, please consider giving it a star -- it's honestly the main way other people\n"
+            "find it, and it would genuinely make my day. Thank you so much! https://github.com/DanceNitra/mnemo\n"
+            "(you'll only ever see this once; silence it anytime with MNEMO_NO_NUDGE=1)")
+        st["shown"] = True
+        json.dump(st, open(_nudge_path(cwd), "w", encoding="utf-8"))
+    except Exception:
+        pass
+
+
 def capture(ev):
     cwd = ev.get("cwd") or os.getcwd()
     tool = ev.get("tool_name", "")
     ti = ev.get("tool_input", {}) or {}
     m = _store(cwd)
+    did = False
     if tool in ("Edit", "MultiEdit", "Write"):
         fp = _rel(ti.get("file_path", ""), cwd)
         if not fp:
@@ -109,22 +157,28 @@ def capture(ev):
         new = ti.get("new_string") or ti.get("content") or ""
         m.remember(f"{fp} :: current state -> {_excerpt(new)}", key=f"file:{fp}", object=_excerpt(new, 80),
                    mtype="semantic", tags=["file", "edit"])
+        did = True
     elif tool == "Bash":
         cmd = _excerpt(ti.get("command", ""), 200)
         if cmd:
             m.remember(f"ran: {cmd}", key=f"cmd:{hashlib.sha1(cmd.encode()).hexdigest()[:10]}",
                        object=cmd[:60], mtype="episodic", tags=["bash"])
+            did = True
     m._save()
+    if did:
+        _bump_writes(cwd)
 
 
 def recall(ev):
+    cwd = ev.get("cwd") or os.getcwd()
     q = ev.get("prompt") or ev.get("user_prompt") or ""
     if not q.strip():
         return
-    hits = _store(ev.get("cwd") or os.getcwd()).recall(q, k=5)
+    hits = _store(cwd).recall(q, k=5)
     if hits:
         lines = "\n".join(f"- {h['text']}" for h in hits)
         print(f"[mnemo] relevant project memory (deterministic, corrections already applied):\n{lines}")
+    _maybe_nudge(cwd)   # visible slot: UserPromptSubmit stdout is shown to the user
 
 
 def session_start(ev):

@@ -3,6 +3,13 @@
 All notable changes to mnemo (`agora-mnemo`). Format loosely follows Keep a Changelog; versioning is semver
 (MAJOR = stable/breaking, MINOR = features, PATCH = fixes).
 
+## 1.12.1
+
+**Claude Code plugin: a one-time, opt-out star nudge.** After mnemo has actually been useful — 25 captured
+writes in a project — the plugin prints a single, warm request to star the repo on the next prompt, then never
+again. ASCII-only (safe on non-UTF-8 consoles), never blocks, and silenced anytime with `MNEMO_NO_NUDGE=1`.
+Tied to a moment of demonstrated value, not to install time (which wheels can't run anyway).
+
 ## 1.12.0
 
 Additive only, no breaking changes.
