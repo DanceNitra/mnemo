@@ -324,7 +324,7 @@ def sign_erasure(principal_sk_hex: str, subject: str, request_id) -> str:
     sk = _Ed25519SK.from_private_bytes(bytes.fromhex(principal_sk_hex))
     return sk.sign(erasure_challenge(subject, request_id).encode()).hex()
 
-__version__ = "1.12.2"
+__version__ = "1.12.3"
 
 # Internal sentinel: marks a reaffirm write already authorized by submit_revert() (which verified the
 # signed INTENT). Object identity — no text/content path can ever produce it.
@@ -2577,7 +2577,7 @@ class Mnemo:
                prefer_max_boost: float | None = None, near: dict | None = None,
                tie_recent: float | None = None,
                with_status: bool = False, with_warrant: bool = False,
-               redact_pii: bool = False) -> list[dict]:
+               redact_pii: bool = False, rerank=None, rerank_pool: int | None = None) -> list[dict]:
         """Top-k memories by RELEVANCE × VALUE — high-value memories outrank merely-similar ones.
         Memories the dream pass flagged as hubs (universal matchers) are skipped unless include_hubs.
 
@@ -2885,6 +2885,23 @@ class Mnemo:
             _rest = [t for t in scored if t[1] < _top_sim - _eps]
             _tied.sort(key=lambda t: -(t[2].get("valid_from") or t[2]["ts"]))
             scored = _tied + _rest
+        # OPT-IN reranker hook (retrieve-then-rerank). `rerank(query, records) -> list[float]` (one relevance
+        # score per record, higher=better) lets a caller plug a cross-encoder / model reranker over the top
+        # candidates — the one lever MEASURED to lift multi-hop recall beyond mnemo's zero-LLM base (LoCoMo
+        # multi-hop full-recall ~0.30 -> ~0.48 with a reader-reranker; [[locomo-iterative-lever-full-benchmark]]).
+        # Model-agnostic (mnemo never imports a model) and MOAT-SAFE: no LLM runs unless the caller supplies one,
+        # and the WRITE path is untouched. rerank_pool bounds how many top candidates are reranked (default
+        # max(4*k, 50)). Fail-open: any error keeps the pre-rerank order.
+        if rerank is not None and scored:
+            _m = int(rerank_pool) if rerank_pool else max(4 * k, 50)
+            _head = scored[:_m]
+            try:
+                _rs = rerank(query, [t[2] for t in _head])
+                if _rs is not None and len(_rs) == len(_head):
+                    _order = sorted(range(len(_head)), key=lambda i: -float(_rs[i]))
+                    scored = [_head[i] for i in _order] + scored[_m:]
+            except Exception:
+                pass
         out = []
         _top_sim = scored[0][1] if scored else 1.0   # normalize reinforcement by this query's best match
         for score, sim, r in scored[:k]:

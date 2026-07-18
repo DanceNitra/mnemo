@@ -3,6 +3,17 @@
 All notable changes to mnemo (`agora-mnemo`). Format loosely follows Keep a Changelog; versioning is semver
 (MAJOR = stable/breaking, MINOR = features, PATCH = fixes).
 
+## 1.12.3
+
+**Optional reranker hook: `recall(rerank=callable, rerank_pool=N)`.** A retrieve-then-rerank extension point:
+`rerank(query, records) -> list[float]` (one relevance score per record, higher=better) reorders the top
+candidates before truncation to `k`. Model-agnostic (mnemo imports no model) and moat-safe: no model runs
+unless the caller supplies one, the WRITE path is untouched, default `None` = zero behavior change, and it
+fails open (a broken or wrong-length reranker keeps the pre-rerank order). Honest scope: the lift is only as
+good as the reranker — a model-READER reranker is the measured multi-hop lever (LoCoMo ~0.30->~0.48), whereas a
+generic query-relevance cross-encoder does NOT help multi-hop (measured: it hurts, because 2nd-hop evidence
+isn't directly query-relevant). Receipt: `mnemo/probes/mnemo_rerank_hook_probe.py` (5/5).
+
 ## 1.12.2
 
 **Opt-out "a newer version is available" check.** When mnemo runs (Claude Code `SessionStart`, or the MCP
