@@ -16,6 +16,12 @@ deterministic, all 10 conversations, n=1536): **recall_any@1 0.193 → 0.294, @2
 plainly: this is a self-comparison bug-fix on a single dataset/embedder; `recall_any` (≥1 gold turn retrieved) is a
 retrieval upper bound, not end-to-end QA, and multi-hop full-recall barely moves. We make no cross-system claim here.
 
+> **Correction (post-release, honesty note).** These absolute figures were measured with `recall()`'s per-hit value
+> reinforcement active while sweeping many queries against one store, which is an order-dependent confound (later
+> queries see values shifted by earlier hits). The DIRECTION and the correctness of the fix stand (asymmetric
+> prefixing is required by Nomic's model card), but the exact absolute deltas should be treated as indicative only; a
+> reinforcement-controlled re-measure is in progress and clean numbers will be reported before any comparative claim.
+
 **Migration guard (persisted vectors).** Because a query and its stored vectors must live in the SAME embedding
 space, changing the embed recipe (e.g. turning prefixes on) would silently mis-rank an existing `persist_vectors=True`
 store. `Mnemo(embed_id=…)` fingerprints the recipe into a `<path>.embedid` sidecar; on open with a different
