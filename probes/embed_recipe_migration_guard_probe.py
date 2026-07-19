@@ -94,5 +94,20 @@ m9 = Mnemo(path=p4, embed=embC, persist_vectors=True, embed_id="C")
 check("8b the rebuilt vectors are persisted", all(r.get("vec") == [0.0, 0.0, 1.0] for r in m9.items))
 os.environ.pop("MNEMO_REALIGN_MAX", None)
 
+# 9: a LEXICAL open of a semantic store must be a pure bystander. The Claude Code hooks default to
+# embed=None (GPU-free hot path) while the store may hold vectors from a semantic session:
+# persist_vectors=True + embed_id=None must (a) keep the persisted vectors across a save, and
+# (b) leave the .embedid sidecar untouched — blanking it would make the next semantic open see
+# ''->recipe and realign for nothing (the exact once-only guarantee of checks 6/6b).
+sidecar_before = open(p4 + ".embedid").read().strip()
+mL = Mnemo(path=p4, embed=None, persist_vectors=True)          # lexical open, no recipe
+mL.remember("captured lexically", key="lex1")
+mL._save(force=True)
+mM = Mnemo(path=p4, embed=embC, persist_vectors=True, embed_id="C")
+check("9 lexical open+save preserves the persisted vectors",
+      all(r.get("vec") == [0.0, 0.0, 1.0] for r in mM.items if r.get("key") != "lex1"))
+check("9b lexical save leaves the embedid sidecar untouched",
+      open(p4 + ".embedid").read().strip() == sidecar_before == "C")
+
 print(f"\n{'ALL PASS' if not FAILS else 'FAILED: ' + ', '.join(FAILS)}")
 sys.exit(1 if FAILS else 0)

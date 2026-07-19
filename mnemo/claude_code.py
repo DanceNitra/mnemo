@@ -45,11 +45,23 @@ def _make_embedder(cwd):
     (MNEMO_EMBED_URL / MNEMO_EMBED_MODEL / MNEMO_EMBED_KEY) or .mnemo/config.json {"embed": {...}}.
     Returns (embed_doc, embed_query, embed_id); (None, None, None) when unconfigured -> LEXICAL recall.
     Fail-open on the write path: mnemo stores the record with vec=None if a call raises, so a down
-    embedder degrades recall to lexical but never drops a capture."""
+    embedder degrades recall to lexical but never drops a capture.
+
+    HOOKS ARE LEXICAL BY DEFAULT (opt in with MNEMO_EMBED_HOOKS=1 or config {"embed": {"hooks": true}}).
+    The hooks run in the agent's hot path — PostToolUse after EVERY Edit/Write/Bash, UserPromptSubmit
+    blocking the prompt — and with a local GPU embedder each capture costs one embedding call (~2s on an
+    idle GPU, unbounded on a busy one: this plugin's own dogfood machine runs a 21GB LLM on the same card).
+    The capture is deterministic and keyed either way; what the embedder buys on THIS store is small (its
+    bulk is 'ran: ...' mechanics, the least semantic content there is), so the hot path defaults to the
+    zero-network lexical mode and semantic stays a deliberate choice for stores where it earns its cost."""
     import urllib.request
     ec = _cfg(cwd).get("embed", {})
     if not isinstance(ec, dict):
         ec = {}
+    hooks_on = os.environ.get("MNEMO_EMBED_HOOKS", "").strip().lower() in ("1", "true", "yes") \
+        or ec.get("hooks") is True
+    if not hooks_on:
+        return None, None, None
     url = (os.environ.get("MNEMO_EMBED_URL") or ec.get("url") or "").strip()
     if not url:
         return None, None, None
@@ -83,11 +95,13 @@ def _store(cwd):
     d = os.path.join(cwd or os.getcwd(), ".mnemo")
     os.makedirs(d, exist_ok=True)
     emb_doc, emb_query, emb_id = _make_embedder(cwd)
-    # persist_vectors only when an embedder is configured: a coding store is small and its process is
-    # short-lived (one per hook), so keeping vecs on disk lets semantic recall survive a reload without
-    # re-embedding every item on each start. With no embedder we keep the legacy vec-less (lexical) store.
+    # persist_vectors is ALWAYS on: a store that acquired vectors during a semantic session must keep them
+    # across a lexical open — persist_vectors=False strips vecs on save, so one hook run with the embedder
+    # off would silently erase every persisted vector. On a store that never had vecs it is a no-op. The
+    # matching core guarantee: _save leaves the .embedid sidecar untouched when embed_id is None, so a
+    # lexical open can never mislabel (or blank) the recipe the persisted vectors were made with.
     m = Mnemo(path=os.path.join(d, "coding_memory.json"), embed=emb_doc, embed_query=emb_query,
-              embed_id=emb_id, persist_vectors=emb_doc is not None)
+              embed_id=emb_id, persist_vectors=True)
     m.echo_guard = True
     return m
 

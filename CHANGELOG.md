@@ -3,6 +3,22 @@
 All notable changes to mnemo (`agora-mnemo`). Format loosely follows Keep a Changelog; versioning is semver
 (MAJOR = stable/breaking, MINOR = features, PATCH = fixes).
 
+## 1.20.0
+
+**Claude Code hooks are now LEXICAL by default (opt in to semantic with `MNEMO_EMBED_HOOKS=1` or config
+`{"embed": {"hooks": true}}`).** The hooks run in the agent's hot path — PostToolUse after every
+Edit/Write/Bash, UserPromptSubmit blocking prompt submission — and with a local GPU embedder each capture
+cost one embedding call: ~2s on an idle GPU, unbounded on a busy one (this plugin's own dogfood machine runs
+a 21GB LLM on the same card). The capture is deterministic and keyed either way, and on a coding store the
+embedder buys little (its bulk is `ran: ...` mechanics, the least semantic content there is). Measured on the
+dogfood store: 2.8s -> 0.65s per hook, zero GPU traffic. Semantic recall in the MCP server, CLI and library
+is unchanged — this narrows only the hook hot path.
+
+Two core guarantees added so a lexical open is a pure bystander on a semantic store: the plugin always opens
+with `persist_vectors=True` (a vec-less open would otherwise strip every persisted vector on its first save),
+and `_save()` leaves the `.embedid` sidecar untouched when `embed_id` is None (blanking it would make the
+next semantic open see `''->recipe` and realign for nothing). Probe gains regressions 9/9b.
+
 ## 1.19.0
 
 Security and correctness pass over everything 1.16.0–1.18.0 shipped, from an audit of the whole unreleased
