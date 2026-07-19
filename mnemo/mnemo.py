@@ -2846,7 +2846,8 @@ class Mnemo:
                prefer_max_boost: float | None = None, near: dict | None = None,
                tie_recent: float | None = None,
                with_status: bool = False, with_warrant: bool = False,
-               redact_pii: bool = False, rerank=None, rerank_pool: int | None = None) -> list[dict]:
+               redact_pii: bool = False, rerank=None, rerank_pool: int | None = None,
+               reinforce: bool = True) -> list[dict]:
         """Top-k memories by RELEVANCE × VALUE — high-value memories outrank merely-similar ones.
         Memories the dream pass flagged as hubs (universal matchers) are skipped unless include_hubs.
 
@@ -3181,9 +3182,14 @@ class Mnemo:
             # ties reinforcement to how well the memory actually answered. (Independently converged on
             # in production by the Dakera and mem0 teams: weight access events by recall score, not raw
             # count.)
-            rel = (sim / _top_sim) if _top_sim > 0 else 1.0
-            r["value"] += 0.25 * rel
-            r["last_access"] = _now                 # ...and resets the per-type decay clock
+            # reinforce=False: a NON-MUTATING read (no value bump, no decay-clock reset, no graduation) — for
+            # eval/benchmark or read-only consumers where recall order must not depend on prior queries. The
+            # per-hit reinforcement below optimizes value-weighted importance for a WARM store, but on a cold
+            # query stream it is an order-dependent confound (measured to depress recall_any ~0.10 @low-k).
+            if reinforce:
+                rel = (sim / _top_sim) if _top_sim > 0 else 1.0
+                r["value"] += 0.25 * rel
+                r["last_access"] = _now             # ...and resets the per-type decay clock
             # Type GRADUATION: an episodic memory recalled into high accrued value has proven durable,
             # so promote it to semantic — it stops fading on the fast 7-day episodic clock and decays
             # on the slow semantic one instead. (Dakera's access-driven episodic->semantic promotion,
@@ -3216,7 +3222,7 @@ class Mnemo:
             corroborated = ((_good_earned > 0 and _good >= _bad) or _distinct >= 2) \
                 and not (r.get("meta") or {}).get("slashed") \
                 and not r.get("orphan")   # landed retraction OR orphan (no lineage) blocks (re-)graduation too
-            if r.get("mtype") == "episodic" and r["value"] >= _GRADUATE_VALUE and corroborated:
+            if reinforce and r.get("mtype") == "episodic" and r["value"] >= _GRADUATE_VALUE and corroborated:
                 r["mtype"] = "semantic"
                 r.setdefault("meta", {})["graduated_from_episodic"] = True
             _o = {"id": r["id"], "text": r["text"], "tags": r["tags"], "iso": r["iso"],
