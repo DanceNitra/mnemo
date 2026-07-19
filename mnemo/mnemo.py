@@ -4660,6 +4660,55 @@ class Mnemo:
         return {k: {"count": v["count"], "value": round(v["value"], 2),
                     "avg": round(v["value"] / v["count"], 2)} for k, v in out.items()}
 
+    def graph(self, include_superseded: bool = False) -> dict:
+        """Deterministic knowledge GRAPH over keyed (subject::relation, object) memories — zero-LLM, no graph DB.
+        Every memory stored with a key of the form 'subject::relation' AND an `object` is an edge
+        subject -[relation]-> object; entities are the subjects + objects. This gives the 'graph memory' view
+        mem0/Zep/cognee ship, but DERIVED deterministically from mnemo's existing supersession triples (no LLM
+        entity-extraction, no separate graph store). It covers memories keyed explicitly OR via the optional
+        `extractor` hook, so extractor-keyed free text also enters the graph. Only ACTIVE edges by default, so a
+        superseded fact drops out of the graph (the graph reflects CURRENT truth) unless include_superseded.
+        Returns {'nodes': [entity,...], 'edges': [{subject, relation, object, id, text}, ...]}."""
+        edges, nodes = [], set()
+        for r in self.items:
+            if not include_superseded and r.get("status") != "active":
+                continue
+            if self.tenant is not None and r.get("tenant") != self.tenant:
+                continue
+            k = r.get("key") or ""
+            obj = r.get("object")
+            if "::" in k and obj:
+                subj, rel = k.split("::", 1)
+                edges.append({"subject": subj, "relation": rel, "object": str(obj),
+                              "id": r["id"], "text": r.get("text", "")})
+                nodes.add(subj); nodes.add(str(obj))
+        return {"nodes": sorted(nodes), "edges": edges}
+
+    def subgraph(self, entity: str, hops: int = 1, include_superseded: bool = False) -> dict:
+        """MULTI-HOP graph traversal from `entity` (matched as a subject OR an object), up to `hops` edges away —
+        the 'connected memories' / multi-hop retrieval a graph memory offers, as a deterministic BFS over the
+        (subject, relation, object) edges (no LLM, no graph DB). Returns {'nodes', 'edges'} reachable within hops."""
+        g = self.graph(include_superseded=include_superseded)
+        adj: dict = {}
+        for e in g["edges"]:
+            adj.setdefault(e["subject"], []).append(e)
+            adj.setdefault(e["object"], []).append(e)
+        seen_nodes, seen_edges, edge_ids = {entity}, [], set()
+        frontier = {entity}
+        for _ in range(max(0, int(hops))):
+            nxt = set()
+            for node in frontier:
+                for e in adj.get(node, []):
+                    if e["id"] not in edge_ids:
+                        edge_ids.add(e["id"]); seen_edges.append(e)
+                    for other in (e["subject"], e["object"]):
+                        if other not in seen_nodes:
+                            seen_nodes.add(other); nxt.add(other)
+            frontier = nxt
+            if not frontier:
+                break
+        return {"nodes": sorted(seen_nodes), "edges": seen_edges}
+
     def _resolve_key(self) -> bytes:
         """The 32-byte AES key for this store. A raw key is used directly; a passphrase is scrypt-derived
         against the store's salt (from the file header on load, or minted on first save) and cached so scrypt
