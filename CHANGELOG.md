@@ -3,6 +3,15 @@
 All notable changes to mnemo (`agora-mnemo`). Format loosely follows Keep a Changelog; versioning is semver
 (MAJOR = stable/breaking, MINOR = features, PATCH = fixes).
 
+## 1.22.0
+
+**MCP: the hydration-witness primitives are now tools.** `witness`, `verify_witness`, and `index_coherence`
+are exposed over the MCP server, so any Claude/Cursor/agent client can pin an answer to the store revision it
+was derived from ("this answer reflects store state as of revision X"), check later whether that answer
+predates a change, and ask whether the derived semantic index agrees with the store — all deterministic,
+zero-LLM, read-only (witness/verify) exactly as in the 1.21.0 core. Smoke-tested end to end through the MCP
+module (witness → verify true on unchanged → false after a write; coherence report fields present).
+
 ## 1.21.0
 
 **Hydration witness: `witness()` / `verify_witness()` / `state_digest()`.** A compact, deterministic receipt

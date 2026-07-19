@@ -403,6 +403,32 @@ def verify_writes() -> dict:
 
 
 @mcp.tool()
+def witness() -> dict:
+    """HYDRATION WITNESS: a compact, deterministic receipt of the store state your answer was derived from —
+    "this answer reflects store state as of revision X". Call it right after recall() and attach the result to
+    the answer; any later write/supersession/revert/erasure changes the digest, and verify_witness() makes that
+    visible. When write receipts are enabled it is anchored to the tamper-evident write chain. No LLM."""
+    return _MEM.witness()
+
+
+@mcp.tool()
+def verify_witness(witness: dict) -> dict:
+    """Check a hydration witness against the store as it is NOW. digest_match=true means the store is still in
+    the exact state the witness pinned; false means the answer that carried it predates a change (stale serve
+    made visible instead of silent). Deterministic re-computation, no LLM."""
+    return _MEM.verify_witness(witness)
+
+
+@mcp.tool()
+def index_coherence() -> dict:
+    """Does the derived semantic index agree with the store? Reports active text records missing a vector while
+    an embedder is configured (index behind store), persisted-vector recipe vs the current embedder, and the
+    persistence regime. A governed store can still serve stale answers through a lagging index — this is the
+    deterministic check for exactly that. Read-only."""
+    return _MEM.index_coherence()
+
+
+@mcp.tool()
 def pii_report() -> dict:
     """What PII the store currently holds, by type (emails, phones, cards, …) — a data-minimization / audit view.
     Read-only; pair with forget_pii to act on it."""
