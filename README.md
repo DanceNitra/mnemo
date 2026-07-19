@@ -131,7 +131,7 @@ recall serves the current value, a restated stale value can't resurrect it (`ech
 `route` undo a correction on an unmarked "go back". Fifteen tools total; [details below](#use-it-as-an-mcp-server-any-claude--cursor--agent-client).
 
 **Jump to:** [Correction (measured)](#correction-is-a-first-class-operation-measured-across-systems) ·
-[Governance & erasure](#governance-erasure--audit) · [Install](#install) ·
+[Governance & erasure](#governance-erasure--audit) · [Org-wide erasure receipt](#org-wide-erasure-receipt-prove-deletion-across-your-whole-stack-not-one-library) · [Install](#install) ·
 [MCP server](#use-it-as-an-mcp-server-any-claude--cursor--agent-client) ·
 [Shell CLI](#use-it-from-the-shell-the-mnemo-cli-1124) ·
 [Framework integrations](#framework-integrations) ·
@@ -796,6 +796,29 @@ included, leaves bytes in free space/backups), and NOT the app's own vector stor
 erasure use an encrypted store + `shred()` (NIST SP 800-88 crypto-erasure: destroy the key, ciphertext and
 every backup die); for cross-store erasure register `ErasureTarget`s so `forget_subject` cascades. Receipts:
 `mnemo/probes/erasure_certificate_probe.py`, `erasure_raw_store_probe.py`.
+
+### Org-wide erasure receipt: prove deletion across your WHOLE stack, not one library
+A right-to-erasure demand isn't satisfied by one library scrubbing its own file — the subject's data is also in
+your vector index, your retrieval logs, your caches, your backups. `DeletionManifest` (`mnemo.deletion_manifest`)
+cascades the erasure across **every store you register** and emits ONE signed, tamper-evident manifest:
+
+```python
+from mnemo.deletion_manifest import DeletionManifest
+man = (DeletionManifest(sign_sk_hex=sk, pubkey_hex=pub)
+       .register(MnemoTarget(m)).register(vector_index).register(retrieval_log).register(backup))
+cert = man.execute("alice", values=[the_pii], request_id="dsr-2026-...")
+# -> {complete: bool, residual_targets: [...], entries:[{target, erased, verified_absent, sig}], chain_tip}
+man.verify(cert)   # -> (ok, problems)  — re-checkable by an auditor
+```
+
+The property a within-one-library scrub can't give you: **`complete` is True only if EVERY registered store
+verified the value no longer recoverable, and any store that didn't comply is NAMED in `residual_targets`** — the
+receipt refuses to falsely certify. Each `ErasureTarget` implements two methods (`erase` + `still_recoverable`),
+so a broken wiring produces an INCOMPLETE receipt, never a clean lie. Honest scope (in-band): it covers only the
+registered targets (not unregistered stores), and "complete" is verified-non-recoverable at check time, not proof
+of physical destruction — and it does not defend against reconstructing the subject from RETAINED embeddings
+(embedding inversion, Morris et al., EMNLP 2023) unless the embeddings are a registered target too. Receipt:
+`mnemo/probes/org_wide_erasure_probe.py` (10/10, incl. a non-compliant backup correctly named + a tamper caught).
 
 ### Point-in-time / bi-temporal reads: `as_of()` + `history()` (0.6.14)
 Every keyed write already carries a `[valid_from, invalidated_at)` interval, so the timeline is
