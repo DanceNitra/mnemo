@@ -3,6 +3,17 @@
 All notable changes to mnemo (`agora-mnemo`). Format loosely follows Keep a Changelog; versioning is semver
 (MAJOR = stable/breaking, MINOR = features, PATCH = fixes).
 
+## Unreleased (built, not yet published)
+
+**`recall(mmr=λ)` — result-level diversity / dedup.** A top-k that isn't dominated by near-identical memories, via
+greedy Maximal Marginal Relevance (Carbonell & Goldstein 1998 — a standard IR technique, not novel here). The value
+is that it is **in-core, zero-LLM, and works with OR without an embedder** (diversity by record vectors, falling back
+to token-Jaccard so lexical recall dedups too) — the "unbounded redundant results" lever that mem0/Hindsight
+explicitly declined. `next = argmax[λ·rel − (1−λ)·max cos(d, chosen)]`; `rel` is the composite score min-max
+normalized over the reranked pool. `mmr=1.0` is a no-op (pure relevance); lower = more diverse. Default off (no
+behavior change); composes after the `rerank` hook. Probe `mmr_result_dedup_probe.py` (5 checks incl. plain-returns-
+duplicates so the test can fail).
+
 ## 1.15.0
 
 **Asymmetric query embedder (`embed_query`) — a recall correctness fix for nomic-embed-text.** nomic-embed-text is

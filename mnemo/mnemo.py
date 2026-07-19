@@ -2847,7 +2847,7 @@ class Mnemo:
                tie_recent: float | None = None,
                with_status: bool = False, with_warrant: bool = False,
                redact_pii: bool = False, rerank=None, rerank_pool: int | None = None,
-               reinforce: bool = True, trusted_only: bool = False) -> list[dict]:
+               reinforce: bool = True, trusted_only: bool = False, mmr: float | None = None) -> list[dict]:
         """Top-k memories by RELEVANCE × VALUE — high-value memories outrank merely-similar ones.
         Memories the dream pass flagged as hubs (universal matchers) are skipped unless include_hubs.
 
@@ -3172,6 +3172,39 @@ class Mnemo:
                     scored = [_head[i] for i in _order] + scored[_m:]
             except Exception:
                 pass
+        # OPT-IN MMR / result-dedup (mmr in [0,1]): rerank the top pool for DIVERSITY so recall does not return k
+        # near-duplicate memories (the unbounded-redundant-results failure that mem0/hindsight explicitly declined
+        # to fix). Greedy Maximal Marginal Relevance: next = argmax [ mmr*rel(d) - (1-mmr)*max cos(d, chosen) ].
+        # rel = the composite score min-max normalized over the pool (comparable to the [0,1] cosine diversity
+        # term); diversity uses record vectors, falling back to token-Jaccard so LEXICAL recall dedups too.
+        # mmr=1.0 == pure relevance (no-op); lower = more diverse. Zero-LLM, deterministic. Composes AFTER rerank.
+        if mmr is not None and len(scored) > 1:
+            lam = max(0.0, min(1.0, float(mmr)))
+            _mp = int(rerank_pool) if rerank_pool else max(4 * k, 50)
+            pool, tail = scored[:_mp], scored[_mp:]
+            rels = [t[0] for t in pool]
+            lo, hi = min(rels), max(rels)
+            norm = [((rl - lo) / (hi - lo)) if hi > lo else 1.0 for rl in rels]
+            _toks = [set((t[2].get("text") or "").lower().split()) for t in pool]
+
+            def _dsim(i, j):
+                vi, vj = pool[i][2].get("vec"), pool[j][2].get("vec")
+                if vi and vj:
+                    return max(0.0, _cosine(vi, vj))
+                a, b = _toks[i], _toks[j]
+                return (len(a & b) / len(a | b)) if (a and b) else 0.0
+
+            chosen, remaining = [], list(range(len(pool)))
+            while remaining:
+                best_i, best_v = remaining[0], None
+                for i in remaining:
+                    div = max((_dsim(i, c) for c in chosen), default=0.0)
+                    val = lam * norm[i] - (1.0 - lam) * div
+                    if best_v is None or val > best_v:
+                        best_v, best_i = val, i
+                chosen.append(best_i)
+                remaining.remove(best_i)
+            scored = [pool[i] for i in chosen] + tail
         out = []
         _top_sim = scored[0][1] if scored else 1.0   # normalize reinforcement by this query's best match
         for score, sim, r in scored[:k]:
