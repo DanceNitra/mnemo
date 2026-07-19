@@ -138,6 +138,23 @@ def remember(text: str, tags: list[str] | None = None, value: float = 1.0,
 
 
 @mcp.tool()
+def remember_decision(decision: str, because: str = "", context: str = "", topic: str = "") -> dict:
+    """Store a DECISION — the thing that actually matters and that a raw event/command log misses. Use this
+    whenever you (or the user) CONCLUDE or CHOOSE something: "we decided X", "we're going with Y", "dropped Z",
+    "the plan is W". Pass `because` (the rationale) and `context` (the situation) — they're kept for retrieval so a
+    later recall answers "what did we decide, and why", not just "what commands ran".
+
+    `topic` (recommended) gives the decision deterministic keyed supersession (`decision::<topic>`): a NEW decision
+    on the same topic RETIRES the old one, recall returns the CURRENT decision, and `revert('decision::<topic>')`
+    restores the prior one — decisions stay current, correctable, revertible, and auditable, with NO LLM and no
+    similarity guesswork (mnemo's integrity moat applied to decisions; an LLM-extracted fact store can't do this).
+    Returns the new memory id."""
+    mid = _MEM.remember_decision(decision, because=because or None, context=context or None,
+                                 topic=topic or None)
+    return {"id": mid, "decision": decision[:120], "topic": topic or None, "supersedes_by_key": bool(topic)}
+
+
+@mcp.tool()
 def revert(key: str, capability: str = "") -> dict:
     """Restore the PREVIOUS value for a supersession `key` — use this when the user asks to go back
     to the old value WITHOUT saying what it was ("go back to the old one", "undo that change",

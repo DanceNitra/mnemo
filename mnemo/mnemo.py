@@ -1391,6 +1391,38 @@ class Mnemo:
                     out.add(self._support_class.get(pk, pk))
         return out
 
+    def remember_decision(self, decision: str, because: str | None = None, context: str | None = None,
+                          topic: str | None = None, tags=None, value: float = 2.0,
+                          capability: str | None = None) -> str:
+        """Capture a DECISION — the memory that actually matters and that a raw event-log misses. A coding/agent
+        session logging only commands + file-states records the MECHANICS but not the CONCLUSIONS ("we decided X
+        because Y"), so recall can't answer "what did we decide / send / choose". This stores the decision as a
+        durable (procedural-decay), higher-value memory, with its rationale (`because`) and situation (`context`)
+        kept in meta for retrieval.
+
+        `topic` (recommended) becomes a deterministic supersession key `decision::<topic>` — so a NEW decision on
+        the same topic RETIRES the old one (mnemo's keyed supersession: recall always returns the CURRENT decision,
+        the reversal is a ledgered/attributable event, and `revert('decision::<topic>')` restores the prior one).
+        This is mnemo's integrity moat applied to decisions — something an LLM-extracted fact store cannot do:
+        decisions stay current, correctable, revertible, and auditable, with NO LLM and NO similarity guesswork.
+
+        This is the DETERMINISTIC half of decision capture (the caller/agent states the decision). The OPTIONAL
+        LLM half — distilling decisions out of a raw transcript automatically, the way mem0/Zep extract facts on
+        write — is `distill_and_remember()` (you choose whether to pay an LLM; the store/correction/erasure stays
+        deterministic). Returns the new memory id."""
+        text = "DECISION: " + decision.strip()
+        if because:
+            text += " — because: " + because.strip()
+        md = {"kind": "decision"}
+        if because:
+            md["rationale"] = because.strip()
+        if context:
+            md["context"] = context.strip()
+        key = ("decision::" + topic.strip()) if topic else None
+        return self.remember(text, tags=(list(tags) if tags else []) + ["decision"], value=value,
+                             mtype="procedural", key=key, object=(topic.strip() if topic else None),
+                             meta=md, capability=capability)
+
     def observe(self, text: str, key: str, object: str | None = None, support=None,
                 meta: dict | None = None) -> dict:
         """READ-PATH contradiction check (marintkael's mirror of the Fellegi-Sunter clerical-review band, r/RAG
