@@ -1423,6 +1423,70 @@ class Mnemo:
                              mtype="procedural", key=key, object=(topic.strip() if topic else None),
                              meta=md, capability=capability)
 
+    # The extraction contract for distill_and_remember (the OPTIONAL LLM capture half). A caller's distiller feeds
+    # this prompt + the raw text to any LLM and returns the parsed JSON list. mnemo owns the STRUCTURE (extract ->
+    # remember with keyed supersession) + this spec; the LLM only proposes what to keep. Analogous to mem0's
+    # FACT_RETRIEVAL_PROMPT, but the distilled items land in mnemo's deterministic, correctable, revertible store.
+    DISTILL_PROMPT = (
+        "You distill a conversation/transcript into the few memories worth keeping. Extract ONLY durable, "
+        "reusable items; drop chit-chat, transient state, and anything already obvious. Return a JSON object "
+        "{\"items\": [...]} where each item is:\n"
+        "  {\"kind\": \"decision\"|\"fact\", \"text\": <one clear sentence>, \"topic\": <short stable slug or \"\">, "
+        "\"because\": <rationale, only for decisions, else \"\">}\n"
+        "- kind=\"decision\": a choice/conclusion/plan (\"we decided/chose/dropped/will…\"). Give a `topic` slug so "
+        "a later decision on the same topic supersedes it (e.g. \"release::v2\", \"vendor::db\").\n"
+        "- kind=\"fact\": a durable fact/preference/detail worth recalling later.\n"
+        "Return {\"items\": []} if nothing is worth keeping. No prose outside the JSON."
+    )
+
+    def distill_and_remember(self, text: str, distiller, source: dict | None = None) -> dict:
+        """OPTIONAL LLM capture: turn a raw conversation/transcript into the few memories worth keeping — the
+        auto-capture-what-matters that a raw event log misses and that mem0/Zep do with an LLM on the write path.
+        mnemo stays zero-dependency/zero-LLM in its CORE: YOU inject `distiller`, a callable `distiller(prompt, text)
+        -> str|dict|list` that runs any LLM (or a subagent) with `Mnemo.DISTILL_PROMPT` and returns the JSON (a
+        raw string is parsed here; a dict/list is accepted directly). Each extracted item is then stored
+        DETERMINISTICALLY: a `decision` via remember_decision() (durable, with `topic`-keyed supersession + revert),
+        a `fact` via remember() (semantic). So the LLM only proposes WHAT to keep; the store/correction/erasure/
+        supersession stay deterministic and auditable — the trust layer never depends on the LLM.
+
+        Fail-open: a distiller error or a malformed item is skipped, never crashes the call. Returns
+        {captured, decisions, facts, ids}."""
+        import json as _json
+        try:
+            raw = distiller(Mnemo.DISTILL_PROMPT, text)
+        except Exception:
+            return {"captured": 0, "decisions": 0, "facts": 0, "ids": [], "error": "distiller_failed"}
+        items = raw
+        if isinstance(raw, str):
+            try:
+                s = raw.strip()
+                if "```" in s:                                   # tolerate ```json fenced output
+                    s = s.split("```")[1].lstrip("json").strip() if s.count("```") >= 2 else s
+                obj = _json.loads(s)
+                items = obj.get("items", obj) if isinstance(obj, dict) else obj
+            except Exception:
+                return {"captured": 0, "decisions": 0, "facts": 0, "ids": [], "error": "unparseable_distiller_output"}
+        if isinstance(items, dict):
+            items = items.get("items", [])
+        ids, nd, nf = [], 0, 0
+        for it in (items or []):
+            if not isinstance(it, dict):
+                continue
+            t = str(it.get("text") or "").strip()
+            if not t:
+                continue
+            topic = str(it.get("topic") or "").strip() or None
+            try:
+                if str(it.get("kind") or "").lower() == "decision":
+                    ids.append(self.remember_decision(t, because=(it.get("because") or None), topic=topic)); nd += 1
+                else:
+                    ids.append(self.remember(t, mtype="semantic", tags=["distilled"],
+                                             key=("fact::" + topic) if topic else None,
+                                             object=topic, source=source)); nf += 1
+            except Exception:
+                continue
+        return {"captured": len(ids), "decisions": nd, "facts": nf, "ids": ids}
+
     def observe(self, text: str, key: str, object: str | None = None, support=None,
                 meta: dict | None = None) -> dict:
         """READ-PATH contradiction check (marintkael's mirror of the Fellegi-Sunter clerical-review band, r/RAG
