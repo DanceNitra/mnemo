@@ -3,6 +3,17 @@
 All notable changes to mnemo (`agora-mnemo`). Format loosely follows Keep a Changelog; versioning is semver
 (MAJOR = stable/breaking, MINOR = features, PATCH = fixes).
 
+## 1.24.2
+
+**Docs only: the landing page is readable again.** The README had grown to 124 KB / 1587 lines — ten
+times mem0's — with a 600-line API reference and a 300-line integration catalogue sitting between the
+pitch and the proof. Nothing was deleted: those blocks moved verbatim to `docs/API.md`,
+`docs/INTEGRATIONS.md` and `docs/SECOND_BRAIN.md`, leaving pointers. README is now 31 KB.
+
+Also fixes stale version strings that had been shipping for months: the header still said v1.12.1, the
+CLI section v1.12.4, and `server.json` — the manifest the official MCP registry reads — was pinned at
+1.12.2 while the live registry entry still advertised **0.7.19** and pointed at the wrong repository.
+
 ## 1.24.1
 
 **Docs only.** `claims_audit.py` is now the first thing the README offers: one command downloads the
