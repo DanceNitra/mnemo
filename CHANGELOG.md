@@ -3,6 +3,28 @@
 All notable changes to mnemo (`agora-mnemo`). Format loosely follows Keep a Changelog; versioning is semver
 (MAJOR = stable/breaking, MINOR = features, PATCH = fixes).
 
+## 1.23.1
+
+**BUGFIX (silent data loss): `regex_extractor` minted keys from non-referring subjects.** On natural
+conversational prose the copula patterns fire on pronouns, expletives and interrogatives — "It is
+important to ...", "There is a growing ...", "These are just a few ...", "What is ...?" — producing the
+keys `it`, `there`, `these`, `what`. Those keys collide across completely unrelated sentences, and keyed
+supersession then RETIRES the earlier record, hiding it from recall. Measured on a real conversational
+corpus (the MemOps dataset, arXiv 2607.12893) before the fix: **103 supersessions in one 3.7k-sentence
+transcript, 83% of them driven by such a key** — a universal-basic-income sentence was retired because a
+London-landmark sentence shared the subject `what`. The README advertises this extractor precisely so
+"supersession engages over free text", so the exposure was real.
+
+Fix: a subject that IS, or ENDS IN, a non-referring word yields no key, which is the extractor's already
+documented fallback (return None -> plain append). Nothing that produced a key before loses one:
+`my zip code`, `my manager`, `my current title`, `alice::email`, `france::capital`, `api rate limit` all
+still key, and a real correction still supersedes. Spurious supersessions on the same corpus drop
+**103 -> 18, 74 -> 13, 71 -> 17**.
+
+Why no probe caught it: every existing extractor probe fed clean declarative statements. New regression
+probe `probes/extractor_nonreferring_subject_probe.py` (16/16) ingests the failing shapes end to end.
+Suite 148.
+
 ## 1.23.0
 
 **Read-time conflict resolver: `recall(resolve_conflicts=True)` (default OFF → byte-identical legacy).**

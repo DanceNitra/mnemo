@@ -409,7 +409,7 @@ def verify_erasure_certificate(cert: dict, store_path: str | None = None,
     return {"valid": valid, "checks": checks, "problems": problems, "count": cert.get("count")}
 
 
-__version__ = "1.23.0"
+__version__ = "1.23.1"
 
 # Internal sentinel: marks a reaffirm write already authorized by submit_revert() (which verified the
 # signed INTENT). Object identity — no text/content path can ever produce it.
@@ -5194,10 +5194,29 @@ _EX_IS = re.compile(
     r"(?P<obj>.+?)\s*\.?\s*$", re.I)
 
 
+# NON-REFERRING SUBJECTS (2026-07-20). A key is only meaningful if its subject IDENTIFIES something. On
+# natural prose these patterns otherwise fire on pronouns, expletives and interrogatives — "It is important
+# to ...", "There are many ...", "These are just a few ...", "What is ...?" — producing the keys 'it',
+# 'there', 'these', 'what', which then COLLIDE across completely unrelated sentences and make supersession
+# retire live records. Measured on the MemOps conversational corpus BEFORE this guard: 103 supersessions in
+# one 3.7k-sentence transcript, 83% of them driven by such a key, retiring e.g. a UBI-economics sentence
+# because a London-landmark sentence shared the subject 'what'. That is silent data loss in a feature the
+# README advertises for free text. Refusing to key these falls back to the extractor's documented
+# behaviour (return None -> plain append), so nothing that worked before changes.
+_EX_NONREFERRING = frozenset("""
+it he she they them we us you i this that these those there here one ones someone somebody anyone anybody
+everyone everybody something anything nothing everything what who whom whose where when why which how
+each both all some any none other others another such
+""".split())
+
+
 def regex_extractor(text):
     """text -> (key, object) | None. Deterministic, no LLM. Recognizes 'X's Y is Z', 'the Y of X is Z', and
     'X is Z' (with optional leading correction/update/now markers). key is a canonical 'subject::relation' (or
-    just 'subject' for the plain copula) so a reworded restatement maps to the SAME key. Returns None (=> plain
+    just 'subject' for the plain copula) so a reworded restatement maps to the SAME key. A subject that does
+    not REFER to anything (pronoun / expletive / interrogative — "it", "there", "these", "what") is rejected,
+    because such keys collide across unrelated sentences and would make supersession retire live records.
+    Returns None (=> plain
     append) when nothing matches confidently."""
     if not text:
         return None
@@ -5205,6 +5224,12 @@ def regex_extractor(text):
         mt = rx.match(text)
         if mt:
             subj = " ".join(mt.group("subject").lower().split())
+            # Reject when the subject IS a non-referring word, or merely ENDS in one: the patterns greedily
+            # swallow conversational lead-ins, so "Do you think there is ..." yields the subject
+            # "do you think there", which is not an entity either and collided just as badly (measured).
+            _st = subj.split()
+            if subj in _EX_NONREFERRING or (_st and _st[-1] in _EX_NONREFERRING):
+                return None
             obj = mt.group("obj").strip().strip(".").strip()
             obj = re.sub(r"^(?:now|actually|currently|really)\s+", "", obj, flags=re.I).strip()   # copula adverb
             if not subj or not obj or len(obj) > 200:
