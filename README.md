@@ -102,9 +102,21 @@ m.history("api::rate_limit")                  # full audit trail, oldest to newe
 ```
 
 New in **1.11.0**: ready-made write-path extractors (`regex_extractor`, deterministic; `make_llm_extractor`,
-opt-in) so supersession engages over free text without an explicit key, and a first-class **LangChain**
+opt-in) that can derive a key from text without an explicit one, and a first-class **LangChain**
 integration (`from mnemo.integrations.langchain import MnemoRetriever` — a retriever that never hands a
 superseded fact back to your chain). `pip install "agora-mnemo[langchain]"`.
+
+**Honest scope of `regex_extractor` (measured 2026-07-20, corrected from an earlier overclaim).** It keys
+clean declarative statements — "My ZIP code is 94107", "Alice's email is …", "The API rate limit is 500 rps".
+It does **not** reliably key natural conversational prose: measured on an external dialogue corpus (the
+MemOps dataset, arXiv 2607.12893) it derived a key for 5.2% of sentences (1,037 of 19,851 across six transcripts), and — the part that matters —
+it does not hold a *stable* key across a real correction chain, because "my official title … **was** Junior
+Data Analyst" and "**so my current title is** Data Analyst" yield different keys that never meet. On raw
+chat transcripts, supersession therefore mostly does not fire and mnemo behaves as a verbatim store.
+**If you control the write, pass `key=` explicitly** — that is the path where corrections-stick, `revert`
+and the erasure guarantees actually hold. (This README previously said the extractors exist "so supersession
+engages over free text"; that was too strong. See CHANGELOG 1.23.1, which also fixes a real data-loss bug
+found in the same measurement.)
 
 ## Give your agent this memory in 60 seconds (MCP)
 
