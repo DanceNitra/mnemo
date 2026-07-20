@@ -1,0 +1,71 @@
+name: audit
+
+# The claims in the README are checked on a machine we do not control, on every push and every day.
+# There is no certification body for an agent-memory library; the closest honest substitute is a public,
+# reproducible audit whose failures are as visible as its passes. If this badge is red, believe the badge.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: "17 5 * * *"        # daily, so a claim that rots is caught without a push
+  workflow_dispatch:
+
+jobs:
+  claims:
+    name: README claims (working tree)
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python: ["3.10", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: claims_audit
+        run: python claims_audit.py --local
+      - name: governance_audit
+        run: python governance_audit.py --local
+
+  falsification:
+    name: the audit can actually fail
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      # An audit that cannot fail proves nothing. Disable the erasure and require the governance audit
+      # to REPORT THE CLAIM BROKEN; a green run here would mean the checks measure nothing.
+      - name: governance audit must fail when erasure is skipped
+        run: |
+          if GOV_FALSIFY=1 python governance_audit.py --local --repeats 1; then
+            echo "::error::falsification control PASSED — the audit cannot fail, so it proves nothing"
+            exit 1
+          else
+            echo "falsification control correctly reported CLAIM BROKEN"
+          fi
+
+  published:
+    name: the PUBLISHED wheel from PyPI
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      # Audits the artifact users actually install, not the source in this repo.
+      - name: claims_audit against PyPI
+        run: python claims_audit.py | tee claims_report.txt
+      - name: governance_audit against PyPI
+        run: python governance_audit.py | tee governance_report.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: audit-reports
+          path: |
+            claims_report.txt
+            governance_report.txt

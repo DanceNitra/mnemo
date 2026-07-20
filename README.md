@@ -12,6 +12,7 @@ it daily over 10,000 notes.*
 
 `pip install agora-mnemo` → `import mnemo` · [PyPI](https://pypi.org/project/agora-mnemo/) · [Hugging Face](https://huggingface.co/Danchi17/mnemo) · [DOI](https://doi.org/10.5281/zenodo.21128549) · [Homepage](https://dancenitra.github.io/mnemo/) · MIT · v1.24.1
 
+[![audit](https://github.com/DanceNitra/mnemo/actions/workflows/audit.yml/badge.svg)](https://github.com/DanceNitra/mnemo/actions/workflows/audit.yml)
 [![Star on GitHub](https://img.shields.io/github/stars/DanceNitra/mnemo?style=social)](https://github.com/DanceNitra/mnemo)
 
 *If mnemo's saved you some time, a ⭐ would mean a lot — it's how other people find it. Thank you!*
@@ -45,6 +46,30 @@ This exists because the exercise pays for itself: the first time we ran a README
 published wheel, it failed. Erasure did delete the record and scrub the bytes, but plain `forget()` left
 no receipt, so the store's own `verify_writes()` reported the deletion as out-of-band — flagging a
 legitimate API call as tampering. Fixed in 1.24.0, with a regression probe, and the audit now covers it.
+The tightened audit then caught a second one: `forget_subject()` was writing *two* receipts per record,
+one of them with the wrong reason (fixed in 1.24.3).
+
+**On certification.** There is no certification body for an agent-memory library, and anyone claiming
+otherwise is selling a logo. SOC 2 and ISO 27001 certify organisations running services; no scheme
+certifies that a Python file deletes what it says it deletes. So instead:
+
+- **`governance_audit.py`** attacks the strongest claim here — *tell it to forget everything about a
+  subject and it can prove it* — across three scenarios and three repeats each: erasure through
+  `derived_from` lineage, absence from the records, from recall under several phrasings, and from the
+  **bytes of every file the store wrote** including sidecars; exactly one receipt carrying the caller's
+  stated basis; tamper detection; survival across a reload; unrelated records intact; and an identical
+  end state on every run.
+- **The audit must be able to fail.** `GOV_FALSIFY=1` skips the erasure, and CI requires the run to
+  report CLAIM BROKEN. A green falsification control would mean the checks measure nothing, so it is
+  treated as a build failure.
+- **It runs where we cannot touch it** — every push and daily, on Linux, Windows and macOS, against
+  both this source and the wheel published on PyPI. The badge above is the result. If it is red,
+  believe the badge and not this paragraph.
+
+What that does **not** certify: this store, not your vector index, prompt logs or backups; the receipt
+proves the *act* of deletion, never the content; and an operator holding the receipt key can forge
+receipts, so anchor the chain head externally if your adversary is the operator. Those limits are in the
+docstrings too, and they are the reason the word "certified" does not appear anywhere else on this page.
 
 ## Why mnemo — the one thing no other agent memory does
 
