@@ -409,7 +409,7 @@ def verify_erasure_certificate(cert: dict, store_path: str | None = None,
     return {"valid": valid, "checks": checks, "problems": problems, "count": cert.get("count")}
 
 
-__version__ = "1.24.2"
+__version__ = "1.24.3"
 
 # Internal sentinel: marks a reaffirm write already authorized by submit_revert() (which verified the
 # signed INTENT). Object identity — no text/content path can ever produce it.
@@ -1740,7 +1740,8 @@ class Mnemo:
         return self.remember(text, tags=tags, value=value, meta=meta, mtype=mtype)
 
     def forget(self, ids=None, where=None, redact_links: bool = True,
-               request_id: str | None = None, basis: str | None = None) -> dict:
+               request_id: str | None = None, basis: str | None = None,
+               authorized_by: str | None = None, authorization: str | None = None) -> dict:
         """HARD-DELETE memories — the one operation that genuinely REMOVES content. mnemo is otherwise
         append-only: supersession / invalidation only DEMOTE a record (it still exists, recallable with
         include_superseded). forget() is for the cases where demotion is not enough: a right-to-be-forgotten
@@ -1791,7 +1792,8 @@ class Mnemo:
             self._sig_cache.pop(tid, None)
         now = time.time()
         for tid in sorted(target):                           # deterministic order -> reproducible chain
-            self._emit_tombstone(tid, now, request_id, basis=basis or "forget")
+            self._emit_tombstone(tid, now, request_id, basis=basis or "forget",
+                                 authorized_by=authorized_by, authorization=authorization)
         self._mat = None; self._mat_built_n = -1             # force vec-matrix rebuild (drops forgotten rows)
         self._save(force=True)                               # a deletion is real content change — persist now
         return {"forgotten": len(target), "ids": sorted(target), "scrubbed_links": scrubbed,
@@ -1887,11 +1889,12 @@ class Mnemo:
                     for v in (r.get("text"), r.get("object")):
                         if v and str(v).strip():
                             values.append(str(v))
-        now = time.time()
-        res = self.forget(ids=subj_ids)
-        for mid in res["ids"]:
-            self._emit_tombstone(mid, now, request_id, basis=basis,
-                                 authorized_by=authorized_by, authorization=authorization)
+        # forget() has emitted the tombstones itself since 1.24.0, so the erasure's own request_id,
+        # basis and authorisation go THROUGH it. Emitting a second time here (as this did until 1.24.3)
+        # wrote TWO receipts per record — one carrying the real basis, one carrying the generic
+        # basis="forget" — so an auditor saw a single deletion twice, with conflicting reasons.
+        res = self.forget(ids=subj_ids, request_id=request_id, basis=basis,
+                          authorized_by=authorized_by, authorization=authorization)
         out = {"erased": res["forgotten"], "ids": res["ids"],
                "request_id": request_id, "tombstones": len(res["ids"])}
         if targets:
@@ -1983,10 +1986,9 @@ class Mnemo:
             target.append(r["id"])
         if not target:
             return {"erased": 0, "ids": [], "request_id": request_id, "tombstones": 0}
-        now = time.time()
-        res = self.forget(ids=target)
-        for mid in res["ids"]:
-            self._emit_tombstone(mid, now, request_id, basis=basis or "pii_minimization")
+        # same as forget_subject: forget() emits the receipts, so pass the reason through it rather
+        # than writing a second tombstone per record on top of the one it already wrote
+        res = self.forget(ids=target, request_id=request_id, basis=basis or "pii_minimization")
         return {"erased": res["forgotten"], "ids": res["ids"],
                 "request_id": request_id, "tombstones": len(res["ids"])}
 

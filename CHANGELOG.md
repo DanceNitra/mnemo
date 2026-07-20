@@ -3,6 +3,24 @@
 All notable changes to mnemo (`agora-mnemo`). Format loosely follows Keep a Changelog; versioning is semver
 (MAJOR = stable/breaking, MINOR = features, PATCH = fixes).
 
+## 1.24.3
+
+**BUGFIX (regression from 1.24.0): double deletion receipts.** `forget_subject()` and `forget_pii()`
+call `forget()` and then emitted their own tombstones. Once `forget()` started emitting in 1.24.0 that
+produced **two receipts per erased record** — one carrying the caller's real basis, one carrying a
+generic `basis="forget"` — so an auditor saw a single deletion twice, with conflicting reasons. Both
+now pass `request_id` / `basis` / `authorized_by` / `authorization` through `forget()` and emit once.
+
+**New: `governance_audit.py`.** Attacks the claim "tell it to forget everything about a subject and it
+can prove it" across three scenarios x three repeats: erasure through `derived_from` lineage, absence
+from records, from recall under several phrasings, and from the BYTES of every file including sidecars;
+exactly one receipt per record carrying the caller's basis; tamper detection; survival across a reload;
+unrelated records intact; identical end state every run. `GOV_FALSIFY=1` skips the erasure and 7 of 11
+checks must fail — a test that cannot fail is a demo.
+
+That audit is what caught the double-receipt regression, and only after its own first version was
+tightened: it asserted "at least one receipt per record", which passed the bug.
+
 ## 1.24.2
 
 **Docs only: the landing page is readable again.** The README had grown to 124 KB / 1587 lines — ten
