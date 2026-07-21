@@ -3,6 +3,22 @@
 All notable changes to inspeximus (`inspeximus`). Format loosely follows Keep a Changelog; versioning is semver
 (MAJOR = stable/breaking, MINOR = features, PATCH = fixes).
 
+## 1.27.2 - InspeximusStore now matches the reference on namespace lifetime
+
+`InMemoryStore` keeps listing a namespace after its last key is deleted; this store dropped it. That
+made "drop-in" need a footnote, and a footnote on a contract you claim to implement is the kind of
+thing that gets an integration rejected -- rightly.
+
+Default is now parity: deleting the last value erases the VALUE and leaves only the namespace name
+behind, as a marker carrying no data. It never surfaces in `get` or `search`, and the deleted value
+is still absent from the bytes on disk, which the audit checks.
+
+The stricter behaviour is available as `InspeximusStore(prune_empty_namespaces=True)`, because a
+namespace is not neutral metadata: `("user", "42")` names a person, and retaining that after every
+value it held has been erased leaves an identifier behind. It is offered rather than imposed.
+
+11 new tests pin both modes and the marker's invisibility.
+
 ## 1.27.1 — LangGraph adapter: conformance and parity fixes
 
 Both of LangGraph's official verification routes were run against the adapter for the first time,

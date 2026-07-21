@@ -44,11 +44,26 @@ def _dt(ts: float) -> datetime:
 class InspeximusStore(BaseStore):
     """LangGraph BaseStore over a inspeximus store; keeps queryable value history the built-in store discards."""
 
-    def __init__(self, path: str | None = None, store: Any = None):
+    def __init__(self, path: str | None = None, store: Any = None,
+                 prune_empty_namespaces: bool = False):
+        """`prune_empty_namespaces` decides one behaviour where the reference and an erasure-first
+        store genuinely disagree.
+
+        `InMemoryStore` keeps listing a namespace after its last key is deleted. Defaulting to that
+        (False) is what makes "works anywhere InMemoryStore does" true without a footnote, and it is
+        the default here for exactly that reason.
+
+        Set it True and a namespace disappears once it is empty. That matters because a namespace is
+        not neutral metadata: `("user", "42")` names a person. Retaining it after every value it held
+        has been erased leaves an identifier behind, which is the one thing this library's erasure
+        story says it does not do. So the stricter behaviour is available, but it is opt-in rather
+        than imposed, because silently diverging from a contract you claim to implement is worse.
+        """
         if store is None:
             from inspeximus import Inspeximus
             store = Inspeximus(path=path)
         self.store = store
+        self.prune_empty_namespaces = prune_empty_namespaces
 
     @staticmethod
     def _mkey(namespace: tuple[str, ...], key: str) -> str:
@@ -78,6 +93,15 @@ class InspeximusStore(BaseStore):
                            if r.get("status") == "active" and (r.get("meta") or {}).get("mkey") == mk]
                     if ids:
                         self.store.forget(ids=ids)
+                    if not self.prune_empty_namespaces:
+                        # The value is erased; only the namespace name survives, as a marker carrying
+                        # no value at all. That is what lets list_namespaces match the reference after
+                        # a delete without keeping any of the deleted content.
+                        nsk = "lgns::" + "/".join(op.namespace)
+                        if not any((r.get("meta") or {}).get("nskey") == nsk for r in self.store.items):
+                            self.store.remember("lg namespace " + "/".join(op.namespace), key=nsk,
+                                                tags=["_langgraph"],
+                                                meta={"nskey": nsk, "lg_ns": list(op.namespace)})
                 else:
                     self.store.remember((op.key + " " + json.dumps(op.value, ensure_ascii=False, sort_keys=True))[:2000],
                                         key=mk, object=json.dumps(op.value, sort_keys=True),
@@ -87,6 +111,7 @@ class InspeximusStore(BaseStore):
             elif isinstance(op, SearchOp):
                 pref = "lg::" + "/".join(op.namespace_prefix)
                 pool = [r for r in self.store.items if r.get("status") == "active"
+                        and not (r.get("meta") or {}).get("nskey")
                         and str((r.get("meta") or {}).get("mkey", "")).startswith(pref)]
                 if op.query:
                     ranked = self.store.recall(op.query, k=op.limit + op.offset + 10)
@@ -111,7 +136,10 @@ class InspeximusStore(BaseStore):
                 for r in self.store.items:
                     if r.get("status") != "active":
                         continue
-                    ns = tuple((r.get("meta") or {}).get("lg_ns", ()))
+                    m = r.get("meta") or {}
+                    if self.prune_empty_namespaces and m.get("nskey"):
+                        continue                       # marker-only namespace: pruned mode hides it
+                    ns = tuple(m.get("lg_ns", ()))
                     if ns and ns not in seen:
                         seen.append(ns)
 

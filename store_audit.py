@@ -107,30 +107,37 @@ SCRIPTS = [("CRUD + overwrite + delete", script_crud),
            ("list_namespaces: prefix/suffix/wildcard/depth/order", script_list_namespaces)]
 
 
-def report_documented_divergence():
-    """One place where we deliberately do NOT match the reference, stated rather than hidden.
+def report_namespace_lifetime():
+    """The one place the reference and an erasure-first store could disagree, and how it was resolved.
 
-    After the last key in a namespace is deleted, InMemoryStore still lists the now-empty namespace;
-    this store does not. Matching the reference would mean a namespace name outliving the erasure of
-    every value it held, which contradicts the receipted-erasure guarantee this library is built on.
-    So the divergence is intentional -- and printed, because a parity audit that quietly skips the
-    case it loses is worth nothing.
+    `InMemoryStore` keeps listing a namespace after its last key is deleted. This store used to drop
+    it, which made "drop-in" need a footnote. It now matches by default: deleting the last value
+    erases the VALUE and leaves only the namespace name behind as a marker carrying no data. The
+    stricter behaviour -- where an emptied namespace disappears too, because `("user", "42")` names a
+    person -- is available as `prune_empty_namespaces=True` rather than imposed on every caller.
     """
     import tempfile
     from langgraph.store.memory import InMemoryStore
+    from inspeximus.integrations.langgraph import InspeximusStore
     tmp = pathlib.Path(tempfile.mkdtemp())
-    out = []
+    rows = []
     for label, s in (("reference", InMemoryStore()),
-                     ("ours", InspeximusStore(path=str(tmp / "div.jsonl")))):
-        s.put(("u", "1"), "p", {"a": 1})
-        s.delete(("u", "1"), "p")
-        out.append((label, [tuple(x) for x in s.list_namespaces()]))
+                     ("ours (default)", InspeximusStore(path=str(tmp / "d.jsonl"))),
+                     ("ours (prune_empty_namespaces=True)",
+                      InspeximusStore(path=str(tmp / "p.jsonl"), prune_empty_namespaces=True))):
+        s.put(("user", "42"), "secret", {"code": "ALPHA-SECRET"})
+        s.delete(("user", "42"), "secret")
+        rows.append((label, [tuple(x) for x in s.list_namespaces()]))
     print()
-    print("--- documented divergence (intentional, not a parity failure)")
-    for label, got in out:
-        print(f"  {label:10} namespaces after deleting the only key: {got}")
-    print("  ours drops the empty namespace: an erased value must not leave its namespace behind.")
-    return out[0][1] != out[1][1]
+    print("--- namespace lifetime after the last key is deleted")
+    for label, got in rows:
+        print(f"  {label:36} {got}")
+    ok = rows[0][1] == rows[1][1]
+    blob = " ".join(p.read_text(encoding="utf-8", errors="replace")
+                    for p in tmp.rglob("*") if p.is_file()).lower()
+    print(f"  default matches the reference: {ok}")
+    print(f"  and the deleted VALUE is still gone from disk: {'alpha-secret' not in blob}")
+    return ok and "alpha-secret" not in blob
 
 
 def _item(it):
@@ -237,6 +244,9 @@ def main():
         same_state = len(set(hashes)) == 1
         fails += not same_state
         print(f"  [{'PASS' if same_state else 'FAIL'}] identical results across {a.repeats} runs")
+
+    if os.environ.get("STORE_FALSIFY") != "1":
+        fails += not report_namespace_lifetime()
 
     print("\n" + "=" * 92)
     print("InspeximusStore IS a drop-in BaseStore" if not fails else f"NOT drop-in — {fails} failing groups")
