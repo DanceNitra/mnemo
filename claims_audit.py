@@ -33,24 +33,24 @@ import tempfile
 import time
 from concurrent.futures import ProcessPoolExecutor
 
-PKG_ENV = "MNEMO_AUDIT_PKG"
+PKG_ENV = "INSPEXIMUS_AUDIT_PKG"
 
 
 def _load():
-    """Import mnemo from the artifact under audit (set by the parent process)."""
+    """Import inspeximus from the artifact under audit (set by the parent process)."""
     p = os.environ.get(PKG_ENV)
     if p and p not in sys.path:
         sys.path.insert(0, p)
-    import inspeximus as mnemo
-    from mnemo.mnemo import Mnemo
-    return mnemo, Mnemo
+    import inspeximus as inspeximus
+    from inspeximus.core import Inspeximus
+    return inspeximus, Inspeximus
 
 
 def _store(tmp_name, keyed=True):
-    mnemo, Mnemo = _load()
-    from mnemo.mnemo import regex_extractor
+    inspeximus, Inspeximus = _load()
+    from inspeximus.core import regex_extractor
     d = pathlib.Path(tempfile.mkdtemp(prefix=f"audit_{tmp_name}_"))
-    m = Mnemo(path=str(d / "store.jsonl"))
+    m = Inspeximus(path=str(d / "store.jsonl"))
     if keyed:
         m.extractor = regex_extractor
         m.echo_guard = True
@@ -62,15 +62,15 @@ def _store(tmp_name, keyed=True):
 
 def c_zero_deps():
     """README: 'zero-dependency single file'."""
-    mnemo, _ = _load()
-    root = pathlib.Path(mnemo.__file__).resolve().parent
+    inspeximus, _ = _load()
+    root = pathlib.Path(inspeximus.__file__).resolve().parent
     meta = list(root.parent.glob("*.dist-info/METADATA"))
     requires = []
     if meta:
         for ln in meta[0].read_text(encoding="utf-8", errors="replace").splitlines():
             if ln.startswith("Requires-Dist:") and "extra ==" not in ln:
                 requires.append(ln.split(":", 1)[1].strip())
-    core = root / "mnemo.py"
+    core = root / "inspeximus.py"
     return (not requires), f"mandatory requirements={requires or 'none'}; core file={core.stat().st_size//1024} KB"
 
 
@@ -149,14 +149,14 @@ def c_tamper_detected():
     """README: 'tamper-evident write chain' — editing a stored record must be caught.
 
     NOTE, and the first version of this check got it wrong: write receipts are OPT-IN
-    (`Mnemo(..., receipts=True)`). Without them there is no chain to compare against, so
+    (`Inspeximus(..., receipts=True)`). Without them there is no chain to compare against, so
     verify_writes() returns clean and the check FAILED against correct code. The claim is about the
     receipt chain, so the store under test must have it enabled — auditing a feature with the feature
     switched off measures nothing.
     """
-    mnemo, Mnemo = _load()
+    inspeximus, Inspeximus = _load()
     d = pathlib.Path(tempfile.mkdtemp(prefix="audit_tamper_"))
-    m = Mnemo(path=str(d / "store.jsonl"), receipts=True)
+    m = Inspeximus(path=str(d / "store.jsonl"), receipts=True)
     i = m.remember("My salary is 74500.")
     m._save(force=True)
     clean = m.verify_writes()
@@ -191,9 +191,9 @@ def c_trusted_only_fails_closed():
 
 def c_tenant_isolation():
     """README: 'tenant isolation' — one tenant must not recall another's records."""
-    mnemo, Mnemo = _load()
+    inspeximus, Inspeximus = _load()
     d = pathlib.Path(tempfile.mkdtemp(prefix="audit_tenant_"))
-    base = Mnemo(path=str(d / "s.jsonl"))
+    base = Inspeximus(path=str(d / "s.jsonl"))
     try:
         # the API is for_tenant(); a first pass guessed tenant_view() and reported SKIP on a feature
         # that is present — a wrong method name reads exactly like a missing feature
@@ -235,8 +235,8 @@ def c_pii_sweep():
 
 def c_mcp_server_present():
     """README: 'an MCP server so any agent can use it as memory'."""
-    mnemo, _ = _load()
-    root = pathlib.Path(mnemo.__file__).resolve().parent
+    inspeximus, _ = _load()
+    root = pathlib.Path(inspeximus.__file__).resolve().parent
     cands = list(root.glob("*mcp*.py")) + list(root.parent.glob("*mcp*.py"))
     return bool(cands), f"module(s): {[c.name for c in cands] or 'none found in the wheel'}"
 
@@ -280,7 +280,7 @@ def _run(idx):
 
 def fetch_wheel(version, workdir):
     cmd = [sys.executable, "-m", "pip", "download",
-           f"agora-mnemo=={version}" if version else "agora-mnemo",
+           f"agora-inspeximus=={version}" if version else "agora-inspeximus",
            "--no-deps", "-d", str(workdir)]
     subprocess.run(cmd, capture_output=True, check=True)
     wheel = sorted(workdir.glob("*.whl"))[0]
@@ -297,7 +297,7 @@ def main():
     ap.add_argument("--workers", type=int, default=min(12, (os.cpu_count() or 4) - 2))
     a = ap.parse_args()
 
-    tmp = pathlib.Path(tempfile.mkdtemp(prefix="mnemo_claims_"))
+    tmp = pathlib.Path(tempfile.mkdtemp(prefix="inspeximus_claims_"))
     if a.local:
         pkg, src = pathlib.Path(__file__).resolve().parent, "working tree"
         sha = "n/a"
@@ -307,10 +307,10 @@ def main():
     os.environ[PKG_ENV] = str(pkg)
 
     sys.path.insert(0, str(pkg))
-    import inspeximus as mnemo
+    import inspeximus as inspeximus
     print("=" * 92)
     print(f"auditing : {src}")
-    print(f"version  : {getattr(mnemo, '__version__', '?')}")
+    print(f"version  : {getattr(inspeximus, '__version__', '?')}")
     if sha != "n/a":
         print(f"sha256   : {sha}")
     print(f"checks   : {len(CHECKS)} on {a.workers} workers")

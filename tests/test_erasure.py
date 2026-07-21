@@ -1,9 +1,9 @@
 """Cross-store erasure: DeletionManifest + ErasureAuditor. Deterministic fake embedder (no network)."""
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from mnemo import Mnemo
-from mnemo.deletion_manifest import DeletionManifest, ErasureTarget
-from mnemo.erasure_auditor import (ErasureAuditor, TextStoreProbe, VectorIndexProbe, KVCacheProbe)
+from inspeximus import Inspeximus
+from inspeximus.deletion_manifest import DeletionManifest, ErasureTarget
+from inspeximus.erasure_auditor import (ErasureAuditor, TextStoreProbe, VectorIndexProbe, KVCacheProbe)
 
 
 def _fake_embed(text):
@@ -34,7 +34,7 @@ class _LeakyIndex(ErasureTarget):
 
 
 def test_manifest_reports_incomplete_when_a_store_leaks():
-    m = Mnemo(); m.remember("alice condition is diabetes", source={"doc":"alice"})
+    m = Inspeximus(); m.remember("alice condition is diabetes", source={"doc":"alice"})
     idx = _LeakyIndex(purges=False); idx.add("alice", "alice condition is diabetes")
     man = DeletionManifest().register(_StoreT(m)).register(idx)
     r = man.execute("alice", values=["diabetes"])
@@ -42,7 +42,7 @@ def test_manifest_reports_incomplete_when_a_store_leaks():
 
 
 def test_manifest_complete_and_tamper_evident():
-    m = Mnemo(); m.remember("bob condition is cancer", source={"doc":"bob"})
+    m = Inspeximus(); m.remember("bob condition is cancer", source={"doc":"bob"})
     idx = _LeakyIndex(purges=True); idx.add("bob", "bob condition is cancer")
     man = DeletionManifest().register(_StoreT(m)).register(idx)
     r = man.execute("bob", values=["cancer"])

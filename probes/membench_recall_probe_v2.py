@@ -24,20 +24,20 @@ GROUND-TRUTH NOTES (fixture-construction honesty):
     fresh (corrected) message in the arm's ranking — the retrieval failure mode that answers
     the old value.
 
-Arms: plain nomic cosine vs mnemo.recall(mode='semantic') with the same embedder (asymmetric
+Arms: plain nomic cosine vs inspeximus.recall(mode='semantic') with the same embedder (asymmetric
 prefixes). No disk embedding cache: ~50k vectors would be a ~400MB JSON (probe-cache lesson);
 nomic is deterministic and the GPU is idle, so we embed streaming per-trajectory instead.
 
 HONEST SCOPE: retrieval-only (not comparable to the paper's LLM answer-accuracy tables);
 FirstAgent (participation) perspective only; single embedder; INTERNAL numbers.
 
-RUN: python mnemo/probes/membench_recall_probe_v2.py   (local Ollama, nomic-embed-text)
+RUN: python inspeximus/probes/membench_recall_probe_v2.py   (local Ollama, nomic-embed-text)
 """
 import json, os, sys, math, time, urllib.request, tempfile
 
 sys.stdout.reconfigure(errors="replace")
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "mnemo")))
-from mnemo import Mnemo
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "inspeximus")))
+from inspeximus import Inspeximus
 
 DATA_DIR = os.environ.get("MEMBENCH_DATA", "agora_output/lab/data/membench")
 EMB_URL = os.environ.get("OLLAMA_EMBED_URL", "http://localhost:11434/api/embed")
@@ -128,14 +128,14 @@ def main():
             v = doc_vec.get(DP + text)
             return v if v is not None else embed([text], "q")[0]
         fd, p = tempfile.mkstemp(suffix=".json"); os.close(fd); os.remove(p)
-        m = Mnemo(path=p, embed=emb_fn)
+        m = Inspeximus(path=p, embed=emb_fn)
         ids = [m.remember(t, mtype="episodic") for t in flat]
         idx_of = {mid: i for i, mid in enumerate(ids)}
         got = m.recall(q, k=len(flat), mode="semantic")
         mn_ranked = [idx_of[r["id"]] for r in got if r["id"] in idx_of]
         if os.path.exists(p): os.remove(p)
 
-        for arm, rk in (("cosine", ranked), ("mnemo", mn_ranked)):
+        for arm, rk in (("cosine", ranked), ("inspeximus", mn_ranked)):
             for k in KS:
                 top = set(rk[:k])
                 scores.setdefault((split, arm, "hit", k), []).append(
@@ -158,7 +158,7 @@ def main():
         n = len(scores.get((split, "cosine", "hit", 1), []))
         if not n: continue
         print(f"\n=== MEASURED {split} (n={n}) ===")
-        for arm in ("cosine", "mnemo"):
+        for arm in ("cosine", "inspeximus"):
             parts = []
             for k in KS:
                 v = scores[(split, arm, "hit", k)]
@@ -173,7 +173,7 @@ def main():
                 parts.append(f"STALE-BEATS-FRESH={sum(v)/len(v):.3f}(n={len(v)})")
                 out[f"{split}|{arm}|stale_beats_fresh"] = round(sum(v) / len(v), 4)
             print(f"  {arm:7s} " + " ".join(parts))
-    json.dump(out, open("mnemo/probes/membench_recall_probe_v2_result.json", "w"), indent=2)
-    print(f"\ntotal {time.time()-t0:.0f}s -> mnemo/probes/membench_recall_probe_v2_result.json")
+    json.dump(out, open("inspeximus/probes/membench_recall_probe_v2_result.json", "w"), indent=2)
+    print(f"\ntotal {time.time()-t0:.0f}s -> inspeximus/probes/membench_recall_probe_v2_result.json")
 
 main()

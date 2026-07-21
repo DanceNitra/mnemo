@@ -3,7 +3,7 @@
   "retriever": "all-MiniLM-L6-v2",
   "A0_naive_cosine_rank1_asr": 0.8,
   "A0_naive_cosine_top5_contamination": 1.0,
-  "A_mnemo_raw_asr": 0.0,
+  "A_inspeximus_raw_asr": 0.0,
   "B_influence_asr": 0.0,
   "C_influence_selfgrade_asr": 0.8,
   "D_influence_selfgrade_WARRANT_GUARD_asr": 0.0,

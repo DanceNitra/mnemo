@@ -8,7 +8,7 @@ CORRECT traversal follows the LATEST value at each hop. Question nests the relat
 
 Three context conditions given to the SAME answerer LLM (instructed to prefer the most recent fact — a
 STEELMAN for accumulate):
-  1. supersession  : only the H latest edge-facts (what mnemo's keyed store yields).
+  1. supersession  : only the H latest edge-facts (what inspeximus's keyed store yields).
   2. accumulate    : the H latest + H stale ("Earlier, ... was E_old") facts on the SAME chain edges
                      (what a store that keeps superseded facts yields). Stale targets are wrong branches.
   3. distractor    : the H latest + H IRRELEVANT latest-facts about unrelated entities. SAME context size
@@ -93,7 +93,7 @@ def build(h):
         q = f"the {rels[i]} of {q}"
     q = f"What is {q}? Give only the name."
     conds = [
-        ("supersession", SYS_LABELED, latest_plain[:], True),          # mnemo: only current values
+        ("supersession", SYS_LABELED, latest_plain[:], True),          # inspeximus: only current values
         ("accumulate_labeled", SYS_LABELED, latest_lab + stale_lab, True),   # steelman: recency tagged
         ("accumulate_ordered", SYS_ORDERED, ordered, False),           # realistic: recency = list order only
         ("distractor", SYS_LABELED, latest_lab + distr, True),         # length control (2H, no conflict)

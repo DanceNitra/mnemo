@@ -1,15 +1,15 @@
 """
-mnemo example 01 — the basics: remember, recall, correct, audit.
+inspeximus example 01 — the basics: remember, recall, correct, audit.
 
-    pip install agora-mnemo
+    pip install agora-inspeximus
     python 01_basics.py
 
 The whole loop most agents need, in one zero-dependency file. No embedder required — recall falls back to a
 forgiving lexical match, so this runs anywhere today.
 """
-from mnemo import Mnemo
+from inspeximus import Inspeximus
 
-m = Mnemo("memory.json")          # persists to memory.json; drop the path for pure in-memory
+m = Inspeximus("memory.json")          # persists to memory.json; drop the path for pure in-memory
 
 # --- remember -----------------------------------------------------------------
 # `key` is an optional (subject, relation) identifier. Writing the same key again supersedes the old value.

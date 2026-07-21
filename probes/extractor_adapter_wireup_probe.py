@@ -4,8 +4,8 @@ Requires autogen-core (the clearest current-truth adapter). With extractor= plug
 messages auto-key and supersede, so query/update_context returns only the current value — no manual keying.
 """
 import sys, pathlib, asyncio, tempfile, re
-sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / "mnemo_pypi"))
-from mnemo.integrations.autogen import MnemoMemory
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / "inspeximus_pypi"))
+from inspeximus.integrations.autogen import InspeximusMemory
 from autogen_core.memory import MemoryContent, MemoryMimeType
 
 def extract(t):
@@ -17,14 +17,14 @@ async def run():
     tmp = pathlib.Path(tempfile.mkdtemp())
 
     # WITHOUT extractor: free-text add() does not supersede -> both values recallable (stale leaks)
-    m0 = MnemoMemory(path=str(tmp / "a.json"), k=5)
+    m0 = InspeximusMemory(path=str(tmp / "a.json"), k=5)
     await m0.add(MemoryContent(content="server timezone is UTC", mime_type=MemoryMimeType.TEXT))
     await m0.add(MemoryContent(content="server timezone is PST", mime_type=MemoryMimeType.TEXT))
     t0 = [c.content for c in (await m0.query("server timezone")).results]
     ok["A no extractor -> stale value still present"] = any("UTC" in x for x in t0)
 
     # WITH extractor= wired: same free-text adds auto-key + supersede -> only current-truth returned
-    m1 = MnemoMemory(path=str(tmp / "b.json"), k=5, extractor=extract)
+    m1 = InspeximusMemory(path=str(tmp / "b.json"), k=5, extractor=extract)
     await m1.add(MemoryContent(content="server timezone is UTC", mime_type=MemoryMimeType.TEXT))
     await m1.add(MemoryContent(content="server timezone is PST", mime_type=MemoryMimeType.TEXT))
     t1 = [c.content for c in (await m1.query("server timezone")).results]

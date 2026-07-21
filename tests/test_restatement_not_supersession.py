@@ -19,11 +19,11 @@ import pathlib
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
 
-from mnemo.mnemo import Mnemo   # noqa: E402
+from inspeximus.core import Inspeximus   # noqa: E402
 
 
 def _store(extractor):
-    m = Mnemo(path=None)
+    m = Inspeximus(path=None)
     m.extractor = extractor
     return m
 

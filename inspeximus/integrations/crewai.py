@@ -1,35 +1,35 @@
-"""CrewAI integration for mnemo — a custom memory `Storage` backed by mnemo (current-truth recall).
+"""CrewAI integration for inspeximus — a custom memory `Storage` backed by inspeximus (current-truth recall).
 
 CrewAI's memory (short-term, long-term, entity, external) delegates persistence to a `Storage` object with
 three methods: `save(value, metadata)`, `search(query, limit, score_threshold)` and `reset()`. This module
-provides `MnemoStorage`, a drop-in Storage you hand to CrewAI's `ExternalMemory` (or any custom-storage slot):
+provides `InspeximusStorage`, a drop-in Storage you hand to CrewAI's `ExternalMemory` (or any custom-storage slot):
 
     from crewai import Crew, Agent, Task
     from crewai.memory.external.external_memory import ExternalMemory
-    from inspeximus.integrations.crewai import MnemoStorage
+    from inspeximus.integrations.crewai import InspeximusStorage
 
     crew = Crew(
         agents=[...], tasks=[...],
-        external_memory=ExternalMemory(storage=MnemoStorage(path="crew_mem.json")),
+        external_memory=ExternalMemory(storage=InspeximusStorage(path="crew_mem.json")),
     )
 
-The honest differentiator vs CrewAI's default RAG storage: `search()` retrieves through mnemo's `recall()`,
+The honest differentiator vs CrewAI's default RAG storage: `search()` retrieves through inspeximus's `recall()`,
 which hides SUPERSEDED values by default — once a fact is corrected via a keyed write, the stale value is
 never returned back into the crew's context. For that to bite, writes must carry a supersession key: pass one
 in the metadata (`storage.save(value, {"key": "user::tz"})`) or set an OPT-IN `extractor` (text -> (key, obj))
 so plain `save()` calls are auto-keyed. Without a key, values are stored append-only like any RAG store.
 
-Duck-typed: this module does NOT import CrewAI, so `pip install agora-mnemo` alone is enough to use it against
-an installed CrewAI. `MnemoStorage` matches the `Storage` protocol structurally; `import inspeximus` stays
-zero-dependency. For semantic recall pass an embedder to the store: `MnemoStorage(embed=my_embed_fn)`; without
+Duck-typed: this module does NOT import CrewAI, so `pip install agora-inspeximus` alone is enough to use it against
+an installed CrewAI. `InspeximusStorage` matches the `Storage` protocol structurally; `import inspeximus` stays
+zero-dependency. For semantic recall pass an embedder to the store: `InspeximusStorage(embed=my_embed_fn)`; without
 one, recall is lexical (zero-dependency fallback).
 """
 from __future__ import annotations
 from typing import Any, Dict, List, Optional
 
 
-class MnemoStorage:
-    """A CrewAI `Storage` (duck-typed) backed by mnemo with supersession-filtered, current-truth search.
+class InspeximusStorage:
+    """A CrewAI `Storage` (duck-typed) backed by inspeximus with supersession-filtered, current-truth search.
 
     save(value, metadata) -> None            store a memory; metadata['key'] engages supersession
     search(query, limit, score_threshold)    return current-truth hits (superseded values omitted)
@@ -39,8 +39,8 @@ class MnemoStorage:
     def __init__(self, path: str | None = None, store: Any = None,
                  embed=None, extractor=None, tag: str = "crewai"):
         if store is None:
-            from inspeximus import Mnemo
-            store = Mnemo(path=path, embed=embed)
+            from inspeximus import Inspeximus
+            store = Inspeximus(path=path, embed=embed)
         self.store = store
         self._tag = tag
         # OPT-IN extractor (text -> (key, object)): auto-keys save()d values so search() returns current-truth.

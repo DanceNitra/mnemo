@@ -4,7 +4,7 @@ import os
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from mnemo.erasure_auditor import (
+from inspeximus.erasure_auditor import (
     ErasureAuditor, SoftDeleteProbe, QdrantSoftDeleteProbe, PgVectorSoftDeleteProbe, S3VersioningProbe,
 )
 

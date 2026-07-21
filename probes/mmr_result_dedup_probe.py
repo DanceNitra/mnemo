@@ -11,7 +11,7 @@ token-Jaccard so LEXICAL recall dedups too. Deterministic, zero-LLM. Asserts (ea
 """
 import sys
 sys.path.insert(0, ".")
-from mnemo import Mnemo
+from inspeximus import Inspeximus
 
 FAILS = []
 def check(n, c):
@@ -19,7 +19,7 @@ def check(n, c):
     if not c: FAILS.append(n)
 
 def fresh():
-    m = Mnemo(path=None)                       # lexical (no embedder) -> token-Jaccard diversity, no GPU
+    m = Inspeximus(path=None)                       # lexical (no embedder) -> token-Jaccard diversity, no GPU
     # a CLUSTER of near-duplicate "capital" facts + ONE distinct-but-relevant Paris fact
     m.remember("Paris is the capital of France.", key="a1")
     m.remember("The capital of France is the city of Paris.", key="a2")

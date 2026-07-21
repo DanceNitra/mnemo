@@ -1,7 +1,7 @@
 """membench_recency_tiebreak_probe.py — measure the recency-tiebreak lever on MemBench.
 
 v2 finding: on knowledge_update questions the STALE (pre-correction) value outranks the fresh
-one at rank 1 in 32.7% of cases, identically for plain cosine and mnemo semantic recall
+one at rank 1 in 32.7% of cases, identically for plain cosine and inspeximus semantic recall
 (free-text SRO supersession never triggers). Hypothesized lever: a small position (recency)
 bonus in the recall score.
 
@@ -22,7 +22,7 @@ Two-stage:
 GT note: knowledge_update GT is OUR lexical construction (benchmark annotations measured ~35%
 reliable — see v2 header). INTERNAL numbers.
 
-RUN: python -u mnemo/probes/membench_recency_tiebreak_probe.py    (local Ollama nomic)
+RUN: python -u inspeximus/probes/membench_recency_tiebreak_probe.py    (local Ollama nomic)
 Re-runs skip stage A if the stage-A dump exists.
 """
 import json, os, sys, time, math, urllib.request
@@ -30,7 +30,7 @@ import json, os, sys, time, math, urllib.request
 sys.stdout.reconfigure(errors="replace")
 
 DATA_DIR = os.environ.get("MEMBENCH_DATA", "agora_output/lab/data/membench")
-STAGE_A = "mnemo/probes/membench_recency_stage_a.json"
+STAGE_A = "inspeximus/probes/membench_recency_stage_a.json"
 EMB_URL = os.environ.get("OLLAMA_EMBED_URL", "http://localhost:11434/api/embed")
 MODEL = "nomic-embed-text"
 QP, DP = "search_query: ", "search_document: "

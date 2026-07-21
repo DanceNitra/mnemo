@@ -1,12 +1,12 @@
 """Governance + tamper-evidence: CT-style anchor, authenticated-principal erasure, decision basis."""
 import sys, os, copy
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from mnemo import (Mnemo, new_receipt_keypair, new_source_keypair, sign_erasure, erasure_challenge)
-from mnemo.mnemo import _sha256_hex, _canon, _GENESIS
+from inspeximus import (Inspeximus, new_receipt_keypair, new_source_keypair, sign_erasure, erasure_challenge)
+from inspeximus.core import _sha256_hex, _canon, _GENESIS
 
 
 def test_anchor_verifies_append_only_extension():
-    m = Mnemo(receipts=True)
+    m = Inspeximus(receipts=True)
     for i in range(3):
         m.remember(f"f{i}")
     a = m.anchor()
@@ -16,7 +16,7 @@ def test_anchor_verifies_append_only_extension():
 
 
 def test_anchor_catches_operator_rewrite():
-    m = Mnemo(receipts=True)
+    m = Inspeximus(receipts=True)
     for i in range(4):
         m.remember(f"f{i}")
     a = m.anchor()
@@ -39,7 +39,7 @@ def test_anchor_catches_operator_rewrite():
 
 
 def test_anchor_catches_rollback():
-    m = Mnemo(receipts=True)
+    m = Inspeximus(receipts=True)
     for i in range(5):
         m.remember(f"f{i}")
     a = m.anchor()
@@ -50,7 +50,7 @@ def test_anchor_catches_rollback():
 
 def test_erasure_binds_authenticated_principal_and_basis():
     sk, pk = new_receipt_keypair()
-    m = Mnemo(receipts=True, receipt_key=sk, receipt_pubkey=pk)
+    m = Inspeximus(receipts=True, receipt_key=sk, receipt_pubkey=pk)
     m.remember("bob data", source={"doc": "bob"})
     psk, ppk = new_source_keypair()
     authz = sign_erasure(psk, "bob", "req-1")
@@ -66,7 +66,7 @@ def test_erasure_binds_authenticated_principal_and_basis():
 
 def test_governance_report_carries_anchor():
     sk, pk = new_receipt_keypair()
-    m = Mnemo(receipts=True, receipt_key=sk, receipt_pubkey=pk)
+    m = Inspeximus(receipts=True, receipt_key=sk, receipt_pubkey=pk)
     m.remember("x", source={"doc": "s"}); m.forget_subject("s", request_id="r")
     rep = m.governance_report(expected_pubkey=pk)
     assert rep["proof"]["verified"]

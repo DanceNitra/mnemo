@@ -1,7 +1,7 @@
 """Live-agent end-to-end arm for the Generative Agents replication: does GA's context contamination
 actually make the AGENT answer wrong? Same LLM + same prompt (given every fair advantage, incl. an explicit
 'use the most recent / "is now" supersedes' instruction); ONLY the retrieved context differs — GA's
-top-k (stale + fresh) vs mnemo's supersession-cleaned top-k (fresh only). Writes generative_agents_agent_result.json."""
+top-k (stale + fresh) vs inspeximus's supersession-cleaned top-k (fresh only). Writes generative_agents_agent_result.json."""
 import os, sys, json, time, urllib.request
 from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor
@@ -51,7 +51,7 @@ def correct(ans, new, old):
 
 def eval_cond(embed, contra, scale):
     import random
-    hits = {"ga": 0, "mnemo": 0, "n": 0, "errs": 0}
+    hits = {"ga": 0, "inspeximus": 0, "n": 0, "errs": 0}
     for s in range(SEEDS):
         random.seed(20260716 + s)
         ga, st, updated = G.build(embed, n_facts=20, contra_frac=contra, scale_distractors=scale)
@@ -61,7 +61,7 @@ def eval_cond(embed, contra, scale):
             ga_ctx = [m["text"] for m in G.ga_topk(ga, qv, K)]
             mn_ctx = [h["text"] for h in st.recall(f"what is {subj}?", k=K, mode="semantic")]
             jobs.append(("ga", ga_ctx, subj, new, old))
-            jobs.append(("mnemo", mn_ctx, subj, new, old))
+            jobs.append(("inspeximus", mn_ctx, subj, new, old))
 
         def work(job):
             arm, ctx, subj, new, old = job
@@ -75,7 +75,7 @@ def eval_cond(embed, contra, scale):
         hits["n"] += len(updated)
     n = hits["n"]
     return {"contra": contra, "scale": scale, "n_queries": n, "errors": hits["errs"],
-            "ga_agent_acc": round(hits["ga"] / n, 3), "mnemo_agent_acc": round(hits["mnemo"] / n, 3)}
+            "ga_agent_acc": round(hits["ga"] / n, 3), "inspeximus_agent_acc": round(hits["inspeximus"] / n, 3)}
 
 
 def main():
@@ -89,7 +89,7 @@ def main():
     for contra in (0.2, 0.5, 0.9):
         r = eval_cond(embed, contra, SCALE)
         res.append(r)
-        print(f"contra={contra:.0%}: AGENT acc  GA={r['ga_agent_acc']:.0%}  mnemo={r['mnemo_agent_acc']:.0%}  "
+        print(f"contra={contra:.0%}: AGENT acc  GA={r['ga_agent_acc']:.0%}  inspeximus={r['inspeximus_agent_acc']:.0%}  "
               f"(n={r['n_queries']}, errs={r['errors']})")
     OUT.write_text(json.dumps({"ok": True, "model": MODEL, "scale": SCALE, "k": K, "rows": res}, indent=1),
                    encoding="utf-8")

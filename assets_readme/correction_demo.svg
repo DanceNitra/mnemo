@@ -15,7 +15,7 @@
   <text x="360" y="21" text-anchor="middle" class="p" font-size="12">a corrected fact stays corrected</text>
 
   <g class="l l1">
-    <text x="20" y="62"><tspan class="p">&gt;&gt;&gt;</tspan><tspan class="c" dx="8">m = Mnemo(</tspan><tspan class="s">"memory.json"</tspan><tspan class="c">);  m.echo_guard = </tspan><tspan class="k">True</tspan></text>
+    <text x="20" y="62"><tspan class="p">&gt;&gt;&gt;</tspan><tspan class="c" dx="8">m = Inspeximus(</tspan><tspan class="s">"memory.json"</tspan><tspan class="c">);  m.echo_guard = </tspan><tspan class="k">True</tspan></text>
   </g>
   <g class="l l2">
     <text x="20" y="90"><tspan class="p">&gt;&gt;&gt;</tspan><tspan class="c" dx="8">m.remember(</tspan><tspan class="s">"the region is Frankfurt"</tspan><tspan class="c">, key=</tspan><tspan class="s">"svc/region"</tspan><tspan class="c">, object=</tspan><tspan class="s">"Frankfurt"</tspan><tspan class="c">)</tspan></text>

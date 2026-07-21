@@ -9,7 +9,7 @@ is AUTO-STAMPED LINEAGE PROPAGATION -- the store inherits the retrieved parents 
 lineage EDGE is carried by the store from the recall->write flow, not supplied by the untrusted LLM (MemLineage,
 arXiv:2605.14421: signature-only 6/6 attacks -> 0/6 once ancestor lineage propagates, sub-ms overhead).
 
-This probe MEASURES that mechanism on shipped mnemo: recall() records what it surfaced; a subsequent
+This probe MEASURES that mechanism on shipped inspeximus: recall() records what it surfaced; a subsequent
 remember(..., derived=True) with no explicit parent auto-stamps derived_from from that recall, so the summary
 carries its ancestors' taint and a slash on the root REACHES it -- the untrusted summarize step never had to
 preserve the link. A derived write with NO preceding recall stays an orphan (fail-closed).
@@ -23,25 +23,25 @@ those need content-moderation + trust-decay retrieval, where provenance appears 
 FALSIFIER: if the auto-stamped summary did NOT carry the root's taint (so a slash on the root missed it), or if a
 derived write with no preceding recall were NOT an orphan, the mechanism would be doing nothing. Neither holds.
 
-Deterministic, zero-dependency (lexical recall, no embedder). MIT. Part of Agora / mnemo.
-Run:  python mnemo/probes/autostamp_lineage.py
+Deterministic, zero-dependency (lexical recall, no embedder). MIT. Part of Agora / inspeximus.
+Run:  python inspeximus/probes/autostamp_lineage.py
 """
 import os
 import sys
 import tempfile
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
-from mnemo import Mnemo
+from inspeximus import Inspeximus
 
 
 def _is_lb(m, rid):
     by = {x["id"]: x for x in m.items}
     r = by.get(rid)
-    return bool(r) and r.get("status") == "active" and Mnemo._is_corroborated(r, by)
+    return bool(r) and r.get("status") == "active" and Inspeximus._is_corroborated(r, by)
 
 
 def main():
-    m = Mnemo(os.path.join(tempfile.mkdtemp(), "autostamp.jsonl"))
+    m = Inspeximus(os.path.join(tempfile.mkdtemp(), "autostamp.jsonl"))
     print("=== Auto-stamped lineage: store carries the recall->write edge (MemLineage mechanism) ===\n")
 
     # a poison admitted with real-looking provenance, made load-bearing by banked credit
@@ -72,7 +72,7 @@ def main():
     print("t2  restore([P]) -> summary load-bearing: %s  (reversible)\n" % _is_lb(m, S))
 
     # contrast: a declared-derived write with NO preceding recall -> nothing to inherit -> orphan (fail-closed)
-    m2 = Mnemo(os.path.join(tempfile.mkdtemp(), "b.jsonl"))
+    m2 = Inspeximus(os.path.join(tempfile.mkdtemp(), "b.jsonl"))
     O = m2.remember("Summary with no recall before it.", derived=True)
     m2.credit([O], "good", weight=3.0)
     o_orphan = bool({x["id"]: x for x in m2.items}[O].get("orphan"))

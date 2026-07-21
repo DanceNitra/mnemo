@@ -1,7 +1,7 @@
 """
 continuous_chunk_recall_probe.py  --  recall(..., near=...): CONTINUOUS proximity retrieval. MIT.
 
-mnemo's `where=` / `prefer=` match CATEGORICAL metadata (theme == "identity"). But some memories carry a
+inspeximus's `where=` / `prefer=` match CATEGORICAL metadata (theme == "identity"). But some memories carry a
 CONTINUOUS state vector -- a TAT-style 5-D chunk (Theme, Role, Emotion, Meaning, Goal, each a float), or any
 embedding-like feature stored in meta. For those you want NEAREST-NEIGHBOUR retrieval in the numeric
 subspace, not exact match. `near=` adds exactly that, as the continuous analogue of `prefer`:
@@ -14,7 +14,7 @@ composes multiplicatively with text similarity and with `prefer`, and near=None 
 
 WHY it exists (measured on a real TAT 5-D state trace, DeepSeek-V3 #1466, @maratsultanov2): on a state/regime-
 relevance task the field-state chunk carries the signal but the text is thin, and the values are CONTINUOUS so
-a categorical filter can't touch them. Through mnemo's own recall, near= on the state vector beats plain text:
+a categorical filter can't touch them. Through inspeximus's own recall, near= on the state vector beats plain text:
     precision@5  0.984 (near)  vs  0.758 (plain text)   (+0.226)
     precision@10 0.972         vs  0.874                 (+0.098)
 Honest scope: this is a soft continuous CUE, not a vector index -- it re-ranks the recall candidate pool, so
@@ -26,13 +26,13 @@ zero-dependency, composes-with-text option in the core.
 Run:  python continuous_chunk_recall_probe.py
 """
 import os, sys, random, math
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "mnemo")))
-from mnemo import Mnemo
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "inspeximus")))
+from inspeximus import Inspeximus
 
 
 def main():
     # ---- 1. near=None is byte-identical legacy recall (zero behaviour change) ----
-    m = Mnemo()
+    m = Inspeximus()
     for i, txt in enumerate(["alpha note one", "alpha note two", "omega note one", "omega note two"]):
         m.remember(txt, meta={"theme": 0.1 if "alpha" in txt else 0.9, "role": 0.5})
     a = [h["id"] for h in m.recall("note", k=4)]
@@ -46,7 +46,7 @@ def main():
     print(f"   near theme=0.9 (omega): {near_hi}   (omega, close to 0.9, is pulled to the top)")
 
     # ---- 3. continuous separation: a broad text pool re-ranked by a 5-D state vector ----
-    m2 = Mnemo(); rng = random.Random(0)
+    m2 = Inspeximus(); rng = random.Random(0)
     # two regimes A (~0.2) and B (~0.8) in a 5-D state; identical thin text so text can't separate them
     ids = {}
     for i in range(40):

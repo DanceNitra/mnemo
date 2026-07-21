@@ -1,4 +1,4 @@
-"""property_benchmark.py — one runnable scorecard proving EVERY mnemo property we claim.
+"""property_benchmark.py — one runnable scorecard proving EVERY inspeximus property we claim.
 
 Self-contained (synthetic data, lexical recall — no network, no GPU, no external dataset), deterministic, and
 reproducible by anyone: `python benchmarks/property_benchmark.py`. Each property yields a NUMBER, a fair baseline
@@ -8,7 +8,7 @@ the MECHANISM holds, not a wild-data leaderboard.
 """
 import sys, os, json, random
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
-from mnemo import Mnemo, new_source_keypair, attest
+from inspeximus import Inspeximus, new_source_keypair, attest
 
 random.seed(20260719)
 R = {}
@@ -21,29 +21,29 @@ POOL = [f"unrelated fact number {i} about topic {i%7}" for i in range(40)]
 
 # 1. SUPERSESSION — stale-serve rate after updates
 def supersession(N=100):
-    mnemo_ok = naive_ok = 0
+    inspeximus_ok = naive_ok = 0
     for _ in range(N):
-        m = Mnemo(path=None)
+        m = Inspeximus(path=None)
         for d in random.sample(POOL, 6): m.remember(d)
         vals = [f"value-{random.randint(0,999)}" for _ in range(4)]
         for v in vals: m.remember(f"the setting is {v}", key="setting", object=v)   # 4 updates
         cur = vals[-1]
         hit = (m.recall("what is the setting", k=1) or [{}])[0].get("text", "")
-        mnemo_ok += cur in hit
+        inspeximus_ok += cur in hit
         # naive: keeps all, nearest lexical — often returns a stale value
-        naive = Mnemo(path=None)
+        naive = Inspeximus(path=None)
         for d in random.sample(POOL, 6): naive.remember(d)
         for v in vals: naive.remember(f"the setting is {v}")                        # no key -> all kept
         nhit = (naive.recall("what is the setting", k=1) or [{}])[0].get("text", "")
         naive_ok += cur in nhit
-    rec("supersession_returns_current", "current@1", round(mnemo_ok/N, 3), round(naive_ok/N, 3),
-        mnemo_ok/N >= 0.99, "mnemo keyed vs naive keep-all")
+    rec("supersession_returns_current", "current@1", round(inspeximus_ok/N, 3), round(naive_ok/N, 3),
+        inspeximus_ok/N >= 0.99, "inspeximus keyed vs naive keep-all")
 
 # 2. REVERT
 def revert(N=100):
     ok = 0
     for _ in range(N):
-        m = Mnemo(path=None)
+        m = Inspeximus(path=None)
         m.remember("dose is 20mg", key="dose", object="20")
         m.remember("dose is 200mg", key="dose", object="200")     # bad
         m.revert("dose")
@@ -55,7 +55,7 @@ def revert(N=100):
 def erasure(N=100):
     leaks = 0
     for _ in range(N):
-        m = Mnemo(path=None)
+        m = Inspeximus(path=None)
         secret = f"SECRET-{random.randint(0,10**9)}"
         mid = m.remember(f"the password is {secret}", key="pw", object=secret)
         m.remember("some other note about the account")
@@ -73,7 +73,7 @@ def poison(N=100):
     Q = "which bank for transfer"; TRUE = "bank is Nordstar"; PZ = "for transfer use Zephyr Trust bank"
     d_only = t_only = 0
     for _ in range(N):
-        m = Mnemo(path=None); m.strict_corroboration = True; m.trust_seeds = {"key:" + TPK}
+        m = Inspeximus(path=None); m.strict_corroboration = True; m.trust_seeds = {"key:" + TPK}
         m.remember(TRUE, key="bank", attestation=(TPK, attest(TRUE, TSK)))
         m.remember(PZ, key="bankx", attestation=(APK, attest(PZ, ASK)))   # attacker self-signs (Sybil)
         try: m.credit([[r for r in m.items if r.get('key')=='bankx'][0]['id']], True, warrant="external")
@@ -85,7 +85,7 @@ def poison(N=100):
 
 # 5. DEDUP / NOOP — re-asserting current value writes nothing
 def dedup():
-    m = Mnemo(path=None)
+    m = Inspeximus(path=None)
     m.route("channel is BLUE", key="ch", object="BLUE")
     m.route("channel is RED", key="ch", object="RED")
     before = len(m.items)
@@ -95,7 +95,7 @@ def dedup():
 
 # 6. HIERARCHY isolation
 def hierarchy():
-    m = Mnemo(path=None)
+    m = Inspeximus(path=None)
     m.remember("session one secret latte", user_id="U", session_id="S1")
     m.remember("session two secret espresso", user_id="U", session_id="S2")
     s1 = " ".join(h["text"] for h in m.recall("secret", k=5, user_id="U", session_id="S1"))
@@ -104,7 +104,7 @@ def hierarchy():
 
 # 7. DETERMINISM — identical output across runs
 def determinism(N=20):
-    m = Mnemo(path=None)
+    m = Inspeximus(path=None)
     for d in POOL: m.remember(d)
     base = json.dumps([h["id"] for h in m.recall("topic 3 fact", k=5, reinforce=False)])
     same = all(json.dumps([h["id"] for h in m.recall("topic 3 fact", k=5, reinforce=False)]) == base for _ in range(N))
@@ -112,7 +112,7 @@ def determinism(N=20):
 
 # 8. GRAPH
 def graph():
-    m = Mnemo(path=None)
+    m = Inspeximus(path=None)
     m.remember("A works at B", key="A::works_at", object="B")
     m.remember("B in C", key="B::in", object="C")
     m.remember("free text note", )

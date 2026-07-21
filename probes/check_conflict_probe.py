@@ -18,14 +18,14 @@ Pre-registered checks:
 """
 import sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
-from mnemo import Mnemo
+from inspeximus import Inspeximus
 
 
 def main():
     ok = {}
 
     # A / B — managed-key value change
-    m = Mnemo(path=None)
+    m = Inspeximus(path=None)
     m.remember("prod region is frankfurt", key="cfg::region", object="frankfurt")
     ok["A keyed value change flagged"] = any(c["kind"] == "keyed_value_change"
         for c in m.check_conflict("prod region is ohio", key="cfg::region", object="ohio"))
@@ -33,27 +33,27 @@ def main():
         key="cfg::region", object="frankfurt") == []
 
     # C numeric update
-    m = Mnemo(path=None)
+    m = Inspeximus(path=None)
     m.remember("the retry limit is 5 attempts")
     ok["C numeric update flagged"] = len(m.check_conflict("the retry limit is 12 attempts")) >= 1
 
     # D negation flip
-    m = Mnemo(path=None)
+    m = Inspeximus(path=None)
     m.remember("the staging server is up")
     ok["D negation flip flagged"] = len(m.check_conflict("the staging server is not up")) >= 1
 
     # E DUPLICATE must NOT flag (the crux: a similarity gate would; clash-signal does not)
-    m = Mnemo(path=None)
+    m = Inspeximus(path=None)
     m.remember("cats are mammals")
     ok["E duplicate NOT flagged"] = m.check_conflict("cats are mammals") == []
 
     # F unrelated -> clean
-    m = Mnemo(path=None)
+    m = Inspeximus(path=None)
     m.remember("the retry limit is 5 attempts")
     ok["F unrelated NOT flagged"] = m.check_conflict("the sky is blue today") == []
 
     # G semantic contradiction: deterministic default misses; pluggable judge catches
-    m = Mnemo(path=None)
+    m = Inspeximus(path=None)
     m.remember("alice lives in berlin")
     default_miss = m.check_conflict("alice lives in munich") == []
     # a toy "semantic" judge: same subject+relation, different city token
@@ -66,7 +66,7 @@ def main():
     ok["G semantic: default misses, judge catches"] = default_miss and judge_catch
 
     # H read-only
-    m = Mnemo(path=None)
+    m = Inspeximus(path=None)
     m.remember("the retry limit is 5 attempts")
     n0 = len(m.items)
     m.check_conflict("the retry limit is 12 attempts")

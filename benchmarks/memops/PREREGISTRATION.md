@@ -1,4 +1,4 @@
-# Pre-registration — mnemo on MemOps (internal diagnostic)
+# Pre-registration — inspeximus on MemOps (internal diagnostic)
 
 **Written BEFORE any measurement.** Timestamp: 2026-07-20, immediately after the environment was
 quiesced (brain + dungeon stopped, keepalive disabled, GPU idle, zero cloud contention verified).
@@ -6,10 +6,10 @@ Nothing in this file may be edited after the first result lands; corrections go 
 
 ## The question (one sentence)
 
-Does mnemo's **keyed supersession / echo_guard** buy measurable integrity over a **naive verbatim
+Does inspeximus's **keyed supersession / echo_guard** buy measurable integrity over a **naive verbatim
 keep-all** store on someone else's lifecycle-operation data — and if so, on which operations?
 
-Why this and not "do we beat mem0": our own MemoryAgentBench run already found mnemo 85% vs naive
+Why this and not "do we beat mem0": our own MemoryAgentBench run already found inspeximus 85% vs naive
 verbatim 87% (within noise) — i.e. our measured advantage there came from **not running an LLM on the
 write path**, NOT from supersession. MemOps is the first external dataset with explicit Update/Forget
 probes and stale-value / leakage metrics, so it can settle that open question.
@@ -37,7 +37,7 @@ probes and stale-value / leakage metrics, so it can settle that open question.
 - **Ingestion granularity**: session/segment-level verbatim chunks (the paper measures session-level RAG
   0.845 vs turn-level 0.618 — turn-level fragmentation is a known confound, so we do not use it).
 - **Arms** (identical answerer, identical judge, identical data — only the memory layer differs):
-  1. `mnemo` — keyed writes, `echo_guard=True`, supersession active, `resolve_conflicts=True`
+  1. `inspeximus` — keyed writes, `echo_guard=True`, supersession active, `resolve_conflicts=True`
   2. `naive` — same chunks, keep-all, no supersession, no guard (**the control that tied us on MAB**)
   3. `no_context` — answerer sees only the question (floor; proves the probes need memory at all)
   4. `mem0` — its own extraction pipeline, LLM pointed at Ollama Cloud (**added 2026-07-20 at the owner's
@@ -51,10 +51,10 @@ probes and stale-value / leakage metrics, so it can settle that open question.
 
 | # | Prediction | SUPPORTED if | REFUTED if |
 |---|---|---|---|
-| P1 | mnemo ≈ naive on **Remember** accuracy | \|Δ\| ≤ 3 pp | mnemo beats naive by > 3 pp |
-| P2 | mnemo beats naive on **Stale Value Rate** (Update) | mnemo's stale rate is lower by ≥ 5 pp | Δ < 5 pp, or naive lower |
-| P3 | mnemo beats naive on **Leakage Rate** (Forget) | mnemo's leakage lower by ≥ 5 pp | Δ < 5 pp, or naive lower |
-| P4 | mnemo **loses** to naive on `over_forget` | mnemo's over_forget higher by ≥ 5 pp | mnemo ≤ naive |
+| P1 | inspeximus ≈ naive on **Remember** accuracy | \|Δ\| ≤ 3 pp | inspeximus beats naive by > 3 pp |
+| P2 | inspeximus beats naive on **Stale Value Rate** (Update) | inspeximus's stale rate is lower by ≥ 5 pp | Δ < 5 pp, or naive lower |
+| P3 | inspeximus beats naive on **Leakage Rate** (Forget) | inspeximus's leakage lower by ≥ 5 pp | Δ < 5 pp, or naive lower |
+| P4 | inspeximus **loses** to naive on `over_forget` | inspeximus's over_forget higher by ≥ 5 pp | inspeximus ≤ naive |
 | P5 | both arms beat `no_context` on accuracy | ≥ 20 pp over the floor | otherwise the probes are answerable without memory and the run is void |
 
 P4 is a prediction **against ourselves** and is the honest one: `forget_subject` deliberately cascades
@@ -81,7 +81,7 @@ A judge that cannot separate these cannot measure P2/P3, and any number it produ
 1. A settled internal answer on whether supersession earns its place.
 2. A reusable harness (swap the judge when there is budget or when a leaderboard appears).
 3. `over_forget` as a newly-named design tension in `forget_subject`.
-4. Their operation taxonomy (trigger / target / scope / state-transition / evidence) as input to mnemo's
+4. Their operation taxonomy (trigger / target / scope / state-transition / evidence) as input to inspeximus's
    own API design, cited as prior art rather than reinvented.
 
 
@@ -127,7 +127,7 @@ The first pilot run (`pilot_raw_cheap.json`, 24 files, n≈240/arm) finished. It
 
 | arm | n | accuracy | stale (Update) | leak (Forget) | over_forget |
 |---|---|---|---|---|---|
-| mnemo | 237 | 0.283 | 0.114 (4/35) | 0.179 (7/39) | 0.625 |
+| inspeximus | 237 | 0.283 | 0.114 (4/35) | 0.179 (7/39) | 0.625 |
 | naive | 238 | 0.269 | 0.081 (3/37) | 0.147 (5/34) | 0.667 |
 | session_rag | 240 | 0.442 | 0.114 | 0.333 | 0.278 |
 | no_context | 240 | 0.058 | 0.000 | 0.000 | 0.875 |
@@ -138,29 +138,29 @@ floor), P2 and P3 REFUTED, P4 REFUTED. **That reading is not admissible**, becau
 
 | arm | evidence-turn coverage | avg context chars |
 |---|---|---|
-| mnemo@20 (the setting the pilot ran) | 0.035 | 1 323 |
+| inspeximus@20 (the setting the pilot ran) | 0.035 | 1 323 |
 | naive@20 | 0.034 | 1 300 |
-| mnemo@60 | 0.085 | 4 768 |
-| mnemo@150 | 0.142 | 11 916 |
+| inspeximus@60 | 0.085 | 4 768 |
+| inspeximus@150 | 0.142 | 11 916 |
 | session_rag | 0.305 | 11 941 |
 
 `TOPK=20` sentence-level hits spend ~1.3k characters; the `session_rag` arm spends ~11.9k. The arms were
 therefore never compared at equal context budget — a 9x confound of my own making. Two consequences:
 
 1. **session_rag's accuracy win (0.442 vs 0.283) is not a granularity result.** It is mostly a budget
-   result and must not be cited as "BM25 beats mnemo".
+   result and must not be cited as "BM25 beats inspeximus".
 2. **P2/P3 cannot be evaluated from this run at all.** Supersession can only correct a stale value that is
    actually retrieved; at 3.5% evidence coverage there is almost nothing in the context for the integrity
    layer to act on. A null here measures the retriever, not the product.
 
-**Correction (declared before the corrected numbers existed):** re-run the `mnemo` and `naive` arms at
+**Correction (declared before the corrected numbers existed):** re-run the `inspeximus` and `naive` arms at
 `MEMOPS_TOPK=150` (~11.9k chars, matched to `session_rag` to within 0.2%), same 24 files, same answerer,
 same judge, same prompts, tag `k150`. P1–P5 are evaluated on THAT run. The k=20 numbers stay on record as
 what a too-small retrieval budget produces; they are not the study's result.
 
 **Result that survives either way** (it needs no LLM): at a matched ~11.9k budget, turn-level lexical
 retrieval still recovers only 0.142 of the evidence sentences vs 0.305 session-level — turn granularity
-costs ~2.1x in evidence recall. That is a real cost of mnemo's keyed-statement ingestion model and it is
+costs ~2.1x in evidence recall. That is a real cost of inspeximus's keyed-statement ingestion model and it is
 independent of the judge.
 
 
@@ -173,19 +173,19 @@ stratified scenarios, same answerer, same judge.
 
 | arm | n | accuracy | stale (Update) | leakage (Forget) | over-forget |
 |---|---|---|---|---|---|
-| mnemo | 236 | **0.593** | 0.211 (38) | 0.243 (37) | 0.162 (37) |
+| inspeximus | 236 | **0.593** | 0.211 (38) | 0.243 (37) | 0.162 (37) |
 | naive keep-all | 238 | **0.592** | 0.125 (40) | 0.278 (36) | 0.222 (36) |
 | mem0 | 237 | **0.544** | 0.211 (38) | 0.385 (39) | 0.051 (39) |
 | session_rag (BM25) | 240 | 0.442 | 0.114 (35) | 0.333 (36) | 0.278 (36) |
 | no_context | 240 | 0.058 | 0.000 | 0.000 | 0.875 |
 
-mnemo vs mem0, bootstrap 95% CI on the difference: accuracy [−0.040, +0.138], stale [−0.184, +0.184],
+inspeximus vs mem0, bootstrap 95% CI on the difference: accuracy [−0.040, +0.138], stale [−0.184, +0.184],
 leakage [−0.348, +0.067], over-forget [−0.023, +0.246]. **Every interval contains zero.**
 
 ## Verdict against the pre-registered predictions
 
-- **P1 SUPPORTED** — mnemo ≈ naive on Remember/accuracy (Δ = +0.1 pp, CI [−8.8, +8.9]).
-- **P2 REFUTED** — no stale-value advantage; mnemo 0.211 vs naive 0.125, CI spans zero.
+- **P1 SUPPORTED** — inspeximus ≈ naive on Remember/accuracy (Δ = +0.1 pp, CI [−8.8, +8.9]).
+- **P2 REFUTED** — no stale-value advantage; inspeximus 0.211 vs naive 0.125, CI spans zero.
 - **P3 REFUTED** — no leakage advantage; 0.243 vs 0.278, Δ below the 5 pp threshold.
 - **P4 REFUTED, in our favour** — over-forget 0.162 vs naive 0.222; the `derived_from` cascade did not
   cost us here. Note `no_context` scores 0.875 on this metric, i.e. it largely measures "declines to
@@ -203,7 +203,7 @@ itself.
 ## What DID separate, and by how much
 
 **Write cost.** mem0 spends ~600–730 s of LLM extraction per scenario (full run: 4 h 40 min wall clock,
-of which 53 s CPU — the rest is waiting on the cloud). mnemo's write path is 0 s and makes no LLM call.
+of which 53 s CPU — the rest is waiting on the cloud). inspeximus's write path is 0 s and makes no LLM call.
 That is an order-of-magnitude separation, not a noise-level one, and it is the one thing this benchmark
 measured cleanly in our favour.
 
@@ -224,7 +224,7 @@ accuracy (0.593 vs 0.442) despite recovering less than half the evidence sentenc
 
 ## Consequence for the product story
 
-The claim "mnemo gives more accurate or fresher answers" has now failed to replicate three times and must
+The claim "inspeximus gives more accurate or fresher answers" has now failed to replicate three times and must
 not be used. What survives is measurable and defensible: **a zero-LLM, deterministic write path**, and
 the governance primitives (revert, receipted erasure) that this benchmark never asks about. The latter are
 tested separately under `ERASURE_REVERT_SPEC.md`, whose predictions were fixed before it ran and include

@@ -1,6 +1,6 @@
-"""mnemo_mcp_token_pack_probe.py — compact MCP recall + progressive disclosure.
+"""inspeximus_mcp_token_pack_probe.py — compact MCP recall + progressive disclosure.
 
-Standard MCP/RAG context-economy practice (progressive disclosure / small-to-big retrieval), applied to mnemo's
+Standard MCP/RAG context-economy practice (progressive disclosure / small-to-big retrieval), applied to inspeximus's
 MCP surface. Asserts:
   1. recall() returns a COMPACT projection (id/text/score/value/tags), NOT the full internal record.
   2. NO truncation by default (full text kept — so a corrected value can't be silently cut off).
@@ -16,9 +16,9 @@ No LLM, zero extra deps beyond the MCP SDK.
 """
 import os, json, tempfile, sys
 
-os.environ["MNEMO_PATH"] = tempfile.mktemp(suffix=".json")
+os.environ["INSPEXIMUS_PATH"] = tempfile.mktemp(suffix=".json")
 try:
-    import mnemo.mnemo_mcp as M
+    import inspeximus.mcp as M
 except SystemExit:
     print("SKIP: MCP SDK not installed (pip install 'mcp[cli]')"); sys.exit(0)
 

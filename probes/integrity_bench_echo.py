@@ -10,34 +10,34 @@ back?
     echo  "the {entity} is {A}."            # restate the retired value
     ask   "what is the current {entity}?"   ->   B = echo resisted (good), A = resurrected (bad)
 
-metric = echo-resistance rate (fraction where the current answer is still B). mnemo is measured LOCALLY (its
+metric = echo-resistance rate (fraction where the current answer is still B). inspeximus is measured LOCALLY (its
 echo_guard, no OpenAI). mem0 / graphiti are gated behind --systems because they cost OpenAI calls; the honest
-expected shape from prior work: mnemo defends, Graphiti also defends (~0% resurrection in its real pipeline),
+expected shape from prior work: inspeximus defends, Graphiti also defends (~0% resurrection in its real pipeline),
 mem0 ~0.53. We do NOT sweep this cell — that is the point.
 
-RUN (free):  python mnemo/probes/integrity_bench_echo.py --systems mnemo
-RUN (paid):  python mnemo/probes/integrity_bench_echo.py --systems mnemo,mem0,graphiti --n 20
+RUN (free):  python inspeximus/probes/integrity_bench_echo.py --systems inspeximus
+RUN (paid):  python inspeximus/probes/integrity_bench_echo.py --systems inspeximus,mem0,graphiti --n 20
 """
 import os, sys, json, argparse
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, os.path.dirname(__file__))
-from mnemo import Mnemo
+from inspeximus import Inspeximus
 # reuse the shared judge + entity fixture + adapters wiring from the revert cell
 import integrity_bench_revert as rev
 ENTS, openai_chat, judge_current = rev.ENTS, rev.openai_chat, rev.judge_current
 
 
-def run_mnemo_echo(cases):
+def run_inspeximus_echo(cases):
     out = []
     for (e, A, B) in cases:
-        m = Mnemo(path=None); m.echo_guard = True
+        m = Inspeximus(path=None); m.echo_guard = True
         m.remember(f"the {e} is {A}", key=e, object=A)
         m.remember(f"correction: the {e} is now {B}", key=e, object=B)
         m.remember(f"the {e} is {A}", key=e, object=A)          # the echo of the retired value
         hits = m.recall(e, k=6)
         ctx = "\n".join(h["text"] for h in hits)
-        # SYMMETRIC INSTRUMENT (fairness fix 2026-07-11): read mnemo through the SAME LLM judge on its native
+        # SYMMETRIC INSTRUMENT (fairness fix 2026-07-11): read inspeximus through the SAME LLM judge on its native
         # recall surface, exactly as mem0/graphiti — not mechanically from its own ledger (the asymmetric
         # instrument the pre-publication audit caught). judge returns A=resurrected / B=resisted / other.
         out.append(judge_current(e, ctx or "(no memories)", A, B))
@@ -119,14 +119,14 @@ def score(name, verdicts, n_cases):
 
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument("--n", type=int, default=20)
-    ap.add_argument("--systems", default="mnemo")
+    ap.add_argument("--systems", default="inspeximus")
     a = ap.parse_args(); want = [s.strip() for s in a.systems.split(",") if s.strip()]
     cases = [ENTS[i] for i in range(min(a.n, len(ENTS)))]
     print(f"cross-system integrity benchmark — echo resistance · n={len(cases)} · systems={want}\n")
     out = {}
-    if "mnemo" in want:
-        print("mnemo (local, echo_guard)...")
-        out["mnemo"] = score("mnemo", run_mnemo_echo(cases), len(cases)); print(json.dumps(out["mnemo"]))
+    if "inspeximus" in want:
+        print("inspeximus (local, echo_guard)...")
+        out["inspeximus"] = score("inspeximus", run_inspeximus_echo(cases), len(cases)); print(json.dumps(out["inspeximus"]))
     if "mem0" in want:
         print("\nmem0 (native, OpenAI)..."); out["mem0"] = score("mem0", run_mem0_echo(cases), len(cases)); print(json.dumps(out["mem0"]))
     if "graphiti" in want:

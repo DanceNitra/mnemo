@@ -1,18 +1,18 @@
-"""MnemoMemoryBlock — a LlamaIndex long-term `BaseMemoryBlock` backed by mnemo (current-truth recall).
+"""InspeximusMemoryBlock — a LlamaIndex long-term `BaseMemoryBlock` backed by inspeximus (current-truth recall).
 
 LlamaIndex agents attach long-term memory as `BaseMemoryBlock`s on a `Memory` object; the short-term buffer
 flushes into each block, and before a turn the blocks return relevant content to inject. A block implements
 async `_aget` (return what to inject) and `_aput` (store new messages).
 
     from llama_index.core.memory import Memory
-    from inspeximus.integrations.llamaindex import MnemoMemoryBlock
+    from inspeximus.integrations.llamaindex import InspeximusMemoryBlock
     memory = Memory.from_defaults(
         session_id="s1", token_limit=40000,
-        memory_blocks=[MnemoMemoryBlock(name="mnemo", path="mem.json", k=5)],
+        memory_blocks=[InspeximusMemoryBlock(name="inspeximus", path="mem.json", k=5)],
     )
 
 The honest differentiator (same as the AutoGen block, and unlike a plain vector block): `_aget` retrieves
-through mnemo's `recall()`, which hides SUPERSEDED values by default — so once a fact is corrected (via a
+through inspeximus's `recall()`, which hides SUPERSEDED values by default — so once a fact is corrected (via a
 keyed write), the block never injects the stale value back into the prompt. For that to bite you must write
 facts with a supersession `key`; plain message text is stored append-only like any block.
 
@@ -26,10 +26,10 @@ from llama_index.core.memory import BaseMemoryBlock
 from llama_index.core.base.llms.types import ChatMessage
 
 
-class MnemoMemoryBlock(BaseMemoryBlock[str]):
+class InspeximusMemoryBlock(BaseMemoryBlock[str]):
     """A persistent long-term memory block whose recall is supersession-filtered (current-truth)."""
 
-    name: str = Field(default="MnemoMemory")
+    name: str = Field(default="InspeximusMemory")
     description: Optional[str] = Field(
         default="Long-term memory with deterministic supersession: corrected facts are not re-injected.")
     k: int = Field(default=5, description="How many memories to inject.")
@@ -38,8 +38,8 @@ class MnemoMemoryBlock(BaseMemoryBlock[str]):
     def __init__(self, path: str | None = None, store: Any = None, extractor=None, **kwargs: Any):
         super().__init__(**kwargs)                      # only pydantic fields (name/description/priority/k)
         if store is None:
-            from inspeximus import Mnemo
-            store = Mnemo(path=path)
+            from inspeximus import Inspeximus
+            store = Inspeximus(path=path)
         self._store = store
         # OPT-IN extractor (text -> (key, object)): auto-keys _aput'd messages so _aget injects current-truth.
         if extractor is not None:

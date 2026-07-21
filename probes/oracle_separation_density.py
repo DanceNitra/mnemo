@@ -23,7 +23,7 @@ USABLE separation := sep ratio (reduction / legit_block) >= 1.5 AND legit_block 
 
 Needs numpy + a local nomic embedder (Ollama). Deterministic. MIT.
 Run: LOCOMO_CACHE=agora_output/lab/data/locomo_confweighted_cache.json \
-     python mnemo/probes/oracle_separation_density.py"""
+     python inspeximus/probes/oracle_separation_density.py"""
 import json, os, hashlib, random
 import urllib.request
 import numpy as np
@@ -310,4 +310,4 @@ out = {"scenario": "oracle_separation_density", "theta": THETA, "densities": DEN
        "minja_collapses_dense": bool(minja_collapses_dense), "blind_never": bool(blind_never), "verdict": verdict}
 json.dump(out, open(os.path.join(os.path.dirname(__file__), "oracle_separation_density_result.json"), "w"),
           ensure_ascii=False, indent=1)
-print("\nsaved: mnemo/probes/oracle_separation_density_result.json")
+print("\nsaved: inspeximus/probes/oracle_separation_density_result.json")

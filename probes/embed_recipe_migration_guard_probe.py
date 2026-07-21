@@ -11,7 +11,7 @@ open with a different embed_id, the persisted vectors are re-embedded with the c
 """
 import sys, os, tempfile
 sys.path.insert(0, ".")
-from mnemo import Mnemo
+from inspeximus import Inspeximus
 
 FAILS = []
 def check(n, c):
@@ -22,23 +22,23 @@ d = tempfile.mkdtemp(); p = os.path.join(d, "s.json")
 def embA(t): return [1.0, 0.0, 0.0]
 def embB(t): return [0.0, 1.0, 0.0]
 
-m = Mnemo(path=p, embed=embA, persist_vectors=True, embed_id="A")
+m = Inspeximus(path=p, embed=embA, persist_vectors=True, embed_id="A")
 m.remember("hello world", key="k"); m._save(force=True)
 check("1 embed_id sidecar written on save", os.path.exists(p + ".embedid") and open(p + ".embedid").read() == "A")
 
-m2 = Mnemo(path=p, embed=embB, persist_vectors=True, embed_id="B")
+m2 = Inspeximus(path=p, embed=embB, persist_vectors=True, embed_id="B")
 v2 = [r["vec"] for r in m2.items if r.get("key") == "k"][0]
 check("2 recipe change re-embeds persisted vectors", v2 == [0.0, 1.0, 0.0])
 m2._save(force=True)
 check("2b sidecar updated to new recipe on save", open(p + ".embedid").read() == "B")
 
 # same recipe B stored; pass embed=embA but embed_id="B" -> must NOT re-embed (vec stays B)
-m3 = Mnemo(path=p, embed=embA, persist_vectors=True, embed_id="B")
+m3 = Inspeximus(path=p, embed=embA, persist_vectors=True, embed_id="B")
 v3 = [r["vec"] for r in m3.items if r.get("key") == "k"][0]
 check("3 same recipe = no re-embed (idempotent)", v3 == [0.0, 1.0, 0.0])
 
 p2 = os.path.join(d, "ram.json")
-mm = Mnemo(path=p2, embed=embA, embed_id="A")   # persist_vectors=False (default)
+mm = Inspeximus(path=p2, embed=embA, embed_id="A")   # persist_vectors=False (default)
 mm.remember("x", key="k"); mm._save(force=True)
 check("4 non-persist store never creates the embedid sidecar", not os.path.exists(p2 + ".embedid"))
 
@@ -52,7 +52,7 @@ def embC(t):
     return [0.0, 0.0, 1.0]
 
 p3 = os.path.join(d, "mixed.json")
-m4 = Mnemo(path=p3, embed=embA, persist_vectors=True, embed_id="A")
+m4 = Inspeximus(path=p3, embed=embA, persist_vectors=True, embed_id="A")
 m4.remember("has a vector", key="v")
 for i in range(50):                                  # vec-less records (an embedder-down capture, or lexical era)
     m4.remember(f"no vector {i}", key=f"n{i}")
@@ -60,13 +60,13 @@ for i in range(50):                                  # vec-less records (an embe
 m4._save(force=True)
 
 calls["n"] = 0
-m5 = Mnemo(path=p3, embed=embC, persist_vectors=True, embed_id="C")
+m5 = Inspeximus(path=p3, embed=embC, persist_vectors=True, embed_id="C")
 check("5 realign embeds ONLY vec-bearing records (not the whole store)", calls["n"] == 1)
 check("5b vec-less records stay vec-less", all(r["vec"] is None for r in m5.items if r.get("key") != "v"))
 
 # The killer: m5 was never saved by the caller. Opening again must NOT redo the realignment.
 calls["n"] = 0
-m6 = Mnemo(path=p3, embed=embC, persist_vectors=True, embed_id="C")
+m6 = Inspeximus(path=p3, embed=embC, persist_vectors=True, embed_id="C")
 check("6 realignment is persisted, so a read-only open never repeats it", calls["n"] == 0)
 check("6b sidecar records the new recipe without an explicit save",
       open(p3 + ".embedid").read().strip() == "C")
@@ -75,14 +75,14 @@ check("6c the realigned vector actually reached disk",
 
 # Bounded: a big store must never pay an unbounded synchronous re-embed on the load path.
 p4 = os.path.join(d, "big.json")
-m7 = Mnemo(path=p4, embed=embA, persist_vectors=True, embed_id="A")
+m7 = Inspeximus(path=p4, embed=embA, persist_vectors=True, embed_id="A")
 for i in range(12):
     m7.remember(f"rec {i}", key=f"b{i}")
 m7._save(force=True)
-os.environ["MNEMO_REALIGN_MAX"] = "5"
+os.environ["INSPEXIMUS_REALIGN_MAX"] = "5"
 calls["n"] = 0
-m8 = Mnemo(path=p4, embed=embC, persist_vectors=True, embed_id="C")
-check("7 past MNEMO_REALIGN_MAX the guard drops vectors instead of stalling", calls["n"] == 0)
+m8 = Inspeximus(path=p4, embed=embC, persist_vectors=True, embed_id="C")
+check("7 past INSPEXIMUS_REALIGN_MAX the guard drops vectors instead of stalling", calls["n"] == 0)
 check("7b dropped vectors degrade to lexical (vec=None), never a stale-space mismatch",
       all(r.get("vec") is None for r in m8.items))
 
@@ -90,9 +90,9 @@ check("7b dropped vectors degrade to lexical (vec=None), never a stale-space mis
 # way — the point being that it is a foreground call you choose, never implicit work on a load path.
 r8 = m8.reembed()
 check("8 reembed() rebuilds the dropped vectors", r8["reembedded"] == 12 and r8["remaining"] == 0)
-m9 = Mnemo(path=p4, embed=embC, persist_vectors=True, embed_id="C")
+m9 = Inspeximus(path=p4, embed=embC, persist_vectors=True, embed_id="C")
 check("8b the rebuilt vectors are persisted", all(r.get("vec") == [0.0, 0.0, 1.0] for r in m9.items))
-os.environ.pop("MNEMO_REALIGN_MAX", None)
+os.environ.pop("INSPEXIMUS_REALIGN_MAX", None)
 
 # 9: a LEXICAL open of a semantic store must be a pure bystander. The Claude Code hooks default to
 # embed=None (GPU-free hot path) while the store may hold vectors from a semantic session:
@@ -100,10 +100,10 @@ os.environ.pop("MNEMO_REALIGN_MAX", None)
 # (b) leave the .embedid sidecar untouched — blanking it would make the next semantic open see
 # ''->recipe and realign for nothing (the exact once-only guarantee of checks 6/6b).
 sidecar_before = open(p4 + ".embedid").read().strip()
-mL = Mnemo(path=p4, embed=None, persist_vectors=True)          # lexical open, no recipe
+mL = Inspeximus(path=p4, embed=None, persist_vectors=True)          # lexical open, no recipe
 mL.remember("captured lexically", key="lex1")
 mL._save(force=True)
-mM = Mnemo(path=p4, embed=embC, persist_vectors=True, embed_id="C")
+mM = Inspeximus(path=p4, embed=embC, persist_vectors=True, embed_id="C")
 check("9 lexical open+save preserves the persisted vectors",
       all(r.get("vec") == [0.0, 0.0, 1.0] for r in mM.items if r.get("key") != "lex1"))
 check("9b lexical save leaves the embedid sidecar untouched",

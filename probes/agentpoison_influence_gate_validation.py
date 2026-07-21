@@ -1,5 +1,5 @@
 """
-Honest validation of the corroboration-gated INFLUENCE defense (mnemo/probes/agentpoison_influence_gate.py
+Honest validation of the corroboration-gated INFLUENCE defense (inspeximus/probes/agentpoison_influence_gate.py
 showed influence_hijack -> 0% on all 3 retrievers). Three things the standing gate requires before we can
 claim this is a real defense, not an overclaim:
 
@@ -8,7 +8,7 @@ claim this is a real defense, not an overclaim:
       the influence layer instead of retrieval).
   (2) ATTACKER-CORROBORATION LADDER: the gate isn't "poison impossible", it's "poison must EARN
       corroboration". Measure the cost ladder: 1 poison (free) -> filtered; 2 poison same source
-      (cheap) -> does mnemo's distinct-source canonicalization still filter it?; 2 poison with distinct
+      (cheap) -> does inspeximus's distinct-source canonicalization still filter it?; 2 poison with distinct
       forged sources (costlier) -> passes. This quantifies exactly how much the gate RAISES attacker cost.
   (3) SCALE: the STORM/stress-claim skeptic's killer point. Does the raw retrieval hijack survive as the
       corpus grows 60 -> 10k (or does it collapse, making the whole thing a toy artifact)? And does the
@@ -26,7 +26,7 @@ from transformers import AutoModel, AutoTokenizer
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, os.path.dirname(__file__))
-from mnemo import Mnemo
+from inspeximus import Inspeximus
 import agentpoison_multiretriever_check as M
 
 random.seed(20260702)
@@ -61,12 +61,12 @@ def corroborated(rec, by_id):
         return True
     if rec.get("mtype") == "semantic":
         return True
-    return Mnemo._distinct_sources(rec.get("links"), by_id) >= 2
+    return Inspeximus._distinct_sources(rec.get("links"), by_id) >= 2
 
 
 # ── (1) rare-memory cost + (2) attacker ladder, on the base 60-item corpus ──────────────────────
 def build_base():
-    st = Mnemo(None, embed=embed); st.semantic_threshold = 1
+    st = Inspeximus(None, embed=embed); st.semantic_threshold = 1
     id2topic = {}
     for s, t in M.CORPUS:
         id2topic[st.remember(s, tags=[t], value=1.0)] = t
@@ -166,7 +166,7 @@ def make_filler(n):
 def scale_sweep(sizes=(60, 500, 2000, 10000)):
     rows = []
     for N in sizes:
-        st = Mnemo(None, embed=embed); st.semantic_threshold = 1
+        st = Inspeximus(None, embed=embed); st.semantic_threshold = 1
         base = [(s, t) for s, t in M.CORPUS]
         texts = [s for s, _ in base]
         if N > len(base):

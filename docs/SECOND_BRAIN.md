@@ -5,7 +5,7 @@
 <details>
 <summary><strong>Optional add-on</strong> — a separate MCP server that reasons over a folder of Markdown notes. Click to expand.</summary>
 
-`mnemo_mcp` gives an agent **memory**. `second_brain_mcp` gives it a **second brain to think over** —
+`mcp` gives an agent **memory**. `second_brain_mcp` gives it a **second brain to think over** —
 point it at any folder of Markdown notes (an Obsidian vault, a Zettelkasten, a `docs/` tree) and an
 MCP client (Claude Desktop, Claude Code, Cursor, your own agent) gets the substrate to *reason
 against* those notes: pull what's relevant, find where the network is blind, surface non-obvious
@@ -18,7 +18,7 @@ claims below are about what an *agent* did with the tools, not about the tool "t
 No autonomous oracle.
 
 **Runs today, zero config.** It indexes your notes into an in-process `inspeximus` store at startup; with
-no embedder it uses the lexical-overlap fallback. An embedder (`MNEMO_EMBED_URL/MODEL/KEY`) is optional
+no embedder it uses the lexical-overlap fallback. An embedder (`INSPEXIMUS_EMBED_URL/MODEL/KEY`) is optional
 and matters **at scale**: at several-thousand-note scale, lexical recall@5 decays from 0.94 (small store) to
 **0.25** at full corpus while semantic **holds ~0.65** — ≈2.6× (Agora Lab `b4c260`); on paraphrase
 queries semantic recall@5 is **0.86 vs 0.20** lexical (`3501f1`).
@@ -95,7 +95,7 @@ the reasoning; the corrections still warrant a source-check before public citati
   no subprocess, and writes only its own index file. Symlinks/junctions that point *outside*
   `NOTES_DIR` are deliberately **not** followed (so a planted link in a shared/cloned vault can't leak
   files from elsewhere on disk).
-- **The embedder is a trust boundary.** If you set `MNEMO_EMBED_URL`, the **full text of every note**
+- **The embedder is a trust boundary.** If you set `INSPEXIMUS_EMBED_URL`, the **full text of every note**
   is POSTed there. It's validated at startup — `https` anywhere, plain `http` only to loopback (local
   Ollama, etc.), and cloud-metadata/link-local targets are refused. Point it only at an endpoint you trust.
 - **Notes over ~2 MB are skipped** (configurable via `SECOND_BRAIN_MAX_BYTES`) so a single huge file

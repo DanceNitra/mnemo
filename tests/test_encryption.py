@@ -5,7 +5,7 @@ import tempfile
 
 import pytest
 
-from mnemo import Mnemo, new_encryption_key
+from inspeximus import Inspeximus, new_encryption_key
 
 
 def _tmp():
@@ -20,62 +20,62 @@ def test_new_encryption_key_is_32_bytes():
 
 def test_roundtrip_with_key():
     p, k = _tmp(), new_encryption_key()
-    m = Mnemo(path=p, encrypt_key=k)
+    m = Inspeximus(path=p, encrypt_key=k)
     m.remember("the deploy secret is ACME-XYZ-9", key="dep::key", object="ACME-XYZ-9")
     m.flush()
     # reopen with the same key -> data intact
-    m2 = Mnemo(path=p, encrypt_key=k)
+    m2 = Inspeximus(path=p, encrypt_key=k)
     got = m2.recall("deploy secret", k=5)
     assert got and "ACME-XYZ-9" in got[0]["text"]
 
 
 def test_ciphertext_on_disk_hides_plaintext():
     p, k = _tmp(), new_encryption_key()
-    m = Mnemo(path=p, encrypt_key=k)
+    m = Inspeximus(path=p, encrypt_key=k)
     m.remember("SUPER-SECRET-VALUE-42")
     m.flush()
     raw = open(p, "rb").read()
-    assert raw[:5] == b"MNMO\x01"                     # encrypted header
+    assert raw[:5] == b"INSP\x01"                     # encrypted header
     assert b"SUPER-SECRET-VALUE-42" not in raw        # plaintext is NOT on disk
 
 
 def test_open_encrypted_without_key_fails_loud():
     p, k = _tmp(), new_encryption_key()
-    m = Mnemo(path=p, encrypt_key=k); m.remember("x"); m.flush()
+    m = Inspeximus(path=p, encrypt_key=k); m.remember("x"); m.flush()
     with pytest.raises(ValueError):
-        Mnemo(path=p)                                  # encrypted store, no key -> raise (never silent-empty)
+        Inspeximus(path=p)                                  # encrypted store, no key -> raise (never silent-empty)
 
 
 def test_wrong_key_fails_loud():
     p = _tmp()
-    m = Mnemo(path=p, encrypt_key=new_encryption_key()); m.remember("x"); m.flush()
+    m = Inspeximus(path=p, encrypt_key=new_encryption_key()); m.remember("x"); m.flush()
     with pytest.raises(ValueError):
-        Mnemo(path=p, encrypt_key=new_encryption_key())   # different key -> decryption fails
+        Inspeximus(path=p, encrypt_key=new_encryption_key())   # different key -> decryption fails
 
 
 def test_tamper_is_detected():
     p, k = _tmp(), new_encryption_key()
-    m = Mnemo(path=p, encrypt_key=k); m.remember("x"); m.flush()
+    m = Inspeximus(path=p, encrypt_key=k); m.remember("x"); m.flush()
     raw = bytearray(open(p, "rb").read())
     raw[-1] ^= 0x01                                    # flip a bit in the GCM tag/ciphertext
     open(p, "wb").write(raw)
     with pytest.raises(ValueError):
-        Mnemo(path=p, encrypt_key=k)                   # AEAD authentication fails
+        Inspeximus(path=p, encrypt_key=k)                   # AEAD authentication fails
 
 
 def test_passphrase_roundtrip_and_wrong_passphrase():
     p = _tmp()
-    m = Mnemo(path=p, encrypt_passphrase="correct horse battery staple")
+    m = Inspeximus(path=p, encrypt_passphrase="correct horse battery staple")
     m.remember("passphrase secret ZZ"); m.flush()
-    ok = Mnemo(path=p, encrypt_passphrase="correct horse battery staple")
+    ok = Inspeximus(path=p, encrypt_passphrase="correct horse battery staple")
     assert any("ZZ" in r["text"] for r in ok.items)
     with pytest.raises(ValueError):
-        Mnemo(path=p, encrypt_passphrase="wrong passphrase")
+        Inspeximus(path=p, encrypt_passphrase="wrong passphrase")
 
 
 def test_shred_makes_it_unrecoverable():
     p, k = _tmp(), new_encryption_key()
-    m = Mnemo(path=p, encrypt_key=k)
+    m = Inspeximus(path=p, encrypt_key=k)
     m.remember("shred me PLEASE"); m.flush()
     res = m.shred()
     assert res["shredded"] and res["records_dropped"] == 1
@@ -84,19 +84,19 @@ def test_shred_makes_it_unrecoverable():
     # key and it is gone. (Here the test still holds k, so it *can* reopen — that's correct crypto-shred
     # semantics: the guarantee is "no key -> no data", proven by test_wrong_key/test_open_without_key.)
     with pytest.raises(RuntimeError):
-        Mnemo().shred()                                # shred requires an encrypted store (plain store -> raise)
+        Inspeximus().shred()                                # shred requires an encrypted store (plain store -> raise)
 
 
 def test_bad_key_length_rejected():
     with pytest.raises(ValueError):
-        Mnemo(encrypt_key=b"too-short")
+        Inspeximus(encrypt_key=b"too-short")
 
 
 def test_unencrypted_is_byte_identical_legacy():
     p = _tmp()
-    m = Mnemo(path=p); m.remember("plain text here"); m.flush()
+    m = Inspeximus(path=p); m.remember("plain text here"); m.flush()
     raw = open(p, "rb").read()
-    assert raw[:5] != b"MNMO\x01"                       # plaintext JSON, no encryption header
+    assert raw[:5] != b"INSP\x01"                       # plaintext JSON, no encryption header
     assert b"plain text here" in raw
     assert json.loads(raw.decode("utf-8"))             # valid plain JSON
 

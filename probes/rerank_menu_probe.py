@@ -12,14 +12,14 @@ actually switches behavior, not a cosmetic alias. Asserts (each can FAIL):
 """
 import sys
 sys.path.insert(0, ".")
-from mnemo import Mnemo
+from inspeximus import Inspeximus
 
 FAILS = []
 def check(n, c):
     print(f"  [{'OK ' if c else 'XXX'}] {n}")
     if not c: FAILS.append(n)
 
-m = Mnemo(path=None)                                   # lexical, no GPU
+m = Inspeximus(path=None)                                   # lexical, no GPU
 ida = m.remember("signal report about AAA", value=9.0, valid_from=1000)     # oldest, highest value
 idb = m.remember("signal report about BBB", value=1.0, valid_from=2000)     # middle, will be credited
 idc = m.remember("signal report about CCC", value=1.0, valid_from=3000)     # newest

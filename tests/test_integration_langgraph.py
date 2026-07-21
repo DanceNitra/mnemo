@@ -1,14 +1,14 @@
-"""Regression test for the LangGraph BaseStore adapter (mnemo.integrations.langgraph.MnemoStore). The 6
-framework adapters were probe-verified but not in the pytest suite, so an API drift (langgraph or mnemo) could
-break a documented integration silently. This pins the store contract + mnemo's differentiator (queryable
+"""Regression test for the LangGraph BaseStore adapter (inspeximus.integrations.langgraph.InspeximusStore). The 6
+framework adapters were probe-verified but not in the pytest suite, so an API drift (langgraph or inspeximus) could
+break a documented integration silently. This pins the store contract + inspeximus's differentiator (queryable
 history the built-in InMemoryStore discards). Skips cleanly if langgraph isn't installed."""
 import pytest
 pytest.importorskip("langgraph")
-from mnemo.integrations.langgraph import MnemoStore
+from inspeximus.integrations.langgraph import InspeximusStore
 
 
 def _store():
-    return MnemoStore()   # in-memory mnemo
+    return InspeximusStore()   # in-memory inspeximus
 
 
 def test_put_get_roundtrip():

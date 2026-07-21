@@ -6,12 +6,12 @@ import os
 
 import pytest
 
-from mnemo import Mnemo
+from inspeximus import Inspeximus
 
 
 @pytest.fixture()
 def store(tmp_path):
-    m = Mnemo(path=str(tmp_path / "m.json"))
+    m = Inspeximus(path=str(tmp_path / "m.json"))
     m.remember("billing region is Frankfurt", key="billing::region", object="Frankfurt")
     return m
 
@@ -85,9 +85,9 @@ def test_candidate_excluded_from_recall_current_value(store):
 
 
 def test_promote_requires_capability_under_authority(tmp_path):
-    from mnemo import new_source_keypair
+    from inspeximus import new_source_keypair
     sk, pk = new_source_keypair()
-    m = Mnemo(path=str(tmp_path / "a.json"), revert_pubkey=pk)
+    m = Inspeximus(path=str(tmp_path / "a.json"), revert_pubkey=pk)
     m.remember("region is Ohio", key="r::x", object="Ohio")
     rid = m.remember("region is Berlin", key="r::x", object="Berlin", identity_confidence=0.3)
     with pytest.raises(PermissionError):
@@ -95,7 +95,7 @@ def test_promote_requires_capability_under_authority(tmp_path):
 
 
 def test_tenant_isolation_on_candidates(tmp_path):
-    m = Mnemo(path=str(tmp_path / "t.json"))
+    m = Inspeximus(path=str(tmp_path / "t.json"))
     a = m.for_tenant("acme")
     b = m.for_tenant("beta")
     a.remember("x is 1", key="k::x", object="1", identity_confidence=0.95)

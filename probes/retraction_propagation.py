@@ -1,4 +1,4 @@
-"""jacksonxly's TEMPORAL integrity invariant, built and measured on shipped mnemo.
+"""jacksonxly's TEMPORAL integrity invariant, built and measured on shipped inspeximus.
 
 Context (r/RAG / r/LangChain thread on our memory-poisoning post). jacksonxly's point: authenticated-but-false
 is the corroboration gate working AS SPECIFIED, not a hole -- once genuinely independent origins converge on a
@@ -13,10 +13,10 @@ from the impossible "never hold a false belief" to the achievable:
 
 We credit jacksonxly for the invariant statement and marintkael for the authenticated-but-false framing; the
 security principle underneath is capability REVOCATION / provenance-carried taint (least-privilege + revocation),
-which we also credit. We did not invent revocation -- we MEASURE whether mnemo's shipped slash()/restore() over
+which we also credit. We did not invent revocation -- we MEASURE whether inspeximus's shipped slash()/restore() over
 derived_from taint actually satisfies his invariant, and exactly where it does not.
 
-WHAT WE MEASURE (deterministic; no embedder -- load-bearing := Mnemo._is_corroborated, the recall influence gate):
+WHAT WE MEASURE (deterministic; no embedder -- load-bearing := Inspeximus._is_corroborated, the recall influence gate):
 Build a provenance tree from an authenticated-but-false root P, land ONE correctness signal (slash the root's
 source), and check the load-bearing set before / after / after-restore.
 
@@ -55,24 +55,24 @@ FALSIFIER: if any provenance-descendant stayed load-bearing after the slash (inc
 did not recover it, or P ever graded 'verified' from corroboration alone, the invariant would be violated. It is
 not. (Before the fix, C stayed load-bearing -- that regression test is the reason C is in the tree.)
 
-Zero-dependency, no network, no embedder. Deterministic. MIT. Part of Agora / mnemo.
-Run:  python mnemo/probes/retraction_propagation.py
+Zero-dependency, no network, no embedder. Deterministic. MIT. Part of Agora / inspeximus.
+Run:  python inspeximus/probes/retraction_propagation.py
 """
 import os
 import sys
 import tempfile
 
-# Prefer the in-repo mnemo source (this probe travels with the repo and tests the current shipped code);
-# a standalone `pip install agora-mnemo` copy falls through to the installed package.
+# Prefer the in-repo inspeximus source (this probe travels with the repo and tests the current shipped code);
+# a standalone `pip install agora-inspeximus` copy falls through to the installed package.
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
-from mnemo import Mnemo
+from inspeximus import Inspeximus
 
 
 def _load_bearing(m, rid):
     """Exactly the recall influence gate (recall(influence_only=True)) applied to one record -- no embedder."""
     by_id = {x["id"]: x for x in m.items}
     r = by_id.get(rid)
-    return bool(r) and r.get("status") == "active" and Mnemo._is_corroborated(r, by_id)
+    return bool(r) and r.get("status") == "active" and Inspeximus._is_corroborated(r, by_id)
 
 
 def _row(m, ids):
@@ -81,7 +81,7 @@ def _row(m, ids):
 
 def main():
     path = os.path.join(tempfile.mkdtemp(), "retraction.jsonl")
-    m = Mnemo(path)
+    m = Inspeximus(path)
 
     SRC_BAD = {"doc": "vendor-brief-42"}          # the (authenticated-but-false) origin of the poison
     SRC_X = {"doc": "independent-blog-7"}         # a genuinely independent source (for the link-corroboration path)
@@ -126,7 +126,7 @@ def main():
     prov_reached = ["P (root)", "A1 (summary)", "A2 (graduated)", "B1 (depth-2)", "C (link-corrob.)"]
 
     print("=== jacksonxly's invariant: 'no false belief stays load-bearing past the correctness signal' ===")
-    print("    measured on shipped mnemo -- load-bearing := the recall influence gate (Mnemo._is_corroborated)\n")
+    print("    measured on shipped inspeximus -- load-bearing := the recall influence gate (Inspeximus._is_corroborated)\n")
 
     t0 = _row(m, ids)
     grade0 = m.convergence_report(P)
@@ -167,7 +167,7 @@ def main():
     # DENIES it standing with no flag required -- provenance must be SHOWN (a source or resolvable parents), so
     # the untrusted caller no longer holds the switch.
     def _undeclared_summary_lb(strict):
-        s = Mnemo(os.path.join(tempfile.mkdtemp(), "s.jsonl"))
+        s = Inspeximus(os.path.join(tempfile.mkdtemp(), "s.jsonl"))
         s.strict_provenance = strict
         u = s.remember("Undeclared LLM summary: retries stay disabled.")   # no source, no derived_from, no flag
         s.credit([u], "good", weight=3.0)                                  # even with earned credit

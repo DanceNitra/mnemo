@@ -3,72 +3,72 @@
   "contra_frac": 0.2,
   "scale": 0,
   "ga_acc": 1.0,
-  "mnemo_acc": 1.0,
+  "inspeximus_acc": 1.0,
   "ga_stale_ctx": 0.9,
-  "mnemo_stale_ctx": 0.0
+  "inspeximus_stale_ctx": 0.0
  },
  {
   "contra_frac": 0.2,
   "scale": 1000,
   "ga_acc": 1.0,
-  "mnemo_acc": 1.0,
+  "inspeximus_acc": 1.0,
   "ga_stale_ctx": 0.65,
-  "mnemo_stale_ctx": 0.0
+  "inspeximus_stale_ctx": 0.0
  },
  {
   "contra_frac": 0.2,
   "scale": 5000,
   "ga_acc": 1.0,
-  "mnemo_acc": 1.0,
+  "inspeximus_acc": 1.0,
   "ga_stale_ctx": 0.55,
-  "mnemo_stale_ctx": 0.0
+  "inspeximus_stale_ctx": 0.0
  },
  {
   "contra_frac": 0.5,
   "scale": 0,
   "ga_acc": 0.9,
-  "mnemo_acc": 1.0,
+  "inspeximus_acc": 1.0,
   "ga_stale_ctx": 0.728,
-  "mnemo_stale_ctx": 0.0
+  "inspeximus_stale_ctx": 0.0
  },
  {
   "contra_frac": 0.5,
   "scale": 1000,
   "ga_acc": 0.845,
-  "mnemo_acc": 1.0,
+  "inspeximus_acc": 1.0,
   "ga_stale_ctx": 0.834,
-  "mnemo_stale_ctx": 0.0
+  "inspeximus_stale_ctx": 0.0
  },
  {
   "contra_frac": 0.5,
   "scale": 5000,
   "ga_acc": 0.845,
-  "mnemo_acc": 1.0,
+  "inspeximus_acc": 1.0,
   "ga_stale_ctx": 0.834,
-  "mnemo_stale_ctx": 0.0
+  "inspeximus_stale_ctx": 0.0
  },
  {
   "contra_frac": 0.9,
   "scale": 0,
   "ga_acc": 0.892,
-  "mnemo_acc": 1.0,
+  "inspeximus_acc": 1.0,
   "ga_stale_ctx": 0.429,
-  "mnemo_stale_ctx": 0.0
+  "inspeximus_stale_ctx": 0.0
  },
  {
   "contra_frac": 0.9,
   "scale": 1000,
   "ga_acc": 0.892,
-  "mnemo_acc": 1.0,
+  "inspeximus_acc": 1.0,
   "ga_stale_ctx": 0.619,
-  "mnemo_stale_ctx": 0.0
+  "inspeximus_stale_ctx": 0.0
  },
  {
   "contra_frac": 0.9,
   "scale": 5000,
   "ga_acc": 0.892,
-  "mnemo_acc": 1.0,
+  "inspeximus_acc": 1.0,
   "ga_stale_ctx": 0.566,
-  "mnemo_stale_ctx": 0.0
+  "inspeximus_stale_ctx": 0.0
  }
 ]

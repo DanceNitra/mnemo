@@ -1,6 +1,6 @@
 """Crucible replication + adversarial stress-test: the Generative Agents (Park et al., 2023, arXiv:2304.03442)
 memory-retrieval mechanism, and where its linear recency/importance/relevance weighting BREAKS under
-contradiction + scale — vs mnemo's structural supersession.
+contradiction + scale — vs inspeximus's structural supersession.
 
 FAITHFUL GA retrieval (paper, Memory Retrieval): for a query q, each memory m is scored
     score(m) = normalize(recency) + normalize(importance) + normalize(relevance),
@@ -11,7 +11,7 @@ each min-max normalized to [0,1] across the candidate pool, EQUAL weights, then 
 
 THE FAILURE MODE (measured, not asserted): when a fact is UPDATED, GA keeps both the stale and the fresh
 memory. recency is only ONE of three equal terms, so a stale memory with comparable importance/relevance and
-only-slightly-lower recency can OUTRANK the fresh one — GA surfaces the stale value. mnemo's keyed
+only-slightly-lower recency can OUTRANK the fresh one — GA surfaces the stale value. inspeximus's keyed
 supersession retires the stale memory, so recall only ever returns the current value.
 
 METRIC (retrieval-level, LLM-free, deterministic): for each updated fact, does the retriever rank the FRESH
@@ -28,7 +28,7 @@ import torch
 from transformers import AutoModel, AutoTokenizer
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-from mnemo import Mnemo
+from inspeximus import Inspeximus
 
 random.seed(20260716)
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
@@ -109,11 +109,11 @@ FILLER = ["the coffee machine descales monthly", "the standup is at 09:30", "par
 
 
 def build(embed, n_facts, contra_frac, scale_distractors):
-    """Return (ga_mems, mnemo_store, updated_keys) with `contra_frac` of facts UPDATED (stale+fresh both
-    present for GA; superseded in mnemo), plus `scale_distractors` unrelated old memories to stress scale."""
+    """Return (ga_mems, inspeximus_store, updated_keys) with `contra_frac` of facts UPDATED (stale+fresh both
+    present for GA; superseded in inspeximus), plus `scale_distractors` unrelated old memories to stress scale."""
     facts = list(zip(SUBJECTS, VALUES, NEW))[:n_facts]
     ga, updated = [], []
-    st = Mnemo(None, embed=embed)
+    st = Inspeximus(None, embed=embed)
     st.semantic_threshold = 1
     for subj, old, new in facts:
         key = subj.lower()
@@ -144,7 +144,7 @@ def run(embed, n_facts=20, contra_frac=0.5, scale_distractors=0, k=8):
     ga, st, updated = build(embed, n_facts, contra_frac, scale_distractors)
     if not updated:
         return None
-    ga_correct = mnemo_correct = ga_stale = mnemo_stale = 0
+    ga_correct = inspeximus_correct = ga_stale = inspeximus_stale = 0
     for subj, key, new, old in updated:
         q = f"what is {subj}?"
         qv = embed(q)
@@ -153,18 +153,18 @@ def run(embed, n_facts=20, contra_frac=0.5, scale_distractors=0, k=8):
         ga_ans = keyed[0]["value"] if keyed else None
         ga_correct += int(ga_ans == new)
         ga_stale += int(any(m["key"] == key and m["value"] == old for m in top))   # stale in GA's top-k
-        # mnemo: recall EXCLUDES superseded by default -> only the current (fresh) record survives.
+        # inspeximus: recall EXCLUDES superseded by default -> only the current (fresh) record survives.
         # recall hits carry text (not key/object), so match on the value string in the text.
         hits = st.recall(q, k=k, mode="semantic")
         sub_hits = [h for h in hits if subj.lower() in h["text"].lower()]
         top_txt = sub_hits[0]["text"].lower() if sub_hits else ""
-        mnemo_correct += int(new.lower() in top_txt)
-        mnemo_stale += int(any(subj.lower() in h["text"].lower() and old.lower() in h["text"].lower()
-                              for h in hits))                                        # stale leaked into mnemo recall
+        inspeximus_correct += int(new.lower() in top_txt)
+        inspeximus_stale += int(any(subj.lower() in h["text"].lower() and old.lower() in h["text"].lower()
+                              for h in hits))                                        # stale leaked into inspeximus recall
     m = len(updated)
     return {"n_facts": n_facts, "contra_frac": contra_frac, "scale_distractors": scale_distractors,
-            "updated": m, "ga_acc": round(ga_correct / m, 3), "mnemo_acc": round(mnemo_correct / m, 3),
-            "ga_stale_ctx": round(ga_stale / m, 3), "mnemo_stale_ctx": round(mnemo_stale / m, 3)}
+            "updated": m, "ga_acc": round(ga_correct / m, 3), "inspeximus_acc": round(inspeximus_correct / m, 3),
+            "ga_stale_ctx": round(ga_stale / m, 3), "inspeximus_stale_ctx": round(inspeximus_stale / m, 3)}
 
 
 if __name__ == "__main__":
@@ -177,7 +177,7 @@ if __name__ == "__main__":
     print(f"warming embedder cache ({len(warm)} texts)...")
     embed.warm(warm)
     OUT = []
-    print("=== GA retrieval vs mnemo supersession: contradiction + scale sweep ===")
+    print("=== GA retrieval vs inspeximus supersession: contradiction + scale sweep ===")
     for contra in (0.2, 0.5, 0.9):
         for scale in (0, 1000, MAXSCALE):
             # average over 2 seeds for stability
@@ -189,12 +189,12 @@ if __name__ == "__main__":
                     accs.append(r)
             if accs:
                 ga = round(sum(a["ga_acc"] for a in accs) / len(accs), 3)
-                mn = round(sum(a["mnemo_acc"] for a in accs) / len(accs), 3)
+                mn = round(sum(a["inspeximus_acc"] for a in accs) / len(accs), 3)
                 gs = round(sum(a["ga_stale_ctx"] for a in accs) / len(accs), 3)
-                ms = round(sum(a["mnemo_stale_ctx"] for a in accs) / len(accs), 3)
-                row = {"contra_frac": contra, "scale": scale, "ga_acc": ga, "mnemo_acc": mn,
-                       "ga_stale_ctx": gs, "mnemo_stale_ctx": ms}
+                ms = round(sum(a["inspeximus_stale_ctx"] for a in accs) / len(accs), 3)
+                row = {"contra_frac": contra, "scale": scale, "ga_acc": ga, "inspeximus_acc": mn,
+                       "ga_stale_ctx": gs, "inspeximus_stale_ctx": ms}
                 OUT.append(row)
-                print(f"contra={contra:.0%} scale={scale:6d}: acc GA={ga:.0%}/mnemo={mn:.0%}  |  "
-                      f"STALE-in-context GA={gs:.0%}/mnemo={ms:.0%}")
+                print(f"contra={contra:.0%} scale={scale:6d}: acc GA={ga:.0%}/inspeximus={mn:.0%}  |  "
+                      f"STALE-in-context GA={gs:.0%}/inspeximus={ms:.0%}")
     json.dump(OUT, open(os.path.join(os.path.dirname(__file__), "generative_agents_retrieval_stress_result.json"), "w"), indent=1)

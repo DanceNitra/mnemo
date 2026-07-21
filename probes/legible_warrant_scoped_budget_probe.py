@@ -24,12 +24,12 @@ Both are OPT-IN: with_warrant=False and provenance_lo=None reproduce byte-identi
 Run:  python legible_warrant_scoped_budget_probe.py
 """
 import os, sys
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "mnemo")))
-from mnemo import Mnemo
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "inspeximus")))
+from inspeximus import Inspeximus
 
 
 def main():
-    m = Mnemo()
+    m = Inspeximus()
 
     # --- 1. legible warrant tiers ---
     unw = m.remember("a single self-asserted fact", source={"doc": "solo"})

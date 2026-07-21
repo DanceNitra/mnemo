@@ -1,13 +1,13 @@
-"""MnemoSession — a persistent `Session` backend for the OpenAI Agents SDK, backed by mnemo.
+"""InspeximusSession — a persistent `Session` backend for the OpenAI Agents SDK, backed by inspeximus.
 
 The OpenAI Agents SDK lets any object implement its `Session` protocol (get_items / add_items / pop_item /
 clear_session, + a `session_id` attribute) and pass it as `Runner.run(..., session=...)`. This adapter is a
 faithful, drop-in persistent backend (the same slot SQLiteSession/RedisSession fill), storing each
-conversation item in a mnemo store so history survives process restarts.
+conversation item in a inspeximus store so history survives process restarts.
 
     from agents import Agent, Runner
-    from inspeximus.integrations.openai_agents import MnemoSession
-    session = MnemoSession("user-42", path="sessions.json")
+    from inspeximus.integrations.openai_agents import InspeximusSession
+    session = InspeximusSession("user-42", path="sessions.json")
     Runner.run_sync(agent, "hi", session=session)
 
 WHAT IT FAITHFULLY DOES (matches SQLiteSession semantics):
@@ -18,14 +18,14 @@ WHAT IT FAITHFULLY DOES (matches SQLiteSession semantics):
 Items are stored VERBATIM in each memory's meta and returned unchanged; the memory `text` is only a short
 searchable shadow. One store can hold many sessions (namespaced by session_id), like SQLite's session column.
 
-HONEST DIFFERENTIATOR (do not overclaim). A `Session` is a VERBATIM turn log, so mnemo's supersession /
+HONEST DIFFERENTIATOR (do not overclaim). A `Session` is a VERBATIM turn log, so inspeximus's supersession /
 echo_guard (which key on FACTS) do NOT automatically "clean" replayed messages — for poison-resistant FACT
-memory use mnemo's core `remember(key=…, object=…)` / `recall()` alongside this session. What this backend
+memory use inspeximus's core `remember(key=…, object=…)` / `recall()` alongside this session. What this backend
 DOES add for free over a plain SQLite session, from inspeximus's governance layer:
   - RIGHT-TO-ERASURE across a user's turns: `session.forget_subject()` (or `store.forget_subject(user)`)
     hard-deletes the user's items AND leaves a signed, content-free deletion tombstone, so an erasure is
-    provable and does not read as tampering (see mnemo.forget_subject / verify_writes).
-  - TAMPER-EVIDENT history: enable receipts on the store (`Mnemo(..., receipts=True, receipt_key=…)`) and
+    provable and does not read as tampering (see inspeximus.forget_subject / verify_writes).
+  - TAMPER-EVIDENT history: enable receipts on the store (`Inspeximus(..., receipts=True, receipt_key=…)`) and
     `store.verify_writes()` proves the turn log was not edited out-of-band.
 Zero extra dependencies; the OpenAI Agents SDK is matched structurally and never imported here.
 """
@@ -34,19 +34,19 @@ import json
 from typing import Any
 
 
-class MnemoSession:
-    """Persistent OpenAI-Agents `Session` backed by a mnemo store (one store, many sessions)."""
+class InspeximusSession:
+    """Persistent OpenAI-Agents `Session` backed by a inspeximus store (one store, many sessions)."""
 
     def __init__(self, session_id: str, path: str | None = None, store: Any = None, extractor=None):
-        """Pass a `path` (a mnemo store is created/opened there) OR an existing mnemo `store` to share one
+        """Pass a `path` (a inspeximus store is created/opened there) OR an existing inspeximus `store` to share one
         store across sessions. `session_id` namespaces this conversation within the store. OPT-IN `extractor`
         (text -> (key, object)) auto-keys turns so the store supersedes corrected facts across the session;
         get_items() still replays the raw turn log (a Session is verbatim), but a fact recall over the store
-        is then current-truth. See Mnemo.extractor."""
+        is then current-truth. See Inspeximus.extractor."""
         self.session_id = str(session_id)
         if store is None:
-            from inspeximus import Mnemo
-            store = Mnemo(path=path)
+            from inspeximus import Inspeximus
+            store = Inspeximus(path=path)
         self.store = store
         if extractor is not None:
             self.store.extractor = extractor
@@ -94,7 +94,7 @@ class MnemoSession:
         if ids:
             self.store.forget(ids=ids)
 
-    # ── governance bonus (mnemo-specific, honest) ──
+    # ── governance bonus (inspeximus-specific, honest) ──
     def forget_subject(self, request_id: str | None = None) -> dict:
         """Right-to-erasure for THIS session's user: hard-delete every turn of this session and leave a
         signed, content-free deletion tombstone (provable erasure that doesn't read as tampering)."""

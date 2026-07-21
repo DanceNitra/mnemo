@@ -13,7 +13,7 @@ Composes the two measured single arms IN THEIR WINNING CONFIGURATIONS:
          exact-name questions (alias_strength=1); on ambiguous questions it backs off to 0 (disclosed —
          no guessed-speaker filter is ever applied here).
 
-Arms (all on the SHIPPED mnemo hybrid scoring; pref term formula identical to mnemo.recall's
+Arms (all on the SHIPPED inspeximus hybrid scoring; pref term formula identical to inspeximus.recall's
   `pref = 1 + trust * _PREFER_GAIN` — see SELF-CHECK below):
   hybrid       : no soft term (floor)
   time_soft    : shipped single-term arm, trust 0.9 on the resolved window
@@ -34,11 +34,11 @@ TIME-ONLY, ALIAS-ONLY. Metric recall@20; bootstrap CI on per-question deltas. Re
 embed cache + local nomic. MIT.
 Run: LOCOMO_PATH=agora_output/lab/data/locomo10.json \
      LOCOMO_CACHE=agora_output/lab/data/locomo_confweighted_cache.json \
-     python mnemo/probes/locomo_composed_soft_filters.py
+     python inspeximus/probes/locomo_composed_soft_filters.py
 """
 import json, re, ast, time, hashlib, os, urllib.request, collections, random, sys
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-from mnemo import Mnemo, _PREFER_GAIN
+from inspeximus import Inspeximus, _PREFER_GAIN
 
 DATA = os.environ.get("LOCOMO_PATH", "agora_output/lab/data/locomo10.json")
 CACHE = os.environ.get("LOCOMO_CACHE", "agora_output/lab/data/locomo_confweighted_cache.json")
@@ -124,7 +124,7 @@ for ci, d0 in enumerate(D):
     for sk in sorted([k for k in conv if re.fullmatch(r"session_\d+", k)], key=lambda s: int(s.split("_")[1])):
         snum = int(sk.split("_")[1]); yr, mon = sess_date.get(snum, (None, None))
         for t in conv[sk]: turns.append((t["dia_id"], t["text"], yr, mon, t["speaker"]))
-    m = Mnemo(embed=embed); m.semantic_threshold = 1; dia2id = {}
+    m = Inspeximus(embed=embed); m.semantic_threshold = 1; dia2id = {}
     for dia, txt, yr, mon, spk in turns:
         dia2id[dia] = m.remember(txt, meta={"year": yr, "month": mon, "speaker": spk, "dia": dia})
     id2dia = {v: k for k, v in dia2id.items()}; turnset = set(dia2id); N = len(turns)
@@ -154,7 +154,7 @@ for ci, d0 in enumerate(D):
         g = set(gold_of(q, turnset)); ng = len(g)
         base = base_ranking(qt)
         def match(rid, cond):
-            return cond is not None and Mnemo._cond_match(rec_by_id[rid], cond)
+            return cond is not None and Inspeximus._cond_match(rec_by_id[rid], cond)
         # DIAGNOSTIC (skeptic's "AND-tautology" check): on the BOTH subset, is the gold turn actually
         # inside BOTH conditions? Not by construction — the window can be wrong (event discussed in a
         # different session) and the named speaker can be the wrong filter (gold said by the other
@@ -268,5 +268,5 @@ sc_out = {"n": nsc, "recall@20": sc_row, "missing_dim_seed": 1.0,
 print(f"  comp_mult vs hybrid: {mean(dl):+.3f}  CI[{lo:+.3f},{hi:+.3f}]  "
       f"(comp_mult == lone cue: seed=1.0 preserves it, no veto)")
 out["single_cue_only"] = sc_out
-json.dump(out, open("mnemo/probes/locomo_composed_soft_filters_result.json", "w"), indent=1)
-print("\nsaved: mnemo/probes/locomo_composed_soft_filters_result.json")
+json.dump(out, open("inspeximus/probes/locomo_composed_soft_filters_result.json", "w"), indent=1)
+print("\nsaved: inspeximus/probes/locomo_composed_soft_filters_result.json")

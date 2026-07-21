@@ -15,8 +15,8 @@ inspeximus forget --key deploy-channel        # or --id <id> / --contains <subst
 inspeximus stats               # store summary   ·   add --json to any command for scripting
 ```
 
-It shares one store with the MCP server (`--path`, else `$MNEMO_PATH`, else `./mnemo_memory.json`). Recall is
-lexical by default; set `$MNEMO_EMBED_URL` (+ `$MNEMO_EMBED_MODEL`) to any OpenAI-compatible `/embeddings`
+It shares one store with the MCP server (`--path`, else `$INSPEXIMUS_PATH`, else `./inspeximus_memory.json`). Recall is
+lexical by default; set `$INSPEXIMUS_EMBED_URL` (+ `$INSPEXIMUS_EMBED_MODEL`) to any OpenAI-compatible `/embeddings`
 endpoint (e.g. local Ollama) for semantic recall. Zero dependencies.
 
 ## Claude Code: deterministic auto-capture memory (1.10.0)
@@ -32,7 +32,7 @@ python -m inspeximus.claude_code --install     # writes the hooks into ./.claude
 
 That is it. `PostToolUse` captures your edits and commands into a deterministic, keyed store; `UserPromptSubmit`
 injects the current-state memory before Claude answers; `SessionStart` shows what the project already knows. The
-store is a local JSON file at `.mnemo/coding_memory.json` you can read, grep, or delete.
+store is a local JSON file at `.inspeximus/coding_memory.json` you can read, grep, or delete.
 
 Why it differs from the LLM-summarizing coding memories: you change an API signature, rename a symbol, move a
 file, and inspeximus keeps only the current state (keyed by file). Next session Claude recalls the new signature,
@@ -97,7 +97,7 @@ confidence. The fields disappear once the steward resolves; a record that was ne
 
 Corroboration counts **distinct novel grounds** in `support`, so replaying one ground is an echo, not a vote.
 `observe()` only *flags* — it never supersedes; the steward decides. Distinguishing a legitimate contradiction
-from an injected one is an **authority** call, not a content call: `Mnemo(support_authorities=[...])` requires
+from an injected one is an **authority** call, not a content call: `Inspeximus(support_authorities=[...])` requires
 grounds to be **Ed25519-signed by an allowlisted key** (self-minted grounds then count zero, and a
 `{pubkey: class}` mapping counts distinct provenance *classes*, so two keys sharing one upstream source count
 once). Honest limit, credited: this is exogenous-trust-root / anti-Sybil (Douceur 2002; DKIM / W3C VC — a
@@ -155,9 +155,9 @@ curl -O https://raw.githubusercontent.com/DanceNitra/inspeximus/main/inspeximus/
 ## Use
 
 ```python
-from inspeximus import Mnemo
+from inspeximus import Inspeximus
 
-m = Mnemo("memory.json")                       # persists to JSON; or Mnemo("memory.json", embed=my_model)
+m = Inspeximus("memory.json")                       # persists to JSON; or Inspeximus("memory.json", embed=my_model)
 
 m.remember("Pre-trend tests catch only ~31% of fatal DiD bias.", tags=["causal"], value=3, mtype="semantic")
 m.recall("difference in differences", k=5)     # relevance × value, decayed by the memory's per-type half-life
@@ -687,7 +687,7 @@ a teammate's already-hydrated context):
 ```python
 from inspeximus.deletion_manifest import DeletionManifest
 man = (DeletionManifest(sign_sk_hex=sk, pubkey_hex=pub)
-       .register(MnemoTarget(m)).register(vector_index).register(retrieval_log).register(backup))
+       .register(InspeximusTarget(m)).register(vector_index).register(retrieval_log).register(backup))
 cert = man.execute("alice", values=[the_pii], request_id="dsr-2026-...")
 # -> {complete: bool, residual_targets: [...], entries:[{target, erased, verified_absent, sig}], chain_tip}
 man.verify(cert)   # -> (ok, problems)  — re-checkable by an auditor
@@ -710,8 +710,8 @@ status, and — since 0.6.18 — the policy that retired it). Closes the one rea
 bi-temporal graph store had, on the existing intervals. Honest limit: an out-of-order back-fill resolves by
 event-time (`valid_from`), not ingest order.
 
-### Run bounded in production: `Mnemo(capacity=N)` two-tier eviction (0.6.15)
-Append-only is unbounded; production memory isn't. `Mnemo(capacity=N)` hard-evicts the lowest-value **active**
+### Run bounded in production: `Inspeximus(capacity=N)` two-tier eviction (0.6.15)
+Append-only is unbounded; production memory isn't. `Inspeximus(capacity=N)` hard-evicts the lowest-value **active**
 records past `N` via the verified value-protected + recency-aged rule (`protect_frac` of the cap is
 recency-immune so a rare-but-critical memory survives a flood; the rest fill by decay-weighted value so a
 stale high-value memory can't crowd out a fresh one). Superseded history isn't counted or evicted (it's cheap

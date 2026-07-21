@@ -1,5 +1,5 @@
 """
-MINJA (Memory INJection Attack, Dong et al. arXiv:2503.03704) vs mnemo's retrieve-then-INFLUENCE gate.
+MINJA (Memory INJection Attack, Dong et al. arXiv:2503.03704) vs inspeximus's retrieve-then-INFLUENCE gate.
 
 WHY THIS IS NOT A RE-RUN OF agentpoison_influence_gate.py:
   AgentPoison / PoisonedRAG plant ONE optimized trigger record; a fixed trigger phrase must appear in the
@@ -21,7 +21,7 @@ set ALLOWED TO INFLUENCE the action) under four conditions on ONE store, real em
   utility_legit    : a benign victim query still surfaces its true,
                      corroborated memory under the gate                 -> expect high (defense is affordable)
 
-If B holds and C collapses, the honest finding is a BOUNDARY MAP, not "mnemo beats MINJA": the influence
+If B holds and C collapses, the honest finding is a BOUNDARY MAP, not "inspeximus beats MINJA": the influence
 gate defends MINJA's retrieval-injection precisely when provenance is independent AND credit is EXOGENOUS
 (issued by the app on real resolved work, not self-gradable from the recalled content). C is the boundary,
 and it is the upgrade target (a structural exogenous-warrant guard on credit()).
@@ -35,7 +35,7 @@ import torch
 from transformers import AutoModel, AutoTokenizer
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-from mnemo import Mnemo
+from inspeximus import Inspeximus
 
 random.seed(20260715)
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
@@ -112,7 +112,7 @@ TRUSTED_CHANNEL = "ticketing-system"   # the app's declared exogenous outcome au
 
 
 def build_store(embed, self_grade, guard=False, forge_warrant=False, authorities=False, cold_start=False):
-    st = Mnemo(None, embed=embed)
+    st = Inspeximus(None, embed=embed)
     st.semantic_threshold = 1                              # force semantic recall from record 1
     if guard:
         st.credit_requires_warrant = True                 # the upgrade under test (condition D)
@@ -168,7 +168,7 @@ def _cos(a, b):
 def naive_cosine_baseline(embed, st, bridge_ids):
     """What a plain vector store (pure cosine top-k, NO value weighting, NO gate) does: the MINJA-works
     baseline. Returns (rank1_asr, top5_contamination) — the honest 'retrieval is fooled' number, since
-    mnemo's own value-weighted recall already partly resists and would undersell the attack."""
+    inspeximus's own value-weighted recall already partly resists and would undersell the attack."""
     recs = [r for r in st.items if not (r.get("meta") or {}).get("hub")]
     vec = {r["id"]: (r.get("vec") or embed(r["text"])) for r in recs}
     r1 = top5 = 0
@@ -220,7 +220,7 @@ def run(hf, label):
         "retriever": label,
         "A0_naive_cosine_rank1_asr": round(naive_r1, 3),
         "A0_naive_cosine_top5_contamination": round(naive_t5, 3),
-        "A_mnemo_raw_asr": round(asr(st0, br0, influence_only=False), 3),
+        "A_inspeximus_raw_asr": round(asr(st0, br0, influence_only=False), 3),
         "B_influence_asr": round(asr(st0, br0, influence_only=True), 3),
         "C_influence_selfgrade_asr": round(asr(st1, br1, influence_only=True), 3),
         "D_influence_selfgrade_WARRANT_GUARD_asr": round(asr(st2, br2, influence_only=True), 3),
@@ -236,7 +236,7 @@ def run(hf, label):
         "G_coldstart_utility_influence": round(utility(stg, legitg, influence_only=True), 3),
         "n_victims": len(VICTIMS), "bridges_per_victim": 3,
     }
-    print(f"[{label}] MINJA ASR: naive={res['A0_naive_cosine_rank1_asr']:.0%} | raw={res['A_mnemo_raw_asr']:.0%} "
+    print(f"[{label}] MINJA ASR: naive={res['A0_naive_cosine_rank1_asr']:.0%} | raw={res['A_inspeximus_raw_asr']:.0%} "
           f"| influence={res['B_influence_asr']:.0%} | +selfgrade={res['C_influence_selfgrade_asr']:.0%} "
           f"| +GUARD={res['D_influence_selfgrade_WARRANT_GUARD_asr']:.0%} "
           f"| +ADAPTIVE-forged={res['E_adaptive_FORGED_warrant_asr']:.0%} "

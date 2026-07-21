@@ -8,7 +8,7 @@ downstream irreversible decision -- while the taint/bond/budget attach to the HO
 CUSUM can't catch it (Lorden delay -> inf at h->0) and reversal never fires. That residual is IRREDUCIBLE
 in general (Lorden 1971; Cheng-Friedman 2005; Tarski). This probe does NOT claim to close it.
 
-What it DOES close (one concrete gap): today mnemo's spend_irreversible already binds "the tightest
+What it DOES close (one concrete gap): today inspeximus's spend_irreversible already binds "the tightest
 contributing source" across a recall set -- BUT the budget is UNIFORM, so a low-provenance poison source
 gets the same irreversible budget as a trusted one and never binds. The lever: scale the irreversible
 budget to EARNED PROVENANCE (uncorroborated source -> tiny budget). Then an honest agent's irreversible
@@ -25,21 +25,21 @@ HONEST SCOPE (BOUND, not CLOSE):
  - Residual 2 (the true Lorden floor): a purely-REVERSIBLE aggregation (h->0) that never drives an
    irreversible action is never passed to the irreversible gate and stays unmetered BY DESIGN -- metering
    reversible influence would strangle every genuinely-good source. That is the irreducible core.
- - This is a POLICY on mnemo primitives (credit/_is_corroborated for standing + a provenance-scaled
+ - This is a POLICY on inspeximus primitives (credit/_is_corroborated for standing + a provenance-scaled
    irreversible budget); it inherits spend_irreversible's own load-bearing assumption: SOUND ATTRIBUTION
    (the app must include the soft-recalled poison id in the action's contributing set and label blast).
 """
 import os, sys, tempfile
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "mnemo")))
-from mnemo import Mnemo
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "inspeximus")))
+from inspeximus import Inspeximus
 
 
 def _store():
     fd, p = tempfile.mkstemp(suffix=".json"); os.close(fd); os.remove(p)
     try:
-        return Mnemo(path=p)
+        return Inspeximus(path=p)
     except TypeError:
-        return Mnemo()
+        return Inspeximus()
 
 
 def main():
@@ -47,7 +47,7 @@ def main():
 
     def corroborated(mid):
         by_id = {r["id"]: r for r in m.items}
-        return Mnemo._is_corroborated(by_id[mid], by_id, strict=False)
+        return Inspeximus._is_corroborated(by_id[mid], by_id, strict=False)
 
     # earned-provenance -> irreversible budget: a corroborated source gets the full budget; an
     # uncorroborated / low-provenance source gets a tiny one (so any irreversible action it taints binds).
@@ -79,18 +79,18 @@ def main():
         """The policy a provenance-scaled spend_irreversible enforces: each recalled source binds against ITS
         OWN earned-provenance budget; deny if ANY under-budget source is in the contributing set."""
         by_id = {r["id"]: r for r in store.items}
-        # per-source cumulative spend via mnemo's real budget side-state
+        # per-source cumulative spend via inspeximus's real budget side-state
         B = store._budget_state()
         deny = []
         for i in ids:
             rec = by_id.get(i)
-            for s in Mnemo._rec_sources(rec):
-                bud = HI if Mnemo._is_corroborated(rec, by_id, strict=False) else LO
+            for s in Inspeximus._rec_sources(rec):
+                bud = HI if Inspeximus._is_corroborated(rec, by_id, strict=False) else LO
                 if float(B.get(s, 0.0)) + float(amount) > bud:
                     deny.append(s)
         if not deny:
             for i in ids:
-                for s in Mnemo._rec_sources(by_id.get(i)):
+                for s in Inspeximus._rec_sources(by_id.get(i)):
                     B[s] = float(B.get(s, 0.0)) + float(amount)
             store._save_budget()
         return {"allowed": not deny, "denied_by": sorted(set(deny))}

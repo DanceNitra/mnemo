@@ -1,10 +1,10 @@
-"""Receipt: mnemo_toolset (Pydantic AI memory-as-tools) works end-to-end against real pydantic-ai.
+"""Receipt: inspeximus_toolset (Pydantic AI memory-as-tools) works end-to-end against real pydantic-ai.
 
 Run in a venv with pydantic-ai installed (measured against pydantic-ai 2.8.0):
-    python mnemo/probes/mnemo_pydantic_ai_adapter_probe.py
+    python inspeximus/probes/inspeximus_pydantic_ai_adapter_probe.py
 
 Checks, all against the REAL SDK (no mocks):
-  A. mnemo_toolset(store) returns a FunctionToolset registering exactly {remember, recall, check_conflict, forget}.
+  A. inspeximus_toolset(store) returns a FunctionToolset registering exactly {remember, recall, check_conflict, forget}.
   B. remember -> recall roundtrip surfaces the stored fact (through the store the tools are bound to).
   C. current-truth: after a keyed correction, recall returns the NEW value and not the superseded one.
   D. check_conflict flags a contradicting value and returns [] for an unrelated fact.
@@ -12,12 +12,12 @@ Checks, all against the REAL SDK (no mocks):
   F. an Agent(TestModel(), toolsets=[ts]) runs and actually invokes the memory tools (no API key).
 """
 import sys, os, json, tempfile, pathlib
-# test the SHIPPED package layout (mnemo_pypi/mnemo/ with integrations/), so the import resolves
+# test the SHIPPED package layout (inspeximus_pypi/inspeximus/ with integrations/), so the import resolves
 # exactly as an installed user's would.
-sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / "mnemo_pypi"))
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / "inspeximus_pypi"))
 
-from mnemo import Mnemo
-from mnemo.integrations.pydantic_ai import mnemo_toolset
+from inspeximus import Inspeximus
+from inspeximus.integrations.pydantic_ai import inspeximus_toolset
 
 
 import re
@@ -35,9 +35,9 @@ def _extractor(text):
 results = {}
 
 # A. toolset shape
-store = Mnemo(path=None)
+store = Inspeximus(path=None)
 store.extractor = _extractor
-ts = mnemo_toolset(store)
+ts = inspeximus_toolset(store)
 names = set(ts.tools.keys())
 results["A_tool_names"] = sorted(names)
 assert names == {"remember", "recall", "check_conflict", "forget"}, names
@@ -78,8 +78,8 @@ assert removed >= 1 and results["E_gone_after"], (removed, after)
 from pydantic_ai import Agent
 from pydantic_ai.models.test import TestModel
 
-store2 = Mnemo(path=None)
-ts2 = mnemo_toolset(store2)
+store2 = Inspeximus(path=None)
+ts2 = inspeximus_toolset(store2)
 agent = Agent(TestModel(), toolsets=[ts2])
 r = agent.run_sync("remember that the launch date is 2026-08-01, then recall it")
 tool_calls = [
@@ -90,7 +90,7 @@ tool_calls = [
 ]
 results["F_agent_invoked_tools"] = sorted(set(tool_calls) & names)
 results["F_store_written"] = len(store2.recall("launch", k=5)) >= 0  # store reachable through the tool path
-assert set(tool_calls) & names, tool_calls  # the agent actually called mnemo tools
+assert set(tool_calls) & names, tool_calls  # the agent actually called inspeximus tools
 
 print(json.dumps(results, indent=2))
 print("\nALL PASS" if all(

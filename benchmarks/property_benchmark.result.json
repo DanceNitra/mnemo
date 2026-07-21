@@ -7,7 +7,7 @@
       "value": 1.0,
       "baseline": 0.0,
       "pass": true,
-      "note": "mnemo keyed vs naive keep-all"
+      "note": "inspeximus keyed vs naive keep-all"
     },
     "revert_restores_prior": {
       "metric": "restored@1",

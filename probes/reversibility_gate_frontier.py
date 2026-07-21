@@ -13,7 +13,7 @@ irreversible action.
 
 Two policies, PAIRED (identical poison injection, query order, seed):
 - BASELINE : any count-corroborated memory (incl. the forged poison) drives ANY action, reversible or not.
-- GATE     : a memory may drive an IRREVERSIBLE action only if it has EARNED outcome standing (mnemo's good>0 &
+- GATE     : a memory may drive an IRREVERSIBLE action only if it has EARNED outcome standing (inspeximus's good>0 &
              good>=bad). Unproven memory drives only REVERSIBLE actions (you are willing to be wrong there).
 
 The non-trivial dynamic (why this is NOT by-construction "gate irreversible -> 0 damage"): the blended poison is
@@ -39,7 +39,7 @@ blocked), OR adaptive/compounding drives damage back to baseline (the reversible
 Needs numpy + the warm LoCoMo embed cache (normalized nomic; cosine = dot). Deterministic (seeded). MIT.
 Run: LOCOMO_PATH=agora_output/lab/data/locomo10.json \
      LOCOMO_CACHE=agora_output/lab/data/locomo_confweighted_cache.json \
-     python mnemo/probes/reversibility_gate_frontier.py"""
+     python inspeximus/probes/reversibility_gate_frontier.py"""
 import json, os, re, hashlib, random, urllib.request
 import numpy as np
 
@@ -133,7 +133,7 @@ def run(turns, qas, policy, seed, p_hi, grad_prime=0.0, compound_c=0, theta=0.0,
     wrng = random.Random(seed ^ 0x5AFE)
     hi = {qi: (wrng.random() < p_hi) for qi in range(len(qas))}
 
-    def earned(j):                       # standing >= theta (blast-rate cap); theta=0 -> mnemo's good>0 & good>=bad
+    def earned(j):                       # standing >= theta (blast-rate cap); theta=0 -> inspeximus's good>0 & good>=bad
         return store[j]["good"] > 0 and (store[j]["good"] - store[j]["bad"]) >= theta
 
     def blocked(j):                      # outcome gate: net-negative memory is withheld entirely (as isolation probe)
@@ -406,4 +406,4 @@ out = {"scenario": "reversibility_gate_frontier", "conversations": len(convs), "
        "checks": {k: bool(v) for k, v in checks.items()}, "verdict": verdict, "audit_caveat": audit_caveat}
 json.dump(out, open(os.path.join(os.path.dirname(__file__), "reversibility_gate_frontier_result.json"), "w"),
           ensure_ascii=False, indent=1)
-print("\nsaved: mnemo/probes/reversibility_gate_frontier_result.json")
+print("\nsaved: inspeximus/probes/reversibility_gate_frontier_result.json")

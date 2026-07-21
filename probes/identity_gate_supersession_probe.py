@@ -10,12 +10,12 @@ nobody gates supersession on identity confidence: mem0/Zep-Graphiti/Letta all au
 THE SCENARIO (deterministic, no LLM, no embedder). E entities each hold an authoritative value. A stream of
 corrections arrives. The upstream identity resolver is NOISY: with prob p_miss it attaches a correction to the
 WRONG entity, and it reports a confidence that is (imperfectly) lower when it is wrong. Two write policies:
-  UNGATED  : supersede on whatever key the resolver returned (mnemo default / mem0-style auto-commit)
+  UNGATED  : supersede on whatever key the resolver returned (inspeximus default / mem0-style auto-commit)
   GATED    : remember(..., identity_confidence=c); c < fork_below forks a candidate instead of superseding
 METRIC = authoritative-ledger CORRUPTION rate: fraction of entities whose authoritative value is now WRONG
 (a correction landed on the wrong record). Lower is better. Also report the review-queue cost (candidates).
 
-RUN:  python mnemo/probes/identity_gate_supersession_probe.py
+RUN:  python inspeximus/probes/identity_gate_supersession_probe.py
 """
 import os
 import sys
@@ -24,7 +24,7 @@ import random
 import tempfile
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from mnemo import Mnemo, __version__                          # noqa: E402
+from inspeximus import Inspeximus, __version__                          # noqa: E402
 
 E = 40            # entities
 ROUNDS = 6        # corrections per entity (a stream)
@@ -43,7 +43,7 @@ def resolver_confidence(is_correct, rng):
 
 def run(policy, rng):
     fd, p = tempfile.mkstemp(suffix=".json", prefix="idg_"); os.close(fd)
-    m = Mnemo(path=p)
+    m = Inspeximus(path=p)
     m.fork_below = FORK_BELOW
     truth = {}                                               # entity -> the value it SHOULD hold
     for e in range(E):
@@ -86,7 +86,7 @@ def run(policy, rng):
 
 
 def main():
-    print(f"=== IDENTITY-GATE SUPERSESSION PROBE (mnemo {__version__}, E={E}, rounds={ROUNDS}, "
+    print(f"=== IDENTITY-GATE SUPERSESSION PROBE (inspeximus {__version__}, E={E}, rounds={ROUNDS}, "
           f"p_miss={P_MISS}, fork_below={FORK_BELOW}) ===")
     print("authoritative-ledger corruption rate = entities whose current value is WRONG (lower better)\n")
     ung, gat = [], []
@@ -99,7 +99,7 @@ def main():
         ung.append(u); gat.append(g); ncand += nc
     import statistics
     mu_u, mu_g = statistics.mean(ung), statistics.mean(gat)
-    print(f"UNGATED (auto-commit, mem0/mnemo-default): corruption {mu_u:.3f}  (per-seed {[round(x,3) for x in ung]})")
+    print(f"UNGATED (auto-commit, mem0/inspeximus-default): corruption {mu_u:.3f}  (per-seed {[round(x,3) for x in ung]})")
     print(f"GATED   (identity_confidence < {FORK_BELOW} -> candidate): corruption {mu_g:.3f}  "
           f"(per-seed {[round(x,3) for x in gat]})")
     print(f"review-queue cost: {ncand/5:.0f} candidates/run forked for steward reconciliation")
@@ -107,7 +107,7 @@ def main():
           f"({(1-mu_g/mu_u)*100:.0f}% reduction) at the cost of a review queue.")
     print("Residual gated corruption = misresolutions that scored ABOVE the threshold (the gate is only as good "
           "as the confidence signal; Fellegi-Sunter's clerical-review zone, not a proof).")
-    json.dump({"mnemo": __version__, "E": E, "rounds": ROUNDS, "p_miss": P_MISS, "fork_below": FORK_BELOW,
+    json.dump({"inspeximus": __version__, "E": E, "rounds": ROUNDS, "p_miss": P_MISS, "fork_below": FORK_BELOW,
                "ungated_corruption": round(mu_u, 3), "gated_corruption": round(mu_g, 3),
                "candidates_per_run": round(ncand / 5, 1)},
               open(os.path.join(os.path.dirname(__file__), "identity_gate_supersession_result.json"), "w"), indent=2)

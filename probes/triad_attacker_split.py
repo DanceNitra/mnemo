@@ -34,7 +34,7 @@ log(D_ISC) - log(D_Bliss) with a bootstrap CI. Superadditive iff synergy < 0 (CI
 synergy < 0 at low p, -> 0 at high p, and at high p D(ISC) ~ D(C) (only the ceiling survives).
 
 Zero-dependency except numpy. Seeded (no runtime randomness in the structure; bootstrap uses a seeded rng). MIT.
-Run: python mnemo/probes/triad_attacker_split.py
+Run: python inspeximus/probes/triad_attacker_split.py
 """
 import os, json, itertools
 import numpy as np
@@ -194,4 +194,4 @@ out = {"scenario": "triad_attacker_split", "patience_grid": PATIENCE,
        "sleeper_residual": float(residual), "base": float(base), "verdict": verdict}
 json.dump(out, open(os.path.join(os.path.dirname(__file__), "triad_attacker_split_result.json"), "w"),
           ensure_ascii=False, indent=1)
-print("\nsaved: mnemo/probes/triad_attacker_split_result.json")
+print("\nsaved: inspeximus/probes/triad_attacker_split_result.json")

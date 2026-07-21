@@ -1,7 +1,7 @@
 """Why does the mem0 arm score 0.000 even with a strong extractor and zero parse errors?
 
 Before recording ANY mem0 number, rule out the confound I already caught on our own arms: an
-unequal context budget. mnemo/naive hand the answerer ~11.9k characters (k=150 sentences); mem0's
+unequal context budget. inspeximus/naive hand the answerer ~11.9k characters (k=150 sentences); mem0's
 `limit=20` short memories may be a fraction of that. Scoring mem0 at a 5x smaller budget would be
 the mirror image of the mistake in Appendix B — and this time it would flatter us.
 
@@ -42,7 +42,7 @@ def main():
         allm = m.get_all(filters={"user_id": sid}, limit=10000) or {}
         allm = allm.get("results") if isinstance(allm, dict) else allm
         print(f"mem0 stored {len(allm or [])} memories from 50 sessions "
-              f"(mnemo stored ~3400 verbatim records from the same input)")
+              f"(inspeximus stored ~3400 verbatim records from the same input)")
     except Exception as e:
         print("get_all failed:", e)
 
@@ -66,7 +66,7 @@ def main():
         print(f"{lim:>6} {avg_c:10.0f} {avg_cov:14.3f}")
         out[lim] = {"avg_chars": avg_c, "coverage": avg_cov}
     print("\nreference (retrieval_coverage.py, same 24-file setting): "
-          "mnemo@150 chars=11916 cov=0.142 | session_rag chars=11941 cov=0.305")
+          "inspeximus@150 chars=11916 cov=0.142 | session_rag chars=11941 cov=0.305")
     print("NOTE: mem0 stores PARAPHRASED memories, so verbatim evidence-sentence coverage understates "
           "it by construction — read the char budget as the comparable quantity, coverage as a floor.")
     (HERE / f"mem0_budget_{sid}.json").write_text(json.dumps(out, indent=1), encoding="utf-8")

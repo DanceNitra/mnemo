@@ -1,7 +1,7 @@
 """graph_layer_probe.py — deterministic knowledge graph over keyed (subject::relation, object) triples, zero-LLM.
 
-graph() derives entities + edges from mnemo's existing keyed-supersession triples; subgraph() does multi-hop
-traversal. No LLM entity-extraction, no graph DB — the 'graph memory' checkbox done mnemo's deterministic way.
+graph() derives entities + edges from inspeximus's existing keyed-supersession triples; subgraph() does multi-hop
+traversal. No LLM entity-extraction, no graph DB — the 'graph memory' checkbox done inspeximus's deterministic way.
 Asserts (each can FAIL):
   1. graph() surfaces edges subject-[relation]->object from keyed memories, with the right nodes.
   2. a SUPERSEDED fact drops out of the active graph (graph reflects CURRENT truth).
@@ -11,14 +11,14 @@ Asserts (each can FAIL):
 """
 import sys
 sys.path.insert(0, ".")
-from mnemo import Mnemo
+from inspeximus import Inspeximus
 
 FAILS = []
 def check(n, c):
     print(f"  [{'OK ' if c else 'XXX'}] {n}")
     if not c: FAILS.append(n)
 
-m = Mnemo(path=None)
+m = Inspeximus(path=None)
 # a small graph: Alice -works_at-> Acme ; Acme -located_in-> Berlin ; Berlin -country-> Germany
 m.remember("Alice works at Acme", key="Alice::works_at", object="Acme")
 m.remember("Acme is located in Berlin", key="Acme::located_in", object="Berlin")

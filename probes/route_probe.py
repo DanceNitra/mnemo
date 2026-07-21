@@ -1,19 +1,19 @@
-"""route_probe.py — receipt for the SHIPPED Mnemo.route() (0.7.9): the write-path intent router.
+"""route_probe.py — receipt for the SHIPPED Inspeximus.route() (0.7.9): the write-path intent router.
 
 Re-runs the full 148-row fixture from intent_tagger_router_probe (assert / correct / value-obscuring +
 named + original reverts / byte-identical echo-vs-reaffirm twins incl. the forged-context adversarial
 class / innocent temporal chatter) — but every decision is made by the SHIPPED store.route() on the
-mnemo_pypi package layout, exactly as an installed user would call it. Expected to reproduce the probe's
+inspeximus_pypi package layout, exactly as an installed user would call it. Expected to reproduce the probe's
 measured picture: marked classes 1.00 end-to-end under every policy; the unmarked twins land on the
 documented policy frontier (safe 1.00/0.00, context 1.00/1.00 honest twins but forged-context 0.00,
 trusting 0.00/1.00).
 
-RUN: python mnemo/probes/route_probe.py
+RUN: python inspeximus/probes/route_probe.py
 """
 import sys, os, json, pathlib, importlib.util
 
-sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / "mnemo_pypi"))
-from mnemo import Mnemo  # the SHIPPED layout
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / "inspeximus_pypi"))
+from inspeximus import Inspeximus  # the SHIPPED layout
 
 _spec = importlib.util.spec_from_file_location(
     "fixture_mod", os.path.join(os.path.dirname(__file__), "intent_tagger_router_probe.py"))
@@ -22,7 +22,7 @@ _spec.loader.exec_module(_fx)
 
 
 def replay(row, policy):
-    store = Mnemo(path=None)
+    store = Inspeximus(path=None)
     store.echo_guard = True
     for i, v in enumerate(row["history"]):
         t = (_fx.T_ASSERT[0] if i == 0 else _fx.T_CORRECT[0]).format(ent=row["entity"], v=v)

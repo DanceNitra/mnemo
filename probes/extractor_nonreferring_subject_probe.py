@@ -21,7 +21,7 @@ import os
 import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-from mnemo.mnemo import Mnemo, regex_extractor  # noqa: E402
+from inspeximus.core import Inspeximus, regex_extractor  # noqa: E402
 
 PASS, FAIL = 0, 0
 
@@ -60,7 +60,7 @@ def main():
 
     # 4. END TO END — the failure this probe exists for: two unrelated "It is ..." sentences must NOT
     #    supersede each other, while a real correction on a real subject still must.
-    m = Mnemo(path=None)
+    m = Inspeximus(path=None)
     m.extractor = regex_extractor
     m.echo_guard = True
     m.remember("It is important to study the outcomes of these programs.")
@@ -68,7 +68,7 @@ def main():
     retired = [r for r in m.items if r.get("status") == "superseded"]
     check("unrelated 'It is ...' sentences do not retire each other", len(retired) == 0)
 
-    m2 = Mnemo(path=None)
+    m2 = Inspeximus(path=None)
     m2.extractor = regex_extractor
     m2.echo_guard = True
     m2.remember("My current title is Junior Data Analyst")

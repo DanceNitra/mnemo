@@ -1,28 +1,28 @@
-"""mnemo_toolset — memory-as-tools for Pydantic AI, backed by mnemo.
+"""inspeximus_toolset — memory-as-tools for Pydantic AI, backed by inspeximus.
 
 Pydantic AI has no built-in persistent memory by design; the established pattern (Hindsight's
-hindsight-pydantic-ai, etc.) is to expose memory as agent tools. `mnemo_toolset(store)` returns a Pydantic AI
+hindsight-pydantic-ai, etc.) is to expose memory as agent tools. `inspeximus_toolset(store)` returns a Pydantic AI
 `FunctionToolset` the agent can call: remember, recall, check_conflict, forget. Retrieval is current-truth
-(mnemo's supersession-filtered recall hides corrected values), and the agent can check a fact for conflicts
+(inspeximus's supersession-filtered recall hides corrected values), and the agent can check a fact for conflicts
 before storing it.
 
     from pydantic_ai import Agent
-    from inspeximus.integrations.pydantic_ai import mnemo_toolset
-    agent = Agent("openai:gpt-4o-mini", toolsets=[mnemo_toolset(path="mem.json")])
+    from inspeximus.integrations.pydantic_ai import inspeximus_toolset
+    agent = Agent("openai:gpt-4o-mini", toolsets=[inspeximus_toolset(path="mem.json")])
 
 Pass a supersession `extractor` (text -> (key, object)) so remembered facts auto-key and a corrected value
-stops surfacing; see Mnemo.extractor. Importing this module imports Pydantic AI (opt-in extra); `import inspeximus`
+stops surfacing; see Inspeximus.extractor. Importing this module imports Pydantic AI (opt-in extra); `import inspeximus`
 stays zero-dependency.
 """
 from __future__ import annotations
 from typing import Any
 
 
-def mnemo_toolset(store: Any = None, path: str | None = None, k: int = 5, extractor=None):
-    """Build a Pydantic AI FunctionToolset of memory tools bound to a mnemo store."""
+def inspeximus_toolset(store: Any = None, path: str | None = None, k: int = 5, extractor=None):
+    """Build a Pydantic AI FunctionToolset of memory tools bound to a inspeximus store."""
     if store is None:
-        from inspeximus import Mnemo
-        store = Mnemo(path=path)
+        from inspeximus import Inspeximus
+        store = Inspeximus(path=path)
     if extractor is not None:
         store.extractor = extractor
 

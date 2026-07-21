@@ -2,7 +2,7 @@
 
 Zero LLM judge calls anywhere: every metric is a string or byte check, so the judge instability that
 qualifies the pilot cannot touch these numbers. The mem0 arm needs LLM ingestion and is therefore
-opt-in (`--arms mnemo,naive,mem0`) so it can wait for the main mem0 run to release the cloud quota.
+opt-in (`--arms inspeximus,naive,mem0`) so it can wait for the main mem0 run to release the cloud quota.
 
 Read ERASURE_REVERT_SPEC.md first: predictions E1-E4 and R1-R3 are fixed there, including E1 which
 predicts a TIE with the naive baseline and R3 which predicts a competitor CAN do what we do.
@@ -25,7 +25,7 @@ os.environ.setdefault("MEMOPS_TOPK", "150")
 HERE = pathlib.Path(__file__).resolve().parent
 
 import pilot  # noqa: E402
-from mnemo.mnemo import Mnemo, regex_extractor  # noqa: E402
+from inspeximus.core import Inspeximus, regex_extractor  # noqa: E402
 
 
 def norm(s):
@@ -63,7 +63,7 @@ def aliases(value, retained=()):
 
 
 def build_store(lc, keyed, path):
-    m = Mnemo(path=path)
+    m = Inspeximus(path=path)
     if keyed:
         m.extractor = regex_extractor
         m.echo_guard = True
@@ -83,12 +83,12 @@ def state_hash(m):
 
 
 def ctx_of(m, q, keyed):
-    return norm(pilot.recall_mnemo(m, q, keyed)[:12000])
+    return norm(pilot.recall_inspeximus(m, q, keyed)[:12000])
 
 
 # ---------------------------------------------------------------- Test A: erasure
 def test_a(files, arm):
-    keyed = arm == "mnemo"
+    keyed = arm == "inspeximus"
     rows = []
     for name in files:
         lc = json.loads((HERE / "data_lc" / name).read_text(encoding="utf-8"))
@@ -158,7 +158,7 @@ def test_a(files, arm):
 
 # ---------------------------------------------------------------- Test B: revert
 def test_b(files, arm):
-    keyed = arm == "mnemo"
+    keyed = arm == "inspeximus"
     rows = []
     import stale_diagnostic as sd
     for name in files:
@@ -212,7 +212,7 @@ def _unit(job):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--arms", default="mnemo,naive")
+    ap.add_argument("--arms", default="inspeximus,naive")
     ap.add_argument("--tests", default="A,B")
     ap.add_argument("--workers", type=int, default=min(12, (os.cpu_count() or 4) - 2))
     a = ap.parse_args()

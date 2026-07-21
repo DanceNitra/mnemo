@@ -1,8 +1,8 @@
-"""reversion_classifier_probe.py — the Marat decomposition shipped as mnemo.classify_reversion (0.7.14).
+"""reversion_classifier_probe.py — the Marat decomposition shipped as inspeximus.classify_reversion (0.7.14).
 
-The joint TAT/mnemo analysis factorized value-obscuring reversion detection into reference resolution (text)
+The joint TAT/inspeximus analysis factorized value-obscuring reversion detection into reference resolution (text)
 plus recency attribution (ledger), with abstention on unresolvable references. classify_reversion() is that,
-running on a real mnemo store's own ledger. This probe measures it end to end on mnemo-native data: per
+running on a real inspeximus store's own ledger. This probe measures it end to end on inspeximus-native data: per
 entity we remember the old state with a descriptive record (it names the setter / a distinguishing feature),
 then the correction, then classify four kinds of candidate:
 
@@ -17,15 +17,15 @@ then the correction, then classify four kinds of candidate:
 
 Uses the local embedder (Ollama nomic-embed-text). The point measured: does the shipped classifier reproduce
 the decomposition's behaviour — resolve real references correctly via the ledger, and abstain (not guess) on
-the undecidable ones — on mnemo's own store rather than on the paper's fixture.
+the undecidable ones — on inspeximus's own store rather than on the paper's fixture.
 
-RUN: python mnemo/probes/reversion_classifier_probe.py
+RUN: python inspeximus/probes/reversion_classifier_probe.py
 """
 import sys, pathlib, json, urllib.request, io
 
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
-sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / "mnemo_pypi"))
-from mnemo import Mnemo, __version__
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / "inspeximus_pypi"))
+from inspeximus import Inspeximus, __version__
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 import integrity_bench_revert as rev
 
@@ -43,7 +43,7 @@ SETTERS = ["marcus", "the vendor", "priya", "the audit team", "lena", "old tomas
 
 
 def main():
-    R = {"mnemo_version": __version__}
+    R = {"inspeximus_version": __version__}
     rng_names = SETTERS
     cases = rev.ENTS[:24]
     referenced_revert = affirm_keep = bare_abstain = unrelated_abstain = 0
@@ -51,7 +51,7 @@ def main():
     misfires = []                                          # a revert flagged where keep/abstain was right, etc.
     for i, (e, A, B) in enumerate(cases):
         setter_old, setter_new = rng_names[i % len(rng_names)], rng_names[(i + 3) % len(rng_names)]
-        m = Mnemo(path=None, embed=embed); m.echo_guard = True
+        m = Inspeximus(path=None, embed=embed); m.echo_guard = True
         m.remember(f"the {e} was {A}; {setter_old} made that call.", key=e, object=A)
         m.remember(f"correction: {setter_new} changed the {e} to {B}.", key=e, object=B)
 

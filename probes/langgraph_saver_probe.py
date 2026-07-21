@@ -1,7 +1,7 @@
-"""langgraph_saver_probe.py — MnemoSaver is a working LangGraph BaseCheckpointSaver (thread-state persistence).
+"""langgraph_saver_probe.py — InspeximusSaver is a working LangGraph BaseCheckpointSaver (thread-state persistence).
 
-mnemo already had MnemoStore (long-term BaseStore); this is the other half — the checkpointer that lets a graph
-resume. Round-trips the real BaseCheckpointSaver contract against a mnemo file. Asserts (each able to FAIL):
+inspeximus already had InspeximusStore (long-term BaseStore); this is the other half — the checkpointer that lets a graph
+resume. Round-trips the real BaseCheckpointSaver contract against a inspeximus file. Asserts (each able to FAIL):
   1. put() a checkpoint then get_tuple() returns the SAME checkpoint (state survives).
   2. put_writes() then get_tuple().pending_writes carries them back.
   3. list() yields the thread's checkpoints (newest-first).
@@ -9,10 +9,10 @@ resume. Round-trips the real BaseCheckpointSaver contract against a mnemo file. 
   5. delete_thread() removes them (get_tuple -> None).
 """
 import os, sys, tempfile
-os.environ["MNEMO_EMBED_URL"] = ""                 # lexical, no GPU
+os.environ["INSPEXIMUS_EMBED_URL"] = ""                 # lexical, no GPU
 sys.path.insert(0, ".")
 from langgraph.checkpoint.base import empty_checkpoint, create_checkpoint
-from mnemo.integrations.langgraph import MnemoSaver
+from inspeximus.integrations.langgraph import InspeximusSaver
 
 FAILS = []
 def check(n, c):
@@ -21,7 +21,7 @@ def check(n, c):
 
 p = os.path.join(tempfile.gettempdir(), "lg_saver_probe.json")
 if os.path.exists(p): os.remove(p)
-saver = MnemoSaver(path=p)
+saver = InspeximusSaver(path=p)
 
 cfg = {"configurable": {"thread_id": "t1", "checkpoint_ns": ""}}
 c1 = empty_checkpoint()

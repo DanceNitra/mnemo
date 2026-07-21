@@ -1,6 +1,6 @@
 """Break the one sentence we intend to say in public, before we say it.
 
-The claim: *"tell mnemo to forget everything about a person, and it not only does it — it can prove
+The claim: *"tell inspeximus to forget everything about a person, and it not only does it — it can prove
 it."* `claims_audit.py` checks that the API exists and behaves on a single record. This goes after the
 claim as a buyer would use it, and tries to falsify it:
 
@@ -29,7 +29,7 @@ import sys
 import tempfile
 import zipfile
 
-PKG_ENV = "MNEMO_AUDIT_PKG"
+PKG_ENV = "INSPEXIMUS_AUDIT_PKG"
 
 # (subject, records the subject owns, a derived record built FROM them, unrelated records that must live)
 SCENARIOS = [
@@ -73,9 +73,9 @@ def _load():
     p = os.environ.get(PKG_ENV)
     if p and p not in sys.path:
         sys.path.insert(0, p)
-    import inspeximus as mnemo
-    from mnemo.mnemo import Mnemo
-    return mnemo, Mnemo
+    import inspeximus as inspeximus
+    from inspeximus.core import Inspeximus
+    return inspeximus, Inspeximus
 
 
 def _secrets(sc):
@@ -97,10 +97,10 @@ def state_hash(m):
 
 def run_scenario(sc, run_idx):
     """One full build → erase → verify cycle. Returns (checks: dict[str, bool], evidence: list[str])."""
-    _, Mnemo = _load()
+    _, Inspeximus = _load()
     d = pathlib.Path(tempfile.mkdtemp(prefix=f"gov_{run_idx}_"))
     ev, chk = [], {}
-    m = Mnemo(path=str(d / "store.jsonl"), receipts=True)
+    m = Inspeximus(path=str(d / "store.jsonl"), receipts=True)
 
     owned_ids = [m.remember(t, source={"doc": sc["subject"]}) for t in sc["owned"]]
     m.remember(sc["derived"], source={"doc": sc["subject"] + "-summary"}, derived_from=owned_ids,
@@ -186,7 +186,7 @@ def run_scenario(sc, run_idx):
         chk["tampered receipt detected"] = False
 
     # 9. it survives a reload from disk
-    m2 = Mnemo(path=str(d / "store.jsonl"), receipts=True)
+    m2 = Inspeximus(path=str(d / "store.jsonl"), receipts=True)
     blob2 = " ".join((r.get("text") or "") for r in m2.items).lower()
     chk["still erased after reload"] = not any(s in blob2 for s in secrets)
 
@@ -207,7 +207,7 @@ def main():
         pkg, src, sha = pathlib.Path(__file__).resolve().parent, "working tree", "n/a"
     else:
         subprocess.run([sys.executable, "-m", "pip", "download",
-                        f"agora-mnemo=={a.version}" if a.version else "agora-mnemo",
+                        f"agora-inspeximus=={a.version}" if a.version else "agora-inspeximus",
                         "--no-deps", "-d", str(tmp)], capture_output=True, check=True)
         wheel = sorted(tmp.glob("*.whl"))[0]
         pkg = tmp / "pkg"
@@ -215,10 +215,10 @@ def main():
         src, sha = wheel.name, hashlib.sha256(wheel.read_bytes()).hexdigest()
     os.environ[PKG_ENV] = str(pkg)
     sys.path.insert(0, str(pkg))
-    import inspeximus as mnemo
+    import inspeximus as inspeximus
 
     print("=" * 96)
-    print(f"auditing : {src}   version {getattr(mnemo, '__version__', '?')}")
+    print(f"auditing : {src}   version {getattr(inspeximus, '__version__', '?')}")
     if sha != "n/a":
         print(f"sha256   : {sha}")
     print(f"claim    : \"tell it to forget everything about a subject, and it can prove it\"")

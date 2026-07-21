@@ -1,7 +1,7 @@
 """
-Runnable probe for mnemo 0.5.2 -- distinct-VERIFIED-KEY corroboration (strict_corroboration).
+Runnable probe for inspeximus 0.5.2 -- distinct-VERIFIED-KEY corroboration (strict_corroboration).
 
-THE GAP IT CLOSES. mnemo's corroboration gate (episodic->semantic graduation + recall(influence_only))
+THE GAP IT CLOSES. inspeximus's corroboration gate (episodic->semantic graduation + recall(influence_only))
 counts ">=2 distinct sources". By default a source is a canonical STRING (entity-resolved), which
 collapses honest sybil variants ("Wikipedia"/"wikipedia.org"/URL) but is still SPOOFABLE: an attacker who
 controls the labeling channel can supply two unrelated source strings it owns and manufacture "independent"
@@ -23,11 +23,11 @@ Needs `cryptography` (pip install cryptography). No cloud, no data files.
 """
 import sys, os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-import mnemo as M
+import inspeximus as M
 
 
 def fresh():
-    m = M.Mnemo()
+    m = M.Inspeximus()
     return m
 
 
@@ -38,7 +38,7 @@ def link(m, target_id, corroborator_id):
             r.setdefault("links", []).append(corroborator_id)
 
 
-print("mnemo", M.__version__)
+print("inspeximus", M.__version__)
 sk_a, pk_a = M.new_source_keypair()      # attacker's single key
 sk_b, pk_b = M.new_source_keypair()      # a genuinely independent witness
 CLAIM = "the deploy key rotates every 24h"
@@ -52,8 +52,8 @@ c2 = m.remember(CLAIM, source={"doc": "another-unrelated-name"})
 link(m, tgt, c1); link(m, tgt, c2)
 byid = {r["id"]: r for r in m.items}
 tgt_rec = byid[tgt]
-default_ok = M.Mnemo._is_corroborated(tgt_rec, byid, strict=False)
-strict_ok = M.Mnemo._is_corroborated(tgt_rec, byid, strict=True)
+default_ok = M.Inspeximus._is_corroborated(tgt_rec, byid, strict=False)
+strict_ok = M.Inspeximus._is_corroborated(tgt_rec, byid, strict=True)
 print("\n[1] string-spoof (2 attacker-owned strings, 0 keys):")
 print(f"    default(string) corroborated = {default_ok}   strict(verified-key) corroborated = {strict_ok}")
 assert default_ok is True, "string gate should be fooled by 2 distinct strings"
@@ -68,8 +68,8 @@ w2 = m.remember(CLAIM, source={"doc": "witness-b"},
                 attestation=(pk_b, M.attest(CLAIM, sk_b, "witness-b")))
 link(m, tgt, w1); link(m, tgt, w2)
 byid = {r["id"]: r for r in m.items}
-strict_ok = M.Mnemo._is_corroborated(byid[tgt], byid, strict=True)
-nkeys = M.Mnemo._distinct_verified_keys(byid[tgt].get("links"), byid)
+strict_ok = M.Inspeximus._is_corroborated(byid[tgt], byid, strict=True)
+nkeys = M.Inspeximus._distinct_verified_keys(byid[tgt].get("links"), byid)
 print("\n[2] two DISTINCT signed witnesses:")
 print(f"    distinct verified keys = {nkeys}   strict corroborated = {strict_ok}")
 assert nkeys == 2 and strict_ok is True, "two distinct verified keys must pass strict"
@@ -81,7 +81,7 @@ s1 = m.remember(CLAIM, source={"doc": "name-x"}, attestation=(pk_a, M.attest(CLA
 s2 = m.remember(CLAIM, source={"doc": "name-y"}, attestation=(pk_a, M.attest(CLAIM, sk_a, "name-y")))
 link(m, tgt, s1); link(m, tgt, s2)
 byid = {r["id"]: r for r in m.items}
-nkeys = M.Mnemo._distinct_verified_keys(byid[tgt].get("links"), byid)
+nkeys = M.Inspeximus._distinct_verified_keys(byid[tgt].get("links"), byid)
 print(f"    same key twice -> distinct verified keys = {nkeys} (sybil collapses)")
 assert nkeys == 1, "one key used twice must collapse to one witness"
 

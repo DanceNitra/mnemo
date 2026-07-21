@@ -3,8 +3,8 @@ import os
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from mnemo import new_source_keypair
-from mnemo.erasure_auditor import (
+from inspeximus import new_source_keypair
+from inspeximus.erasure_auditor import (
     ErasureAuditor, TextStoreProbe, verify_compliance_receipt, ed25519_signer, ed25519_verify,
 )
 
@@ -53,7 +53,7 @@ def test_swapped_key_rejected_when_pinned():
     sk2, pk2 = new_source_keypair()
     r = _auditor(leaky=False).compliance_receipt("alice", ["12.69"], sign=ed25519_signer(sk), pubkey=pk)
     # attacker re-signs the same body with their own key and swaps both sig+pubkey
-    from mnemo.erasure_auditor import _receipt_message
+    from inspeximus.erasure_auditor import _receipt_message
     r["signature"] = ed25519_signer(sk2)(_receipt_message(r)); r["pubkey"] = pk2
     ok_unpinned, _ = verify_compliance_receipt(r, ed25519_verify)          # self-consistent -> passes
     ok_pinned, reason = verify_compliance_receipt(r, ed25519_verify, expected_pubkey=pk)  # pinned -> rejected

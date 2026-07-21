@@ -4,7 +4,7 @@ ALL sidecars: .receipts.json, .tombstones.json, .cusum.json, .irrev.json, .vecs,
 is unrecoverable. A single residue = a hole to fix before anything ships."""
 import sys, pathlib, tempfile, os, glob
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
-from mnemo import Mnemo, new_encryption_key
+from inspeximus import Inspeximus, new_encryption_key
 
 SEC = "Alice-SSN-441-90-2277"
 SB = SEC.encode()
@@ -31,7 +31,7 @@ def run():
     sk, pub = new_encryption_key.__self__ if False else (None, None)
 
     # E1 — superseded STALE value with PII (the retired version must also be erased)
-    p = fresh(); m = Mnemo(path=p)
+    p = fresh(); m = Inspeximus(path=p)
     m.remember(SEC + " OLD", key="alice::ssn", source={"doc": "alice"}, pii=True)
     m.remember(SEC + " NEW", key="alice::ssn", source={"doc": "alice"}, pii=True)   # supersedes -> OLD retired
     m._save(force=True)
@@ -40,7 +40,7 @@ def run():
     ok["E1 superseded stale value erased"] = not residue(os.path.dirname(p))
 
     # E2 — derived lineage (a summary built from the subject's data) erased via derived_from taint
-    p = fresh(); m = Mnemo(path=p)
+    p = fresh(); m = Inspeximus(path=p)
     rid = m.remember(SEC, key="alice::ssn", source={"doc": "alice"}, pii=True)
     m.remember("summary containing " + SEC, derived=True, derived_from=[rid])
     m._save(force=True)
@@ -48,7 +48,7 @@ def run():
     ok["E2 derived-lineage record erased"] = not residue(os.path.dirname(p))
 
     # E3 — PII hidden only in meta (not the text)
-    p = fresh(); m = Mnemo(path=p)
+    p = fresh(); m = Inspeximus(path=p)
     m.remember("innocuous note", key="alice::rec", source={"doc": "alice"}, meta={"ssn": SEC}, pii=True)
     m._save(force=True)
     ok["E3a control"] = bool(residue(os.path.dirname(p)))
@@ -57,7 +57,7 @@ def run():
 
     # E4 — sidecars content-free: receipts + tombstones must NOT contain the PII
     p = fresh(); rk, rpub = _kp()
-    m = Mnemo(path=p, receipts=True, receipt_key=rk, receipt_pubkey=rpub)
+    m = Inspeximus(path=p, receipts=True, receipt_key=rk, receipt_pubkey=rpub)
     m.remember(SEC, key="alice::ssn", source={"doc": "alice"}, pii=True)
     m._save(force=True)
     m.forget_subject("alice", request_id="r4"); m._save(force=True)
@@ -66,7 +66,7 @@ def run():
 
     # E5 — persist_vectors + encryption + shred, all together
     p = fresh(); key = new_encryption_key()
-    m = Mnemo(path=p, embed=lambda t: [float(len(t) % 7)] * 8, persist_vectors=True, encrypt_key=key)
+    m = Inspeximus(path=p, embed=lambda t: [float(len(t) % 7)] * 8, persist_vectors=True, encrypt_key=key)
     m.remember(SEC, key="alice::ssn", source={"doc": "alice"}, pii=True)
     m._save(force=True)
     ok["E5a control: ciphertext hides plaintext"] = not residue(os.path.dirname(p))   # encrypted -> no plaintext leak
@@ -75,7 +75,7 @@ def run():
     # after shred: no plaintext anywhere, and a fresh open with a WRONG key cannot recover
     ok["E5 no plaintext after forget+shred"] = not residue(os.path.dirname(p))
     try:
-        m2 = Mnemo(path=p, encrypt_key=new_encryption_key())
+        m2 = Inspeximus(path=p, encrypt_key=new_encryption_key())
         ok["E5b undecryptable without key"] = not any(SEC in (r.get("text") or "") for r in getattr(m2, "items", []))
     except Exception:
         ok["E5b undecryptable without key"] = True
@@ -92,7 +92,7 @@ def run():
 
 
 def _kp():
-    from mnemo import new_receipt_keypair
+    from inspeximus import new_receipt_keypair
     return new_receipt_keypair()
 
 

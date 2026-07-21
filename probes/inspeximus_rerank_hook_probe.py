@@ -1,17 +1,17 @@
-"""mnemo_rerank_hook_probe.py — recall(rerank=...) retrieve-then-rerank hook.
+"""inspeximus_rerank_hook_probe.py — recall(rerank=...) retrieve-then-rerank hook.
 
-Verifies the plumbing (model-agnostic, mnemo imports no model): a caller-supplied `rerank(query, records)
+Verifies the plumbing (model-agnostic, inspeximus imports no model): a caller-supplied `rerank(query, records)
 -> list[float]` reorders the top candidates before truncation to k, and a broken reranker fails open (original
 order, no crash). HONEST scope: the hook only helps as much as the reranker does — a model-READER reranker is
 the measured multi-hop lever (LoCoMo ~0.30->~0.48); a generic query-relevance cross-encoder does NOT help
 multi-hop (measured: it hurts, because 2nd-hop evidence isn't directly query-relevant)."""
 import sys, pathlib, tempfile, os
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
-from mnemo import Mnemo
+from inspeximus import Inspeximus
 
 
 def _fresh():
-    m = Mnemo(path=os.path.join(tempfile.mkdtemp(), "m.json"))
+    m = Inspeximus(path=os.path.join(tempfile.mkdtemp(), "m.json"))
     for t in ["alpha fact", "beta fact", "gamma fact", "delta fact", "epsilon fact"]:
         m.remember(t, tags=["x"])
     return m

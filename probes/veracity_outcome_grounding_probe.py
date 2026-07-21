@@ -23,13 +23,13 @@ positioned to run: promote Episodic->Core only for memories that have been USED 
 BLUNT SCOPE (so this is not mistaken for a detection result): the outcome-grounding path is textbook
 (defeasible/provisional facts, Doyle 1979 truth-maintenance; reputation-from-outcomes, Dellarocas 2003 /
 Resnick 2000; credit assignment, Sutton-Barto). Phase 2 below is an API DEMONSTRATION, not a detector:
-the application SUPPLIES the good/bad outcomes; the probe just shows mnemo defers standing to them. The one
+the application SUPPLIES the good/bad outcomes; the probe just shows inspeximus defers standing to them. The one
 label-INDEPENDENT, mechanism-level property here is the REVERSIBILITY CHECKPOINT in Phase 3a
 (spend_irreversible) -- it bounds a benign-earned memory's irreversible tail whether or not you can tell
 the memory is true. The honest takeaway is a design stance ("convert write-time-undecidable into
 use-time-observable, and gate the irreversible tail"), NOT a solved veracity oracle.
 
-Measured on the real mnemo store (not a model of it). Run: python veracity_outcome_grounding_probe.py
+Measured on the real inspeximus store (not a model of it). Run: python veracity_outcome_grounding_probe.py
 
 HONEST, stated up front (this RAISES/BOUNDS, it does not CLOSE):
  - LOAD-BEARING ASSUMPTION: harm from acting on a poison is OBSERVABLE at use (a failed compile, a bounced
@@ -40,16 +40,16 @@ HONEST, stated up front (this RAISES/BOUNDS, it does not CLOSE):
    reversibility checkpoint (spend_irreversible) on the first IRREVERSIBLE use.
 """
 import os, sys, tempfile
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "mnemo")))
-from mnemo import Mnemo
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "inspeximus")))
+from inspeximus import Inspeximus
 
 
 def _store():
     fd, p = tempfile.mkstemp(suffix=".json"); os.close(fd); os.remove(p)
     try:
-        return Mnemo(path=p)
+        return Inspeximus(path=p)
     except TypeError:
-        return Mnemo()
+        return Inspeximus()
 
 
 def main():
@@ -58,7 +58,7 @@ def main():
     def acts(mid):
         """Does this memory earn INFLUENCE standing (allowed to drive an action)?"""
         by_id = {r["id"]: r for r in m.items}
-        return Mnemo._is_corroborated(by_id[mid], by_id, strict=False)
+        return Inspeximus._is_corroborated(by_id[mid], by_id, strict=False)
 
     # ---- PHASE 1: provisional-at-write -- NO write-time truth decision, NO discrimination ----
     # (distinct sources: a legit runtime vs an attacker-controlled channel. slash() is SOURCE-scoped by

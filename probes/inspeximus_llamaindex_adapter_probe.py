@@ -1,12 +1,12 @@
-"""mnemo_llamaindex_adapter_probe.py — MnemoMemoryBlock works with the REAL LlamaIndex BaseMemoryBlock.
+"""inspeximus_llamaindex_adapter_probe.py — InspeximusMemoryBlock works with the REAL LlamaIndex BaseMemoryBlock.
 
 Requires llama-index-core. Verifies the block protocol (_aput/_aget round-trip) + the differentiator:
 recall is supersession-filtered, so a corrected (keyed) fact is not injected back into the prompt.
 """
 import sys, pathlib, asyncio, tempfile
-sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / "mnemo_pypi"))
-from mnemo import Mnemo
-from mnemo.integrations.llamaindex import MnemoMemoryBlock
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / "inspeximus_pypi"))
+from inspeximus import Inspeximus
+from inspeximus.integrations.llamaindex import InspeximusMemoryBlock
 from llama_index.core.base.llms.types import ChatMessage
 
 
@@ -14,7 +14,7 @@ async def run():
     ok = {}
     tmp = pathlib.Path(tempfile.mkdtemp())
 
-    blk = MnemoMemoryBlock(name="mnemo", path=str(tmp / "m.json"), k=5)
+    blk = InspeximusMemoryBlock(name="inspeximus", path=str(tmp / "m.json"), k=5)
 
     # A _aput stores, _aget retrieves relevant content
     await blk._aput([ChatMessage(role="user", content="the retry limit is 5 attempts"),
@@ -27,18 +27,18 @@ async def run():
     ok["B no relevant memory -> empty"] = (empty == "")
 
     # C DIFFERENTIATOR: a corrected (keyed) fact is not re-injected — supersession-filtered recall
-    store = Mnemo(path=str(tmp / "sup.json"))
+    store = Inspeximus(path=str(tmp / "sup.json"))
     store.remember("user timezone is UTC", key="user::tz", object="UTC")
     store.remember("user timezone is PST", key="user::tz", object="PST")   # supersedes UTC
-    blk2 = MnemoMemoryBlock(name="mnemo2", store=store, k=5)
+    blk2 = InspeximusMemoryBlock(name="inspeximus2", store=store, k=5)
     inj = await blk2._aget([ChatMessage(role="user", content="user timezone")])
     ok["C current-truth (PST in, UTC out)"] = ("PST" in inj and "UTC" not in inj)
 
     # D block is a real BaseMemoryBlock (name/priority fields present)
-    ok["D is a BaseMemoryBlock"] = (blk.name == "mnemo" and hasattr(blk, "priority"))
+    ok["D is a BaseMemoryBlock"] = (blk.name == "inspeximus" and hasattr(blk, "priority"))
 
     print("=" * 62)
-    print("MnemoMemoryBlock - LlamaIndex BaseMemoryBlock (real llama-index-core)")
+    print("InspeximusMemoryBlock - LlamaIndex BaseMemoryBlock (real llama-index-core)")
     print("=" * 62)
     for k, v in ok.items():
         print(f"  [{'PASS' if v else 'FAIL'}] {k}")

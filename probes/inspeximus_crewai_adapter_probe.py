@@ -1,22 +1,22 @@
-"""mnemo_crewai_adapter_probe.py — MnemoStorage matches CrewAI's Storage protocol + the integrity differentiator.
+"""inspeximus_crewai_adapter_probe.py — InspeximusStorage matches CrewAI's Storage protocol + the integrity differentiator.
 
-MnemoStorage is DUCK-TYPED (it does not import crewai), so this probe verifies the contract CrewAI actually
+InspeximusStorage is DUCK-TYPED (it does not import crewai), so this probe verifies the contract CrewAI actually
 calls — save(value, metadata) / search(query, limit, score_threshold) / reset() — plus the differentiator that
-sets mnemo apart from CrewAI's default RAG storage: search() is supersession-filtered, so a corrected (keyed)
-fact is never returned back into the crew's context. If crewai is installed, it also asserts MnemoStorage is a
+sets inspeximus apart from CrewAI's default RAG storage: search() is supersession-filtered, so a corrected (keyed)
+fact is never returned back into the crew's context. If crewai is installed, it also asserts InspeximusStorage is a
 structural substitute for crewai's abstract Storage (same public method names).
 """
 import sys, pathlib, tempfile
-sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / "mnemo_pypi"))
-from mnemo import Mnemo
-from mnemo.integrations.crewai import MnemoStorage
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / "inspeximus_pypi"))
+from inspeximus import Inspeximus
+from inspeximus.integrations.crewai import InspeximusStorage
 
 
 def run():
     ok = {}
     tmp = pathlib.Path(tempfile.mkdtemp())
 
-    st = MnemoStorage(path=str(tmp / "crew.json"))
+    st = InspeximusStorage(path=str(tmp / "crew.json"))
 
     # A save() stores, search() returns CrewAI-shaped hits ({"context","metadata","score"})
     st.save("the retry limit is 5 attempts", {"kind": "config"})
@@ -32,7 +32,7 @@ def run():
     ok["C no relevant memory -> empty list"] = (empty == [])
 
     # D DIFFERENTIATOR: a corrected (keyed) fact is not returned — supersession-filtered search
-    st2 = MnemoStorage(path=str(tmp / "sup.json"))
+    st2 = InspeximusStorage(path=str(tmp / "sup.json"))
     st2.save("user timezone is UTC", {"key": "user::tz", "object": "UTC"})
     st2.save("user timezone is PST", {"key": "user::tz", "object": "PST"})   # supersedes UTC
     hits = st2.search("user timezone", limit=5)
@@ -56,7 +56,7 @@ def run():
         pass  # crewai not installed -> duck-typed contract already covered by A-F
 
     print("=" * 62)
-    print("MnemoStorage - CrewAI Storage protocol (save/search/reset) + integrity")
+    print("InspeximusStorage - CrewAI Storage protocol (save/search/reset) + integrity")
     print("=" * 62)
     for k, v in ok.items():
         print(f"  [{'PASS' if v else 'FAIL'}] {k}")

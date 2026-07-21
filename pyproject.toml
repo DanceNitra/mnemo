@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "inspeximus"
-version = "1.25.0"
-description = "The self-correcting memory layer for AI agents: when a fact is corrected, inspeximus serves the new value and resists the old one resurfacing. Zero-dependency single file + MCP server — value-ranked recall, per-type decay, consolidation, revert, and tamper-evident erasure."
+version = "1.26.0"
+description = "The self-correcting memory layer for AI agents: when a fact is corrected, Inspeximus serves the new value and resists the old one resurfacing. Zero-dependency single file + MCP server — value-ranked recall, per-type decay, consolidation, revert, and tamper-evident erasure."
 readme = "README.md"
 requires-python = ">=3.8"
 license = { text = "MIT" }
@@ -20,7 +20,7 @@ Repository = "https://github.com/DanceNitra/inspeximus"
 
 [project.optional-dependencies]
 mcp = ["mcp[cli]>=1.0"]
-# Agent-framework integrations (mnemo.integrations.*) — opt-in; the core library stays zero-dependency.
+# Agent-framework integrations (inspeximus.integrations.*) — opt-in; the core library stays zero-dependency.
 langchain = ["langchain-core"]
 langgraph = ["langgraph"]
 llamaindex = ["llama-index-core"]
@@ -32,10 +32,7 @@ crewai = ["crewai"]
 
 [project.scripts]
 inspeximus = "inspeximus.cli:main"
-inspeximus-mcp = "inspeximus.mnemo_mcp:main"
-# Deprecated aliases, kept so existing installs and MCP host configs keep working. Removed in 2.0.
-mnemo = "inspeximus.cli:main"
-mnemo-mcp = "inspeximus.mnemo_mcp:main"
+inspeximus-mcp = "inspeximus.mcp:main"
 
 [tool.setuptools]
-packages = ["inspeximus", "inspeximus.integrations", "mnemo"]
+packages = ["inspeximus", "inspeximus.integrations"]

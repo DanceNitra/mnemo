@@ -1,17 +1,17 @@
 """
-mnemo example 03 — semantic recall by bringing your own embedder.
+inspeximus example 03 — semantic recall by bringing your own embedder.
 
-    pip install agora-mnemo
+    pip install agora-inspeximus
     python 03_semantic_recall.py
 
-mnemo has no required dependencies, so it ships no embedder. Pass ANY text->vector function as `embed=` and
+inspeximus has no required dependencies, so it ships no embedder. Pass ANY text->vector function as `embed=` and
 recall becomes semantic (and, once the store grows, a lexical+semantic hybrid). Without one, recall falls back
 to lexical — so this file runs either way.
 
 To use a real model, `pip install sentence-transformers` and swap `my_embed` for the SentenceTransformer line
 below.
 """
-from mnemo import Mnemo
+from inspeximus import Inspeximus
 
 # --- Option A: a real embedder (uncomment after `pip install sentence-transformers`) --------------------------
 # from sentence_transformers import SentenceTransformer
@@ -28,7 +28,7 @@ def my_embed(text: str):
     return [x / norm for x in v]
 
 
-m = Mnemo(embed=my_embed)
+m = Inspeximus(embed=my_embed)
 
 for fact in [
     "The database connection pool maxes out at 20 connections",

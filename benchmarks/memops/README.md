@@ -1,4 +1,4 @@
-# MemOps: what happened when mnemo's correction layer was measured against a keep-everything store
+# MemOps: what happened when inspeximus's correction layer was measured against a keep-everything store
 
 Short version: **it bought nothing measurable.** This directory is the harness, the pre-registration
 written before the run, and the raw results, published because the result went against us and a null
@@ -11,13 +11,13 @@ identical answerer and judge across arms.
 
 | arm | accuracy | stale value (Update) | leakage (Forget) |
 |---|---|---|---|
-| mnemo (keyed supersession, echo_guard, read-time resolver) | 0.593 | 0.211 | 0.243 |
+| inspeximus (keyed supersession, echo_guard, read-time resolver) | 0.593 | 0.211 | 0.243 |
 | naive keep-everything store | 0.592 | 0.125 | 0.278 |
 | mem0 | 0.544 | 0.211 | 0.385 |
 | session-level BM25 | 0.442 | 0.114 | 0.333 |
 | no context (floor) | 0.058 | — | — |
 
-Bootstrap 95% CIs on every mnemo-vs-mem0 difference contain zero. Against the naive store the
+Bootstrap 95% CIs on every inspeximus-vs-mem0 difference contain zero. Against the naive store the
 accuracy difference is +0.1 pp. Pre-registered predictions P2 and P3 — that supersession would lower
 the stale-value and leakage rates — are **refuted**; P1 (parity on plain recall) and P5 (every arm
 clears the no-context floor) hold. Full verdict in `PREREGISTRATION.md`, Appendix C.
@@ -43,10 +43,10 @@ The dataset is not redistributed here. Get it from [MemTensor/MemOps](https://gi
 (MIT) and place the long-context scenarios in `data_lc/` and the evidence conversations in `data/`.
 
 ```bash
-pip install agora-mnemo mem0ai rank-bm25
+pip install inspeximus mem0ai rank-bm25
 export MEMOPS_API_KEY=...          # any OpenAI-compatible endpoint for the answerer
 python judge_calibration.py        # the gate: >=90% on gold/stale/leak or the pilot does not run
-MEMOPS_TOPK=150 python pilot.py 24 mnemo,naive,no_context,session_rag k150
+MEMOPS_TOPK=150 python pilot.py 24 inspeximus,naive,no_context,session_rag k150
 MEMOPS_TOPK=150 python pilot.py 24 mem0 mem0full
 python retrieval_coverage.py 20,60,150
 ```

@@ -8,12 +8,12 @@ whichever way it falls. If a number here is wrong, the harness is right next to 
 
 This exists because a sharp r/RAG reviewer made the fair point that self-scoring on home fixtures is
 unfalsifiable. So: native configs, a shared judge that never sees ground truth, and results published even
-where mnemo does **not** win.
+where inspeximus does **not** win.
 
 ## Methodology (the same for every system)
 
 - **Native config, no tuning in our favor.** mem0 runs on its recommended stack (gpt-4o-mini +
-  text-embedding-3-small); Graphiti runs against a live neo4j with its own LLM pipeline; mnemo runs local.
+  text-embedding-3-small); Graphiti runs against a live neo4j with its own LLM pipeline; inspeximus runs local.
 - **Shared judge.** One OpenAI model reads each system's **full memory state** (`get_all` / all valid facts,
   not just top-k search) and extracts the current value. It never sees the ground truth beyond the two
   candidate tokens, so it can also answer "unclear". Feeding the full state isolates the *integrity* question
@@ -32,21 +32,21 @@ Store a value, correct it, then issue an **unmarked** revert that names no value
     revert "{unmarked revert, no value}"
     ask   "what is the current {entity}?"   ->   A = revert honored, B = revert ignored
 
-**Symmetric instrument (fairness fix 2026-07-11).** An earlier version scored mnemo *mechanically* from its own
+**Symmetric instrument (fairness fix 2026-07-11).** An earlier version scored inspeximus *mechanically* from its own
 ledger while mem0/Graphiti went through the LLM judge — an asymmetric instrument a pre-publication red-team
 caught. Now **every system is read by the same ground-truth-blind LLM judge on its own native retrieval
-surface**. The fix dropped mnemo's headline from a flattering 1.00 to 0.75.
+surface**. The fix dropped inspeximus's headline from a flattering 1.00 to 0.75.
 
 | system | revert success (n=20) | 95% CI | what happens |
 |---|---|---|---|
-| **mnemo** (route/revert) | **0.75** | [0.53, 0.89] | intent router restores the predecessor from the version ledger; 5/20 of mnemo's own recall surface still reads ambiguous to the neutral judge |
+| **inspeximus** (route/revert) | **0.75** | [0.53, 0.89] | intent router restores the predecessor from the version ledger; 5/20 of inspeximus's own recall surface still reads ambiguous to the neutral judge |
 | mem0 2.0.11 (native) | 0.20 | [0.08, 0.42] | no revert operation — the "go back" utterance mostly isn't even stored as a fact, so the corrected value is retained (A=4, B=11, 5 unclear) |
 | Graphiti (native, live) | 0.00 | [0.00, 0.16] | no revert operation — keeps the corrected value; bitemporal invalidation fires on named contradictions, not on an unnamed "go back" (A=0, B=11, 9 unclear) |
 
 Reading: value-obscuring revert (undoing a correction from a natural-language command that names no value) is a
-capability only mnemo exposes here. mem0 and Graphiti correctly retain the corrected value; they just have no
+capability only inspeximus exposes here. mem0 and Graphiti correctly retain the corrected value; they just have no
 channel to undo it on command. Under a fair instrument even the system built for it clears only 0.75, not 1.00 —
-and the CIs on mnemo [0.53, 0.89] and mem0 [0.08, 0.42] do not overlap, so the capability gap survives at n=20.
+and the CIs on inspeximus [0.53, 0.89] and mem0 [0.08, 0.42] do not overlap, so the capability gap survives at n=20.
 
 **Prior art (this is a known-hard property, not a new axis).** Undo-and-consistency-under-update is belief
 revision (AGM, 1985), truth-maintenance systems (Doyle, 1979), and bitemporal databases (Snodgrass → SQL:2011).
@@ -55,16 +55,16 @@ STALE (2605.06527), Supersede (2606.27472), plus MemoryAgentBench (2507.05257) a
 tests *which of two conflicting facts wins*. None tests an **unmarked revert command** or an **adversarial
 echo-resurrection**; that narrow, adversarial, command-driven cut is what this harness measures.
 
-The benchmark also improved mnemo: it surfaced that `route()` missed "roll back" (mnemo was 0.80) — fixed in
+The benchmark also improved inspeximus: it surfaced that `route()` missed "roll back" (inspeximus was 0.80) — fixed in
 0.7.11.
 
 ## Run it / add your system
 
     # free, local only:
-    python mnemo/probes/integrity_bench_revert.py --systems mnemo
+    python inspeximus/probes/integrity_bench_revert.py --systems inspeximus
 
     # includes paid backends (needs OPENAI_API_KEY in server/.env; Graphiti needs a neo4j at bolt://localhost:7687):
-    python mnemo/probes/integrity_bench_revert.py --systems mnemo,mem0,graphiti --n 20
+    python inspeximus/probes/integrity_bench_revert.py --systems inspeximus,mem0,graphiti --n 20
 
 Adding a system = one adapter function with the interface `(reset, add(text), revert(text), full memory state
 for the judge)`. PRs welcome; we publish whatever it shows.
@@ -80,27 +80,27 @@ restatement). Does the current answer stay corrected, or does the stale value co
     ask   "what is the current {entity}?"    ->   B = echo resisted (good), A = resurrected (bad)
 
 **Two honest metrics, and the naive one flatters us — so we don't use it.** Counting "did the system return the
-corrected value" would show mnemo 0.90 / mem0 0.80 / Graphiti 0.55 and imply Graphiti fails echo. It does not.
+corrected value" would show inspeximus 0.90 / mem0 0.80 / Graphiti 0.55 and imply Graphiti fails echo. It does not.
 Measured under the same symmetric instrument as Cell 1 (n=20):
 
 | system | resurrection rate (the attack, lower=better) | 95% CI | clean current-truth rate (answer clarity) |
 |---|---|---|---|
-| **mnemo** (echo_guard) | **0.00** | [0.00, 0.16] | 0.90 |
+| **inspeximus** (echo_guard) | **0.00** | [0.00, 0.16] | 0.90 |
 | mem0 2.0.11 (native) | **0.05** | [0.01, 0.24] | 0.80 |
 | Graphiti (native, live) | **0.00** | [0.00, 0.16] | 0.55 |
 
 The real finding: **no system systematically resurrects the stale value** — resurrection is at or near zero
-across the board (mnemo 0/20, Graphiti 0/20, mem0 1/20 = 0.05; within noise, not a systematic failure). An
-earlier probe of ours over-stated this failure mode; corrected here. Note mnemo's clean rate is 0.90, not a
-suspiciously perfect 1.00 — under the fair instrument even mnemo's recall surface reads ambiguous to the judge
-2/20 of the time. Where the systems actually differ is *answer clarity*: mnemo and mem0 hand back a single
+across the board (inspeximus 0/20, Graphiti 0/20, mem0 1/20 = 0.05; within noise, not a systematic failure). An
+earlier probe of ours over-stated this failure mode; corrected here. Note inspeximus's clean rate is 0.90, not a
+suspiciously perfect 1.00 — under the fair instrument even inspeximus's recall surface reads ambiguous to the judge
+2/20 of the time. Where the systems actually differ is *answer clarity*: inspeximus and mem0 hand back a single
 current value; Graphiti, by bitemporal design, surfaces both the invalidated old edge and the valid new one, so
 a naive reader (our judge, 9/20) sees ambiguity — that is a different retrieval contract, **not** a resurrection. If
 your consumer resolves validity itself, Graphiti's behaviour is correct; if it just reads the top facts, the
 ambiguity can bite.
 
 This cell is the honest counterweight to the revert cell: on the attack that actually matters (resurrection),
-mnemo does **not** win — every system lands at or near zero. Publishing that is the whole point.
+inspeximus does **not** win — every system lands at or near zero. Publishing that is the whole point.
 
 ## Planned cells (harness shape is the same)
 
@@ -108,4 +108,4 @@ mnemo does **not** win — every system lands at or near zero. Publishing that i
   a shared harness to compare on the same fixture.
 
 Every number traces to a probe in this folder. Nothing here is a claim about recall quality — we have not
-benchmarked mnemo's retrieval against mem0/Zep and assume they lead on that axis until we show otherwise.
+benchmarked inspeximus's retrieval against mem0/Zep and assume they lead on that axis until we show otherwise.

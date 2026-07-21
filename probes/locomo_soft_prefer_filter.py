@@ -1,27 +1,27 @@
-"""Validate mnemo's SHIPPED soft `prefer` filter on LoCoMo — end-to-end through mnemo.recall(), not a
+"""Validate inspeximus's SHIPPED soft `prefer` filter on LoCoMo — end-to-end through inspeximus.recall(), not a
 standalone reimplementation. Confirms the alias-strength-weighted soft filter beats BOTH no filter and a
 hard `where` filter under imperfect (ambiguous) metadata extraction.
 
-Setup: one Mnemo store per LoCoMo conversation (semantic hybrid mode; local nomic embedder via the warm
+Setup: one Inspeximus store per LoCoMo conversation (semantic hybrid mode; local nomic embedder via the warm
 cache). Each dialogue turn is remembered with meta={"speaker": <name>}. For each question we pick the
 speaker to filter on + an alias-strength trust:
   - EXACT: the speaker's name is literally in the question -> chosen = that speaker, alias_strength = 1.0
     (reliable; not error-injected).
   - AMBIGUOUS: no name in the question -> the extractor GUESSES (majority speaker of the top-10 plain
     recall) -> alias_strength = 0.0 (unreliable; this is where extraction actually fails).
-Three retrievals, all via mnemo.recall:
+Three retrievals, all via inspeximus.recall:
   - no_filter:  recall(q)                              (plain hybrid)
-  - hard_where: recall(q, where={"speaker": chosen})   (mnemo's existing HARD filter)
+  - hard_where: recall(q, where={"speaker": chosen})   (inspeximus's existing HARD filter)
   - soft_prefer: recall(q, prefer={"speaker": chosen}, prefer_trust=alias_strength)  (the NEW feature)
 Metric: recall@20 overall + on the harm subset (chosen speaker is wrong). Value/last_access are snapshotted
 and restored around each method so recall's reinforcement can't bias the comparison. Reuses the warm cache.
 Run: LOCOMO_PATH=agora_output/lab/data/locomo10.json \
      LOCOMO_CACHE=agora_output/lab/data/locomo_confweighted_cache.json \
-     python mnemo/probes/locomo_soft_prefer_filter.py
+     python inspeximus/probes/locomo_soft_prefer_filter.py
 """
 import json, re, ast, time, hashlib, os, urllib.request, collections, random, sys
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-from mnemo import Mnemo
+from inspeximus import Inspeximus
 
 DATA = os.environ.get("LOCOMO_PATH", "agora_output/lab/data/locomo10.json")
 CACHE = os.environ.get("LOCOMO_CACHE", "agora_output/lab/data/locomo_confweighted_cache.json")
@@ -75,7 +75,7 @@ for ci, D0 in enumerate(D):
     turns = []
     for sk in sorted([k for k in conv if re.fullmatch(r"session_\d+", k)], key=lambda s: int(s.split("_")[1])):
         for t in conv[sk]: turns.append((t["dia_id"], t["text"], t["speaker"]))
-    m = Mnemo(embed=embed); m.semantic_threshold = 1
+    m = Inspeximus(embed=embed); m.semantic_threshold = 1
     dia2id = {}
     for dia, txt, sp in turns:
         mid = m.remember(txt, meta={"speaker": sp, "dia": dia}); dia2id[dia] = mid
@@ -124,7 +124,7 @@ def boot(dl, it=10000, seed=17):
     r = random.Random(seed); n = len(dl); s = [mean([dl[r.randrange(n)] for _ in range(n)]) for _ in range(it)]
     s.sort(); return s[int(.025*it)], s[int(.975*it)]
 base = per_conv["no_filter"]
-print(f"\n=== mnemo SHIPPED soft `prefer` filter on LoCoMo (recall@{K}, n_q={n_q}, 10 conv) ===")
+print(f"\n=== inspeximus SHIPPED soft `prefer` filter on LoCoMo (recall@{K}, n_q={n_q}, 10 conv) ===")
 print(f"exact-name firings {fex} (wrong {wex}, {100*wex//max(fex,1)}%); ambiguous-guess firings {fam} "
       f"(wrong {wam}, {100*wam//max(fam,1)}%); harm subset n={len(harm['no_filter'])}")
 print(f"\n{'method':<14}{'recall@20':>10}{'delta':>9}{'wins':>7}")
@@ -140,5 +140,5 @@ out = {"k": K, "n_q": n_q, "fire_exact": fex, "wrong_exact": wex, "fire_ambiguou
        "harm_n": len(harm["no_filter"]),
        "recall@20": {mm: round(mean(per_conv[mm]), 4) for mm in METHODS},
        "harm_subset": {mm: {"mean": round(mean(harm[mm]), 4) if harm[mm] else None, "n": len(harm[mm])} for mm in METHODS}}
-json.dump(out, open("mnemo/probes/locomo_soft_prefer_filter_result.json", "w"), indent=1)
-print("\nsaved: mnemo/probes/locomo_soft_prefer_filter_result.json")
+json.dump(out, open("inspeximus/probes/locomo_soft_prefer_filter_result.json", "w"), indent=1)
+print("\nsaved: inspeximus/probes/locomo_soft_prefer_filter_result.json")

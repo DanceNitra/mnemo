@@ -1,12 +1,12 @@
-"""mnemo_adk_adapter_probe.py — MnemoMemoryService works with the REAL Google ADK BaseMemoryService.
+"""inspeximus_adk_adapter_probe.py — InspeximusMemoryService works with the REAL Google ADK BaseMemoryService.
 
 Requires google-adk. Verifies add_session_to_memory/search_memory round-trip, per-user isolation, the
 supersession-filtered current-truth differentiator, and the per-user erasure bonus.
 """
 import sys, pathlib, asyncio, tempfile
-sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / "mnemo_pypi"))
-from mnemo import Mnemo, new_receipt_keypair
-from mnemo.integrations.google_adk import MnemoMemoryService
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / "inspeximus_pypi"))
+from inspeximus import Inspeximus, new_receipt_keypair
+from inspeximus.integrations.google_adk import InspeximusMemoryService
 from google.adk.sessions import Session
 from google.adk.events import Event
 from google.genai import types as gt
@@ -20,7 +20,7 @@ def _sess(app, user, sid, texts, author="user"):
 async def run():
     ok = {}
     tmp = pathlib.Path(tempfile.mkdtemp())
-    svc = MnemoMemoryService(path=str(tmp / "m.json"), k=10)
+    svc = InspeximusMemoryService(path=str(tmp / "m.json"), k=10)
 
     await svc.add_session_to_memory(_sess("app", "alice", "s1",
         ["the retry limit is 5 attempts", "the project deadline is in July"]))
@@ -38,21 +38,21 @@ async def run():
         "dark mode" in " ".join(p.text for p in mm.content.parts) for mm in rb.memories)
 
     # C differentiator: a corrected (keyed) fact is not returned — supersession-filtered
-    store = Mnemo(path=str(tmp / "sup.json"))
+    store = Inspeximus(path=str(tmp / "sup.json"))
     subj = "adk::app::carol"
     store.remember("carol timezone is UTC", key="carol::tz", object="UTC", source={"doc": subj},
                    meta={"adk_app": "app", "adk_user": "carol", "adk_role": "user"})
     store.remember("carol timezone is PST", key="carol::tz", object="PST", source={"doc": subj},
                    meta={"adk_app": "app", "adk_user": "carol", "adk_role": "user"})
-    svc2 = MnemoMemoryService(store=store, k=10)
+    svc2 = InspeximusMemoryService(store=store, k=10)
     rc = await svc2.search_memory(app_name="app", user_id="carol", query="carol timezone")
     ctext = " ".join(" ".join(p.text for p in mm.content.parts) for mm in rc.memories)
     ok["C current-truth (PST in, UTC out)"] = ("PST" in ctext and "UTC" not in ctext)
 
     # D erasure bonus: forget a user + signed tombstone, audit stays intact
     sk, pk = new_receipt_keypair()
-    gstore = Mnemo(path=str(tmp / "gov.json"), receipts=True, receipt_key=sk, receipt_pubkey=pk)
-    gsvc = MnemoMemoryService(store=gstore)
+    gstore = Inspeximus(path=str(tmp / "gov.json"), receipts=True, receipt_key=sk, receipt_pubkey=pk)
+    gsvc = InspeximusMemoryService(store=gstore)
     await gsvc.add_session_to_memory(_sess("app", "dave", "s3", ["dave secret note"]))
     res = gsvc.forget_subject_for("app", "dave", request_id="dsar-1")
     verify_ok, _ = gstore.verify_writes(expected_pubkey=pk)
@@ -60,7 +60,7 @@ async def run():
     ok["D erasure + accounted-for audit"] = (res["erased"] >= 1 and verify_ok and rd.memories == [])
 
     print("=" * 60)
-    print("MnemoMemoryService - Google ADK BaseMemoryService (real google-adk)")
+    print("InspeximusMemoryService - Google ADK BaseMemoryService (real google-adk)")
     print("=" * 60)
     for k, v in ok.items():
         print(f"  [{'PASS' if v else 'FAIL'}] {k}")

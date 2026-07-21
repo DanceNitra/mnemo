@@ -2,7 +2,7 @@
  {
   "file": "A01_reflect.json",
   "op": "reflect",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "operation_trace",
   "answer_score": 0,
   "stale_value": null,
@@ -12,7 +12,7 @@
  {
   "file": "A01_reflect.json",
   "op": "reflect",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "target_binding",
   "answer_score": 0,
   "stale_value": null,
@@ -22,7 +22,7 @@
  {
   "file": "A01_reflect.json",
   "op": "reflect",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "target_binding",
   "answer_score": 0,
   "stale_value": null,
@@ -32,7 +32,7 @@
  {
   "file": "A01_reflect.json",
   "op": "reflect",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "state_reasoning",
   "answer_score": 0,
   "stale_value": null,
@@ -42,7 +42,7 @@
  {
   "file": "A01_reflect.json",
   "op": "reflect",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "state_reasoning",
   "answer_score": 0,
   "stale_value": null,
@@ -52,7 +52,7 @@
  {
   "file": "A01_reflect.json",
   "op": "reflect",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "distractor_control",
   "answer_score": 0,
   "stale_value": null,
@@ -62,7 +62,7 @@
  {
   "file": "A01_reflect.json",
   "op": "reflect",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "distractor_control",
   "answer_score": 0,
   "stale_value": null,
@@ -72,7 +72,7 @@
  {
   "file": "A01_reflect.json",
   "op": "reflect",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "downstream_application",
   "answer_score": 0,
   "stale_value": null,
@@ -82,7 +82,7 @@
  {
   "file": "A01_reflect.json",
   "op": "reflect",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "downstream_application",
   "answer_score": 0,
   "stale_value": null,
@@ -392,7 +392,7 @@
  {
   "file": "A01_remember.json",
   "op": "remember",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "operation_trace",
   "answer_score": 0,
   "stale_value": null,
@@ -402,7 +402,7 @@
  {
   "file": "A01_remember.json",
   "op": "remember",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "operation_trace",
   "answer_score": 0,
   "stale_value": null,
@@ -412,7 +412,7 @@
  {
   "file": "A01_remember.json",
   "op": "remember",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "target_binding",
   "answer_score": 1,
   "stale_value": null,
@@ -422,7 +422,7 @@
  {
   "file": "A01_remember.json",
   "op": "remember",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "target_binding",
   "answer_score": 1,
   "stale_value": null,
@@ -432,7 +432,7 @@
  {
   "file": "A01_remember.json",
   "op": "remember",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "state_reasoning",
   "answer_score": 1,
   "stale_value": null,
@@ -442,7 +442,7 @@
  {
   "file": "A01_remember.json",
   "op": "remember",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "state_reasoning",
   "answer_score": 1,
   "stale_value": null,
@@ -452,7 +452,7 @@
  {
   "file": "A01_remember.json",
   "op": "remember",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "distractor_control",
   "answer_score": 1,
   "stale_value": null,
@@ -462,7 +462,7 @@
  {
   "file": "A01_remember.json",
   "op": "remember",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "distractor_control",
   "answer_score": 1,
   "stale_value": null,
@@ -472,7 +472,7 @@
  {
   "file": "A01_remember.json",
   "op": "remember",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "downstream_application",
   "answer_score": 0,
   "stale_value": null,
@@ -482,7 +482,7 @@
  {
   "file": "A01_remember.json",
   "op": "remember",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "downstream_application",
   "answer_score": 0,
   "stale_value": null,
@@ -492,7 +492,7 @@
  {
   "file": "A01_remember.json",
   "op": "remember",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "state_reasoning",
   "answer_score": 1,
   "stale_value": null,
@@ -502,7 +502,7 @@
  {
   "file": "A01_remember.json",
   "op": "remember",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "state_reasoning",
   "answer_score": 1,
   "stale_value": null,
@@ -862,7 +862,7 @@
  {
   "file": "A01_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "operation_trace",
   "answer_score": 0,
   "stale_value": 0,
@@ -872,7 +872,7 @@
  {
   "file": "A01_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "operation_trace",
   "answer_score": 0,
   "stale_value": null,
@@ -882,7 +882,7 @@
  {
   "file": "A01_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "target_binding",
   "answer_score": 0,
   "stale_value": 0,
@@ -892,7 +892,7 @@
  {
   "file": "A01_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "target_binding",
   "answer_score": 0,
   "stale_value": 0,
@@ -902,7 +902,7 @@
  {
   "file": "A01_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "state_reasoning",
   "answer_score": 1,
   "stale_value": 0,
@@ -912,7 +912,7 @@
  {
   "file": "A01_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "state_reasoning",
   "answer_score": 1,
   "stale_value": 0,
@@ -922,7 +922,7 @@
  {
   "file": "A01_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "downstream_application",
   "answer_score": 0,
   "stale_value": 0,
@@ -932,7 +932,7 @@
  {
   "file": "A01_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "downstream_application",
   "answer_score": 0,
   "stale_value": 0,
@@ -942,7 +942,7 @@
  {
   "file": "A01_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "trajectory_reasoning",
   "answer_score": 0,
   "stale_value": 0,
@@ -952,7 +952,7 @@
  {
   "file": "A01_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "trajectory_reasoning",
   "answer_score": 0,
   "stale_value": 0,
@@ -1262,7 +1262,7 @@
  {
   "file": "A01_update.json",
   "op": "update",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "operation_trace",
   "answer_score": 0,
   "stale_value": 0,
@@ -1272,7 +1272,7 @@
  {
   "file": "A01_update.json",
   "op": "update",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "operation_trace",
   "answer_score": 0,
   "stale_value": 0,
@@ -1282,7 +1282,7 @@
  {
   "file": "A01_update.json",
   "op": "update",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "target_binding",
   "answer_score": 1,
   "stale_value": 0,
@@ -1292,7 +1292,7 @@
  {
   "file": "A01_update.json",
   "op": "update",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "target_binding",
   "answer_score": 0,
   "stale_value": 0,
@@ -1302,7 +1302,7 @@
  {
   "file": "A01_update.json",
   "op": "update",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "distractor_control",
   "answer_score": 1,
   "stale_value": 0,
@@ -1312,7 +1312,7 @@
  {
   "file": "A01_update.json",
   "op": "update",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "distractor_control",
   "answer_score": 1,
   "stale_value": 0,
@@ -1322,7 +1322,7 @@
  {
   "file": "A01_update.json",
   "op": "update",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "downstream_application",
   "answer_score": 0,
   "stale_value": 0,
@@ -1332,7 +1332,7 @@
  {
   "file": "A01_update.json",
   "op": "update",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "downstream_application",
   "answer_score": 0,
   "stale_value": 0,
@@ -1572,7 +1572,7 @@
  {
   "file": "A02_forget.json",
   "op": "forget",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "operation_trace",
   "answer_score": 0,
   "stale_value": null,
@@ -1582,7 +1582,7 @@
  {
   "file": "A02_forget.json",
   "op": "forget",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "operation_trace",
   "answer_score": 0,
   "stale_value": null,
@@ -1592,7 +1592,7 @@
  {
   "file": "A02_forget.json",
   "op": "forget",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "target_binding",
   "answer_score": 0,
   "stale_value": null,
@@ -1602,7 +1602,7 @@
  {
   "file": "A02_forget.json",
   "op": "forget",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "target_binding",
   "answer_score": 0,
   "stale_value": null,
@@ -1612,7 +1612,7 @@
  {
   "file": "A02_forget.json",
   "op": "forget",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "state_reasoning",
   "answer_score": 0,
   "stale_value": null,
@@ -1622,7 +1622,7 @@
  {
   "file": "A02_forget.json",
   "op": "forget",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "state_reasoning",
   "answer_score": 0,
   "stale_value": null,
@@ -1632,7 +1632,7 @@
  {
   "file": "A02_forget.json",
   "op": "forget",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "distractor_control",
   "answer_score": 0,
   "stale_value": 0,
@@ -1642,7 +1642,7 @@
  {
   "file": "A02_forget.json",
   "op": "forget",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "distractor_control",
   "answer_score": 0,
   "stale_value": 0,
@@ -1652,7 +1652,7 @@
  {
   "file": "A02_forget.json",
   "op": "forget",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "downstream_application",
   "answer_score": 0,
   "stale_value": null,
@@ -1662,7 +1662,7 @@
  {
   "file": "A02_forget.json",
   "op": "forget",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "downstream_application",
   "answer_score": 0,
   "stale_value": null,
@@ -1728,16 +1728,6 @@
   "stale_value": null,
   "leakage": null,
   "over_forget": 1
- },
- {
-  "file": "A02_forget.json",
-  "op": "forget",
-  "arm": "naive",
-  "category": "distractor_control",
-  "answer_score": 0,
-  "stale_value": null,
-  "leakage": 1,
-  "over_forget": 0
  },
  {
   "file": "A02_forget.json",
@@ -1753,6 +1743,16 @@
   "file": "A02_forget.json",
   "op": "forget",
   "arm": "naive",
+  "category": "distractor_control",
+  "answer_score": 0,
+  "stale_value": null,
+  "leakage": 1,
+  "over_forget": 0
+ },
+ {
+  "file": "A02_forget.json",
+  "op": "forget",
+  "arm": "naive",
   "category": "downstream_application",
   "answer_score": 0,
   "stale_value": null,
@@ -1972,7 +1972,7 @@
  {
   "file": "A02_reflect.json",
   "op": "reflect",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "operation_trace",
   "answer_score": 0,
   "stale_value": null,
@@ -1982,7 +1982,7 @@
  {
   "file": "A02_reflect.json",
   "op": "reflect",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "operation_trace",
   "answer_score": 0,
   "stale_value": null,
@@ -1992,7 +1992,7 @@
  {
   "file": "A02_reflect.json",
   "op": "reflect",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "target_binding",
   "answer_score": 0,
   "stale_value": null,
@@ -2002,7 +2002,7 @@
  {
   "file": "A02_reflect.json",
   "op": "reflect",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "target_binding",
   "answer_score": 0,
   "stale_value": null,
@@ -2012,7 +2012,7 @@
  {
   "file": "A02_reflect.json",
   "op": "reflect",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "state_reasoning",
   "answer_score": 0,
   "stale_value": null,
@@ -2022,7 +2022,7 @@
  {
   "file": "A02_reflect.json",
   "op": "reflect",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "state_reasoning",
   "answer_score": 0,
   "stale_value": null,
@@ -2032,7 +2032,7 @@
  {
   "file": "A02_reflect.json",
   "op": "reflect",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "distractor_control",
   "answer_score": 0,
   "stale_value": null,
@@ -2042,7 +2042,7 @@
  {
   "file": "A02_reflect.json",
   "op": "reflect",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "distractor_control",
   "answer_score": 0,
   "stale_value": null,
@@ -2052,7 +2052,7 @@
  {
   "file": "A02_reflect.json",
   "op": "reflect",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "downstream_application",
   "answer_score": 0,
   "stale_value": null,
@@ -2062,7 +2062,7 @@
  {
   "file": "A02_reflect.json",
   "op": "reflect",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "downstream_application",
   "answer_score": 0,
   "stale_value": null,
@@ -2372,7 +2372,7 @@
  {
   "file": "A02_remember.json",
   "op": "remember",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "operation_trace",
   "answer_score": 0,
   "stale_value": null,
@@ -2382,7 +2382,7 @@
  {
   "file": "A02_remember.json",
   "op": "remember",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "operation_trace",
   "answer_score": 0,
   "stale_value": null,
@@ -2392,7 +2392,7 @@
  {
   "file": "A02_remember.json",
   "op": "remember",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "target_binding",
   "answer_score": 0,
   "stale_value": null,
@@ -2402,7 +2402,7 @@
  {
   "file": "A02_remember.json",
   "op": "remember",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "target_binding",
   "answer_score": 0,
   "stale_value": null,
@@ -2412,7 +2412,7 @@
  {
   "file": "A02_remember.json",
   "op": "remember",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "state_reasoning",
   "answer_score": 1,
   "stale_value": null,
@@ -2422,7 +2422,7 @@
  {
   "file": "A02_remember.json",
   "op": "remember",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "state_reasoning",
   "answer_score": 1,
   "stale_value": null,
@@ -2432,7 +2432,7 @@
  {
   "file": "A02_remember.json",
   "op": "remember",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "distractor_control",
   "answer_score": 1,
   "stale_value": null,
@@ -2442,7 +2442,7 @@
  {
   "file": "A02_remember.json",
   "op": "remember",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "distractor_control",
   "answer_score": 1,
   "stale_value": null,
@@ -2452,7 +2452,7 @@
  {
   "file": "A02_remember.json",
   "op": "remember",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "downstream_application",
   "answer_score": 0,
   "stale_value": null,
@@ -2462,7 +2462,7 @@
  {
   "file": "A02_remember.json",
   "op": "remember",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "downstream_application",
   "answer_score": 0,
   "stale_value": null,
@@ -2472,7 +2472,7 @@
  {
   "file": "A02_remember.json",
   "op": "remember",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "state_reasoning",
   "answer_score": 1,
   "stale_value": null,
@@ -2482,7 +2482,7 @@
  {
   "file": "A02_remember.json",
   "op": "remember",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "state_reasoning",
   "answer_score": 1,
   "stale_value": null,
@@ -2852,7 +2852,7 @@
  {
   "file": "A02_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "operation_trace",
   "answer_score": 0,
   "stale_value": null,
@@ -2862,7 +2862,7 @@
  {
   "file": "A02_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "operation_trace",
   "answer_score": 0,
   "stale_value": null,
@@ -2872,7 +2872,7 @@
  {
   "file": "A02_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "target_binding",
   "answer_score": 1,
   "stale_value": 1,
@@ -2882,7 +2882,7 @@
  {
   "file": "A02_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "target_binding",
   "answer_score": 1,
   "stale_value": 1,
@@ -2892,7 +2892,7 @@
  {
   "file": "A02_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "state_reasoning",
   "answer_score": 0,
   "stale_value": 1,
@@ -2902,7 +2902,7 @@
  {
   "file": "A02_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "state_reasoning",
   "answer_score": 0,
   "stale_value": 1,
@@ -2912,7 +2912,7 @@
  {
   "file": "A02_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "downstream_application",
   "answer_score": 0,
   "stale_value": null,
@@ -2922,7 +2922,7 @@
  {
   "file": "A02_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "downstream_application",
   "answer_score": 0,
   "stale_value": 0,
@@ -2932,7 +2932,7 @@
  {
   "file": "A02_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "trajectory_reasoning",
   "answer_score": 0,
   "stale_value": 0,
@@ -2942,7 +2942,7 @@
  {
   "file": "A02_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "trajectory_reasoning",
   "answer_score": 0,
   "stale_value": 0,
@@ -3252,7 +3252,7 @@
  {
   "file": "A02_update.json",
   "op": "update",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "operation_trace",
   "answer_score": 0,
   "stale_value": 0,
@@ -3262,7 +3262,7 @@
  {
   "file": "A02_update.json",
   "op": "update",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "operation_trace",
   "answer_score": 0,
   "stale_value": 0,
@@ -3272,7 +3272,7 @@
  {
   "file": "A02_update.json",
   "op": "update",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "target_binding",
   "answer_score": 1,
   "stale_value": 0,
@@ -3282,7 +3282,7 @@
  {
   "file": "A02_update.json",
   "op": "update",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "target_binding",
   "answer_score": 1,
   "stale_value": 0,
@@ -3292,7 +3292,7 @@
  {
   "file": "A02_update.json",
   "op": "update",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "distractor_control",
   "answer_score": 0,
   "stale_value": 1,
@@ -3302,7 +3302,7 @@
  {
   "file": "A02_update.json",
   "op": "update",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "distractor_control",
   "answer_score": 0,
   "stale_value": 1,
@@ -3312,7 +3312,7 @@
  {
   "file": "A02_update.json",
   "op": "update",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "downstream_application",
   "answer_score": 0,
   "stale_value": 0,
@@ -3322,7 +3322,7 @@
  {
   "file": "A02_update.json",
   "op": "update",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "downstream_application",
   "answer_score": 0,
   "stale_value": null,
@@ -3572,7 +3572,7 @@
  {
   "file": "A04_forget.json",
   "op": "forget",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "operation_trace",
   "answer_score": 0,
   "stale_value": null,
@@ -3582,7 +3582,7 @@
  {
   "file": "A04_forget.json",
   "op": "forget",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "operation_trace",
   "answer_score": 0,
   "stale_value": null,
@@ -3592,7 +3592,7 @@
  {
   "file": "A04_forget.json",
   "op": "forget",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "target_binding",
   "answer_score": 0,
   "stale_value": null,
@@ -3602,7 +3602,7 @@
  {
   "file": "A04_forget.json",
   "op": "forget",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "target_binding",
   "answer_score": 0,
   "stale_value": null,
@@ -3612,7 +3612,7 @@
  {
   "file": "A04_forget.json",
   "op": "forget",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "state_reasoning",
   "answer_score": 0,
   "stale_value": null,
@@ -3622,7 +3622,7 @@
  {
   "file": "A04_forget.json",
   "op": "forget",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "state_reasoning",
   "answer_score": 0,
   "stale_value": null,
@@ -3632,7 +3632,7 @@
  {
   "file": "A04_forget.json",
   "op": "forget",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "distractor_control",
   "answer_score": 0,
   "stale_value": null,
@@ -3642,7 +3642,7 @@
  {
   "file": "A04_forget.json",
   "op": "forget",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "distractor_control",
   "answer_score": 0,
   "stale_value": null,
@@ -3652,7 +3652,7 @@
  {
   "file": "A04_forget.json",
   "op": "forget",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "downstream_application",
   "answer_score": 0,
   "stale_value": null,
@@ -3662,7 +3662,7 @@
  {
   "file": "A04_forget.json",
   "op": "forget",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "downstream_application",
   "answer_score": 0,
   "stale_value": null,
@@ -3972,7 +3972,7 @@
  {
   "file": "A04_reflect.json",
   "op": "reflect",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "operation_trace",
   "answer_score": 0,
   "stale_value": null,
@@ -3982,7 +3982,7 @@
  {
   "file": "A04_reflect.json",
   "op": "reflect",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "operation_trace",
   "answer_score": 0,
   "stale_value": null,
@@ -3992,7 +3992,7 @@
  {
   "file": "A04_reflect.json",
   "op": "reflect",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "target_binding",
   "answer_score": 0,
   "stale_value": null,
@@ -4002,7 +4002,7 @@
  {
   "file": "A04_reflect.json",
   "op": "reflect",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "target_binding",
   "answer_score": 0,
   "stale_value": null,
@@ -4012,7 +4012,7 @@
  {
   "file": "A04_reflect.json",
   "op": "reflect",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "state_reasoning",
   "answer_score": 1,
   "stale_value": null,
@@ -4022,7 +4022,7 @@
  {
   "file": "A04_reflect.json",
   "op": "reflect",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "state_reasoning",
   "answer_score": 1,
   "stale_value": null,
@@ -4032,7 +4032,7 @@
  {
   "file": "A04_reflect.json",
   "op": "reflect",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "distractor_control",
   "answer_score": 0,
   "stale_value": null,
@@ -4042,7 +4042,7 @@
  {
   "file": "A04_reflect.json",
   "op": "reflect",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "distractor_control",
   "answer_score": 0,
   "stale_value": null,
@@ -4052,7 +4052,7 @@
  {
   "file": "A04_reflect.json",
   "op": "reflect",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "downstream_application",
   "answer_score": 0,
   "stale_value": null,
@@ -4062,7 +4062,7 @@
  {
   "file": "A04_reflect.json",
   "op": "reflect",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "downstream_application",
   "answer_score": 0,
   "stale_value": null,
@@ -4372,7 +4372,7 @@
  {
   "file": "A04_remember.json",
   "op": "remember",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "operation_trace",
   "answer_score": 0,
   "stale_value": null,
@@ -4382,7 +4382,7 @@
  {
   "file": "A04_remember.json",
   "op": "remember",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "operation_trace",
   "answer_score": 0,
   "stale_value": null,
@@ -4392,7 +4392,7 @@
  {
   "file": "A04_remember.json",
   "op": "remember",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "target_binding",
   "answer_score": 0,
   "stale_value": null,
@@ -4402,7 +4402,7 @@
  {
   "file": "A04_remember.json",
   "op": "remember",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "target_binding",
   "answer_score": 1,
   "stale_value": null,
@@ -4412,7 +4412,7 @@
  {
   "file": "A04_remember.json",
   "op": "remember",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "state_reasoning",
   "answer_score": 1,
   "stale_value": null,
@@ -4422,7 +4422,7 @@
  {
   "file": "A04_remember.json",
   "op": "remember",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "state_reasoning",
   "answer_score": 1,
   "stale_value": null,
@@ -4432,7 +4432,7 @@
  {
   "file": "A04_remember.json",
   "op": "remember",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "distractor_control",
   "answer_score": 1,
   "stale_value": null,
@@ -4442,7 +4442,7 @@
  {
   "file": "A04_remember.json",
   "op": "remember",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "distractor_control",
   "answer_score": 1,
   "stale_value": null,
@@ -4452,7 +4452,7 @@
  {
   "file": "A04_remember.json",
   "op": "remember",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "downstream_application",
   "answer_score": 1,
   "stale_value": null,
@@ -4462,7 +4462,7 @@
  {
   "file": "A04_remember.json",
   "op": "remember",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "downstream_application",
   "answer_score": 1,
   "stale_value": null,
@@ -4472,7 +4472,7 @@
  {
   "file": "A04_remember.json",
   "op": "remember",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "state_reasoning",
   "answer_score": 1,
   "stale_value": null,
@@ -4482,7 +4482,7 @@
  {
   "file": "A04_remember.json",
   "op": "remember",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "state_reasoning",
   "answer_score": 1,
   "stale_value": null,
@@ -4852,7 +4852,7 @@
  {
   "file": "A04_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "operation_trace",
   "answer_score": 0,
   "stale_value": 0,
@@ -4862,7 +4862,7 @@
  {
   "file": "A04_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "operation_trace",
   "answer_score": 0,
   "stale_value": 0,
@@ -4872,7 +4872,7 @@
  {
   "file": "A04_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "target_binding",
   "answer_score": 0,
   "stale_value": null,
@@ -4882,7 +4882,7 @@
  {
   "file": "A04_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "target_binding",
   "answer_score": 0,
   "stale_value": null,
@@ -4892,7 +4892,7 @@
  {
   "file": "A04_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "state_reasoning",
   "answer_score": 0,
   "stale_value": 1,
@@ -4902,7 +4902,7 @@
  {
   "file": "A04_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "state_reasoning",
   "answer_score": 0,
   "stale_value": 1,
@@ -4912,7 +4912,7 @@
  {
   "file": "A04_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "downstream_application",
   "answer_score": 0,
   "stale_value": 0,
@@ -4922,7 +4922,7 @@
  {
   "file": "A04_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "downstream_application",
   "answer_score": 0,
   "stale_value": 0,
@@ -4932,7 +4932,7 @@
  {
   "file": "A04_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "trajectory_reasoning",
   "answer_score": 0,
   "stale_value": 1,
@@ -4942,7 +4942,7 @@
  {
   "file": "A04_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "trajectory_reasoning",
   "answer_score": 0,
   "stale_value": 1,
@@ -5252,7 +5252,7 @@
  {
   "file": "A05_update.json",
   "op": "update",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "operation_trace",
   "answer_score": 0,
   "stale_value": 1,
@@ -5262,7 +5262,7 @@
  {
   "file": "A05_update.json",
   "op": "update",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "operation_trace",
   "answer_score": 0,
   "stale_value": 1,
@@ -5272,7 +5272,7 @@
  {
   "file": "A05_update.json",
   "op": "update",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "target_binding",
   "answer_score": 1,
   "stale_value": 0,
@@ -5282,7 +5282,7 @@
  {
   "file": "A05_update.json",
   "op": "update",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "target_binding",
   "answer_score": 1,
   "stale_value": 0,
@@ -5292,7 +5292,7 @@
  {
   "file": "A05_update.json",
   "op": "update",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "distractor_control",
   "answer_score": 1,
   "stale_value": 0,
@@ -5302,7 +5302,7 @@
  {
   "file": "A05_update.json",
   "op": "update",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "distractor_control",
   "answer_score": 1,
   "stale_value": 0,
@@ -5312,7 +5312,7 @@
  {
   "file": "A05_update.json",
   "op": "update",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "downstream_application",
   "answer_score": 0,
   "stale_value": null,
@@ -5322,7 +5322,7 @@
  {
   "file": "A05_update.json",
   "op": "update",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "downstream_application",
   "answer_score": 0,
   "stale_value": null,
@@ -5572,7 +5572,7 @@
  {
   "file": "A05_forget.json",
   "op": "forget",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "operation_trace",
   "answer_score": 0,
   "stale_value": null,
@@ -5582,7 +5582,7 @@
  {
   "file": "A05_forget.json",
   "op": "forget",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "operation_trace",
   "answer_score": 0,
   "stale_value": null,
@@ -5592,7 +5592,7 @@
  {
   "file": "A05_forget.json",
   "op": "forget",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "target_binding",
   "answer_score": 0,
   "stale_value": null,
@@ -5602,7 +5602,7 @@
  {
   "file": "A05_forget.json",
   "op": "forget",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "target_binding",
   "answer_score": 0,
   "stale_value": null,
@@ -5612,7 +5612,7 @@
  {
   "file": "A05_forget.json",
   "op": "forget",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "state_reasoning",
   "answer_score": 0,
   "stale_value": null,
@@ -5622,7 +5622,7 @@
  {
   "file": "A05_forget.json",
   "op": "forget",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "state_reasoning",
   "answer_score": 0,
   "stale_value": null,
@@ -5632,7 +5632,7 @@
  {
   "file": "A05_forget.json",
   "op": "forget",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "distractor_control",
   "answer_score": 0,
   "stale_value": null,
@@ -5642,7 +5642,7 @@
  {
   "file": "A05_forget.json",
   "op": "forget",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "distractor_control",
   "answer_score": 0,
   "stale_value": 0,
@@ -5652,7 +5652,7 @@
  {
   "file": "A05_forget.json",
   "op": "forget",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "downstream_application",
   "answer_score": 0,
   "stale_value": 0,
@@ -5662,7 +5662,7 @@
  {
   "file": "A05_forget.json",
   "op": "forget",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "downstream_application",
   "answer_score": 0,
   "stale_value": null,
@@ -5972,7 +5972,7 @@
  {
   "file": "A05_reflect.json",
   "op": "reflect",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "operation_trace",
   "answer_score": 0,
   "stale_value": null,
@@ -5982,7 +5982,7 @@
  {
   "file": "A05_reflect.json",
   "op": "reflect",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "target_binding",
   "answer_score": 0,
   "stale_value": null,
@@ -5992,7 +5992,7 @@
  {
   "file": "A05_reflect.json",
   "op": "reflect",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "target_binding",
   "answer_score": 0,
   "stale_value": null,
@@ -6002,7 +6002,7 @@
  {
   "file": "A05_reflect.json",
   "op": "reflect",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "state_reasoning",
   "answer_score": 0,
   "stale_value": null,
@@ -6012,7 +6012,7 @@
  {
   "file": "A05_reflect.json",
   "op": "reflect",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "state_reasoning",
   "answer_score": 1,
   "stale_value": null,
@@ -6022,7 +6022,7 @@
  {
   "file": "A05_reflect.json",
   "op": "reflect",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "distractor_control",
   "answer_score": 0,
   "stale_value": null,
@@ -6032,7 +6032,7 @@
  {
   "file": "A05_reflect.json",
   "op": "reflect",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "distractor_control",
   "answer_score": 0,
   "stale_value": null,
@@ -6042,7 +6042,7 @@
  {
   "file": "A05_reflect.json",
   "op": "reflect",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "downstream_application",
   "answer_score": 1,
   "stale_value": null,
@@ -6052,7 +6052,7 @@
  {
   "file": "A05_reflect.json",
   "op": "reflect",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "downstream_application",
   "answer_score": 1,
   "stale_value": null,
@@ -6362,7 +6362,7 @@
  {
   "file": "A05_remember.json",
   "op": "remember",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "operation_trace",
   "answer_score": 0,
   "stale_value": null,
@@ -6372,7 +6372,7 @@
  {
   "file": "A05_remember.json",
   "op": "remember",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "operation_trace",
   "answer_score": 0,
   "stale_value": null,
@@ -6382,7 +6382,7 @@
  {
   "file": "A05_remember.json",
   "op": "remember",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "target_binding",
   "answer_score": 0,
   "stale_value": null,
@@ -6392,7 +6392,7 @@
  {
   "file": "A05_remember.json",
   "op": "remember",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "target_binding",
   "answer_score": 0,
   "stale_value": null,
@@ -6402,7 +6402,7 @@
  {
   "file": "A05_remember.json",
   "op": "remember",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "state_reasoning",
   "answer_score": 1,
   "stale_value": null,
@@ -6412,7 +6412,7 @@
  {
   "file": "A05_remember.json",
   "op": "remember",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "state_reasoning",
   "answer_score": 1,
   "stale_value": null,
@@ -6422,7 +6422,7 @@
  {
   "file": "A05_remember.json",
   "op": "remember",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "distractor_control",
   "answer_score": 1,
   "stale_value": null,
@@ -6432,7 +6432,7 @@
  {
   "file": "A05_remember.json",
   "op": "remember",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "distractor_control",
   "answer_score": 1,
   "stale_value": null,
@@ -6442,7 +6442,7 @@
  {
   "file": "A05_remember.json",
   "op": "remember",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "downstream_application",
   "answer_score": 1,
   "stale_value": null,
@@ -6452,7 +6452,7 @@
  {
   "file": "A05_remember.json",
   "op": "remember",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "downstream_application",
   "answer_score": 1,
   "stale_value": null,
@@ -6462,7 +6462,7 @@
  {
   "file": "A05_remember.json",
   "op": "remember",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "state_reasoning",
   "answer_score": 1,
   "stale_value": null,
@@ -6472,7 +6472,7 @@
  {
   "file": "A05_remember.json",
   "op": "remember",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "state_reasoning",
   "answer_score": 1,
   "stale_value": null,
@@ -6842,7 +6842,7 @@
  {
   "file": "A05_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "operation_trace",
   "answer_score": 0,
   "stale_value": null,
@@ -6852,7 +6852,7 @@
  {
   "file": "A05_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "operation_trace",
   "answer_score": 0,
   "stale_value": null,
@@ -6862,7 +6862,7 @@
  {
   "file": "A05_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "target_binding",
   "answer_score": 0,
   "stale_value": 0,
@@ -6872,7 +6872,7 @@
  {
   "file": "A05_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "target_binding",
   "answer_score": 0,
   "stale_value": 0,
@@ -6882,7 +6882,7 @@
  {
   "file": "A05_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "state_reasoning",
   "answer_score": 1,
   "stale_value": 0,
@@ -6892,7 +6892,7 @@
  {
   "file": "A05_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "state_reasoning",
   "answer_score": 1,
   "stale_value": 0,
@@ -6902,7 +6902,7 @@
  {
   "file": "A05_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "downstream_application",
   "answer_score": 0,
   "stale_value": null,
@@ -6912,7 +6912,7 @@
  {
   "file": "A05_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "trajectory_reasoning",
   "answer_score": 0,
   "stale_value": 0,
@@ -6922,7 +6922,7 @@
  {
   "file": "A05_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "trajectory_reasoning",
   "answer_score": 0,
   "stale_value": 0,
@@ -7232,7 +7232,7 @@
  {
   "file": "A06_update.json",
   "op": "update",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "operation_trace",
   "answer_score": 0,
   "stale_value": 0,
@@ -7242,7 +7242,7 @@
  {
   "file": "A06_update.json",
   "op": "update",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "operation_trace",
   "answer_score": 0,
   "stale_value": 0,
@@ -7252,7 +7252,7 @@
  {
   "file": "A06_update.json",
   "op": "update",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "target_binding",
   "answer_score": 0,
   "stale_value": null,
@@ -7262,7 +7262,7 @@
  {
   "file": "A06_update.json",
   "op": "update",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "target_binding",
   "answer_score": 1,
   "stale_value": 0,
@@ -7272,7 +7272,7 @@
  {
   "file": "A06_update.json",
   "op": "update",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "distractor_control",
   "answer_score": 1,
   "stale_value": 0,
@@ -7282,7 +7282,7 @@
  {
   "file": "A06_update.json",
   "op": "update",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "distractor_control",
   "answer_score": 1,
   "stale_value": 0,
@@ -7292,7 +7292,7 @@
  {
   "file": "A06_update.json",
   "op": "update",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "downstream_application",
   "answer_score": 0,
   "stale_value": null,
@@ -7302,7 +7302,7 @@
  {
   "file": "A06_update.json",
   "op": "update",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "downstream_application",
   "answer_score": 0,
   "stale_value": 0,
@@ -7552,7 +7552,7 @@
  {
   "file": "A06_forget.json",
   "op": "forget",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "operation_trace",
   "answer_score": 0,
   "stale_value": null,
@@ -7562,7 +7562,7 @@
  {
   "file": "A06_forget.json",
   "op": "forget",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "operation_trace",
   "answer_score": 0,
   "stale_value": null,
@@ -7572,7 +7572,7 @@
  {
   "file": "A06_forget.json",
   "op": "forget",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "target_binding",
   "answer_score": 0,
   "stale_value": null,
@@ -7582,7 +7582,7 @@
  {
   "file": "A06_forget.json",
   "op": "forget",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "target_binding",
   "answer_score": 0,
   "stale_value": null,
@@ -7592,7 +7592,7 @@
  {
   "file": "A06_forget.json",
   "op": "forget",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "state_reasoning",
   "answer_score": 0,
   "stale_value": null,
@@ -7602,7 +7602,7 @@
  {
   "file": "A06_forget.json",
   "op": "forget",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "state_reasoning",
   "answer_score": 0,
   "stale_value": null,
@@ -7612,7 +7612,7 @@
  {
   "file": "A06_forget.json",
   "op": "forget",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "distractor_control",
   "answer_score": 1,
   "stale_value": null,
@@ -7622,7 +7622,7 @@
  {
   "file": "A06_forget.json",
   "op": "forget",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "distractor_control",
   "answer_score": 1,
   "stale_value": null,
@@ -7632,7 +7632,7 @@
  {
   "file": "A06_forget.json",
   "op": "forget",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "downstream_application",
   "answer_score": 0,
   "stale_value": null,
@@ -7642,7 +7642,7 @@
  {
   "file": "A06_forget.json",
   "op": "forget",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "downstream_application",
   "answer_score": 0,
   "stale_value": null,
@@ -7952,7 +7952,7 @@
  {
   "file": "A06_reflect.json",
   "op": "reflect",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "operation_trace",
   "answer_score": 0,
   "stale_value": null,
@@ -7962,7 +7962,7 @@
  {
   "file": "A06_reflect.json",
   "op": "reflect",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "operation_trace",
   "answer_score": 0,
   "stale_value": null,
@@ -7972,7 +7972,7 @@
  {
   "file": "A06_reflect.json",
   "op": "reflect",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "target_binding",
   "answer_score": 1,
   "stale_value": null,
@@ -7982,7 +7982,7 @@
  {
   "file": "A06_reflect.json",
   "op": "reflect",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "target_binding",
   "answer_score": 0,
   "stale_value": null,
@@ -7992,7 +7992,7 @@
  {
   "file": "A06_reflect.json",
   "op": "reflect",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "state_reasoning",
   "answer_score": 0,
   "stale_value": null,
@@ -8002,7 +8002,7 @@
  {
   "file": "A06_reflect.json",
   "op": "reflect",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "state_reasoning",
   "answer_score": 0,
   "stale_value": null,
@@ -8012,7 +8012,7 @@
  {
   "file": "A06_reflect.json",
   "op": "reflect",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "distractor_control",
   "answer_score": 0,
   "stale_value": null,
@@ -8022,7 +8022,7 @@
  {
   "file": "A06_reflect.json",
   "op": "reflect",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "distractor_control",
   "answer_score": 0,
   "stale_value": null,
@@ -8032,7 +8032,7 @@
  {
   "file": "A06_reflect.json",
   "op": "reflect",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "downstream_application",
   "answer_score": 0,
   "stale_value": null,
@@ -8042,7 +8042,7 @@
  {
   "file": "A06_reflect.json",
   "op": "reflect",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "downstream_application",
   "answer_score": 0,
   "stale_value": null,
@@ -8352,7 +8352,7 @@
  {
   "file": "A06_remember.json",
   "op": "remember",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "operation_trace",
   "answer_score": 0,
   "stale_value": null,
@@ -8362,7 +8362,7 @@
  {
   "file": "A06_remember.json",
   "op": "remember",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "operation_trace",
   "answer_score": 0,
   "stale_value": null,
@@ -8372,7 +8372,7 @@
  {
   "file": "A06_remember.json",
   "op": "remember",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "target_binding",
   "answer_score": 0,
   "stale_value": null,
@@ -8382,7 +8382,7 @@
  {
   "file": "A06_remember.json",
   "op": "remember",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "target_binding",
   "answer_score": 0,
   "stale_value": null,
@@ -8392,7 +8392,7 @@
  {
   "file": "A06_remember.json",
   "op": "remember",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "state_reasoning",
   "answer_score": 1,
   "stale_value": null,
@@ -8402,7 +8402,7 @@
  {
   "file": "A06_remember.json",
   "op": "remember",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "state_reasoning",
   "answer_score": 1,
   "stale_value": null,
@@ -8412,7 +8412,7 @@
  {
   "file": "A06_remember.json",
   "op": "remember",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "distractor_control",
   "answer_score": 1,
   "stale_value": null,
@@ -8422,7 +8422,7 @@
  {
   "file": "A06_remember.json",
   "op": "remember",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "distractor_control",
   "answer_score": 1,
   "stale_value": null,
@@ -8432,7 +8432,7 @@
  {
   "file": "A06_remember.json",
   "op": "remember",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "downstream_application",
   "answer_score": 0,
   "stale_value": null,
@@ -8442,7 +8442,7 @@
  {
   "file": "A06_remember.json",
   "op": "remember",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "downstream_application",
   "answer_score": 0,
   "stale_value": null,
@@ -8452,7 +8452,7 @@
  {
   "file": "A06_remember.json",
   "op": "remember",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "state_reasoning",
   "answer_score": 1,
   "stale_value": null,
@@ -8462,7 +8462,7 @@
  {
   "file": "A06_remember.json",
   "op": "remember",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "state_reasoning",
   "answer_score": 1,
   "stale_value": null,
@@ -8832,7 +8832,7 @@
  {
   "file": "A06_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "operation_trace",
   "answer_score": 0,
   "stale_value": 0,
@@ -8842,7 +8842,7 @@
  {
   "file": "A06_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "operation_trace",
   "answer_score": 0,
   "stale_value": 0,
@@ -8852,7 +8852,7 @@
  {
   "file": "A06_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "target_binding",
   "answer_score": 0,
   "stale_value": 0,
@@ -8862,7 +8862,7 @@
  {
   "file": "A06_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "target_binding",
   "answer_score": 0,
   "stale_value": 0,
@@ -8872,7 +8872,7 @@
  {
   "file": "A06_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "state_reasoning",
   "answer_score": 0,
   "stale_value": null,
@@ -8882,7 +8882,7 @@
  {
   "file": "A06_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "state_reasoning",
   "answer_score": 0,
   "stale_value": 0,
@@ -8892,7 +8892,7 @@
  {
   "file": "A06_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "downstream_application",
   "answer_score": 0,
   "stale_value": 0,
@@ -8902,7 +8902,7 @@
  {
   "file": "A06_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "downstream_application",
   "answer_score": 0,
   "stale_value": 0,
@@ -8912,7 +8912,7 @@
  {
   "file": "A06_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "trajectory_reasoning",
   "answer_score": 0,
   "stale_value": 0,
@@ -8922,7 +8922,7 @@
  {
   "file": "A06_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "trajectory_reasoning",
   "answer_score": 0,
   "stale_value": 0,
@@ -9232,7 +9232,7 @@
  {
   "file": "A11_update.json",
   "op": "update",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "operation_trace",
   "answer_score": 0,
   "stale_value": 0,
@@ -9242,7 +9242,7 @@
  {
   "file": "A11_update.json",
   "op": "update",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "operation_trace",
   "answer_score": 0,
   "stale_value": 0,
@@ -9252,7 +9252,7 @@
  {
   "file": "A11_update.json",
   "op": "update",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "target_binding",
   "answer_score": 1,
   "stale_value": 0,
@@ -9262,7 +9262,7 @@
  {
   "file": "A11_update.json",
   "op": "update",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "target_binding",
   "answer_score": 1,
   "stale_value": 0,
@@ -9272,7 +9272,7 @@
  {
   "file": "A11_update.json",
   "op": "update",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "distractor_control",
   "answer_score": 1,
   "stale_value": 0,
@@ -9282,7 +9282,7 @@
  {
   "file": "A11_update.json",
   "op": "update",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "distractor_control",
   "answer_score": 1,
   "stale_value": 0,
@@ -9292,7 +9292,7 @@
  {
   "file": "A11_update.json",
   "op": "update",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "downstream_application",
   "answer_score": 0,
   "stale_value": 0,
@@ -9302,7 +9302,7 @@
  {
   "file": "A11_update.json",
   "op": "update",
-  "arm": "mnemo",
+  "arm": "inspeximus",
   "category": "downstream_application",
   "answer_score": 0,
   "stale_value": 0,

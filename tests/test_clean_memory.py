@@ -3,18 +3,18 @@ import os
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from mnemo import Mnemo
+from inspeximus import Inspeximus
 
 
 def test_admit_stores_new_fact():
-    m = Mnemo()
+    m = Inspeximus()
     r = m.admit("the database region is us-east")
     assert r["admitted"] is True and r["id"] and r["reason"] == "admitted"
     assert len(m.items) == 1
 
 
 def test_admit_rejects_near_duplicate():
-    m = Mnemo()
+    m = Inspeximus()
     a = m.admit("the database region is us-east")
     b = m.admit("the database region is us-east")          # exact repeat -> duplicate
     assert b["admitted"] is False and b["reason"] == "duplicate"
@@ -23,7 +23,7 @@ def test_admit_rejects_near_duplicate():
 
 
 def test_admit_no_808_copies():
-    m = Mnemo()
+    m = Inspeximus()
     for _ in range(50):
         m.admit("user prefers Telegram")
     active = [r for r in m.items if r.get("status") == "active"]
@@ -31,7 +31,7 @@ def test_admit_no_808_copies():
 
 
 def test_admit_rejects_junk():
-    m = Mnemo()
+    m = Inspeximus()
     assert m.admit("")["reason"] == "empty"
     assert m.admit("ok")["reason"] == "too_short"
     assert m.admit("No sources were provided for this claim.")["reason"] == "non_content"
@@ -40,7 +40,7 @@ def test_admit_rejects_junk():
 
 
 def test_admit_value_update_is_not_duplicate():
-    m = Mnemo()
+    m = Inspeximus()
     m.admit("the price is 100 dollars")
     r = m.admit("the price is 250 dollars")                 # value clash -> admitted, not a dup
     assert r["admitted"] is True
@@ -48,13 +48,13 @@ def test_admit_value_update_is_not_duplicate():
 
 
 def test_admit_quality_opt_out():
-    m = Mnemo()
+    m = Inspeximus()
     r = m.admit("ok", quality=False)                        # quality gate off -> short text allowed
     assert r["admitted"] is True
 
 
 def test_why_recalled_breakdown():
-    m = Mnemo()
+    m = Inspeximus()
     m.admit("the capital of France is Paris")
     m.admit("the Eiffel Tower is in Paris")
     rows = m.why_recalled("what city is the capital of France")
@@ -66,7 +66,7 @@ def test_why_recalled_breakdown():
 
 
 def test_why_recalled_single_id():
-    m = Mnemo()
+    m = Inspeximus()
     mid = m.admit("the capital of France is Paris")["id"]
     b = m.why_recalled("capital of France", id=mid)
     assert b["id"] == mid and b["surfaced"] is True and b["rank"] == 1
@@ -74,7 +74,7 @@ def test_why_recalled_single_id():
 
 
 def test_memory_report():
-    m = Mnemo()
+    m = Inspeximus()
     facts = ["the capital of France is Paris", "water boils at one hundred celsius",
              "the stock ticker for Apple is AAPL", "photosynthesis happens in chloroplasts",
              "mount Everest is the tallest mountain"]

@@ -1,12 +1,12 @@
-"""mnemo_autogen_adapter_probe.py — MnemoMemory works with the REAL autogen-core Memory protocol.
+"""inspeximus_autogen_adapter_probe.py — InspeximusMemory works with the REAL autogen-core Memory protocol.
 
 Requires autogen-core installed (a distribution adapter must be verified against the real SDK, not a shim).
 Verifies the faithful protocol + the REAL differentiator: update_context/query inject only CURRENT-TRUTH
 facts (a superseded value is hidden), which a plain list-memory cannot do.
 """
 import sys, pathlib, asyncio, tempfile
-sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / "mnemo_pypi"))
-from mnemo.integrations.autogen import MnemoMemory
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / "inspeximus_pypi"))
+from inspeximus.integrations.autogen import InspeximusMemory
 from autogen_core.memory import MemoryContent, MemoryMimeType
 from autogen_core.models import UserMessage, SystemMessage
 from autogen_core.model_context import UnboundedChatCompletionContext
@@ -15,7 +15,7 @@ from autogen_core.model_context import UnboundedChatCompletionContext
 async def run():
     ok = {}
     path = str(pathlib.Path(tempfile.mkdtemp()) / "m.json")
-    m = MnemoMemory(path=path, k=5)
+    m = InspeximusMemory(path=path, k=5)
 
     # add a keyed fact, then supersede it; plus an unrelated fact
     await m.add(MemoryContent(content="user timezone is UTC", mime_type=MemoryMimeType.TEXT,
@@ -47,7 +47,7 @@ async def run():
     ok["G clear empties"] = (await m.query("timezone")).results == []
 
     print("=" * 64)
-    print("MnemoMemory - AutoGen Memory protocol (real autogen-core)")
+    print("InspeximusMemory - AutoGen Memory protocol (real autogen-core)")
     print("=" * 64)
     for k, v in ok.items():
         print(f"  [{'PASS' if v else 'FAIL'}] {k}")

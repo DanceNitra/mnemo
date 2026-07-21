@@ -1,11 +1,11 @@
-"""Diagnose where mnemo loses on MemoryAgentBench CR: retrieval-miss vs reasoning-miss, and whether SEMANTIC
+"""Diagnose where inspeximus loses on MemoryAgentBench CR: retrieval-miss vs reasoning-miss, and whether SEMANTIC
 recall lifts the retrieval ceiling over LEXICAL (SOTA lever #1). No LLM in the retrieval-ceiling part — the
 ceiling is 'is the gold answer even in the retrieved context'. Writes _diag_cr_result.json."""
 import os, sys, json, string, re
 from pathlib import Path
 sys.path.insert(0, os.path.dirname(__file__))
 from memoryagentbench_cr import fact_lines, parse_fact
-from mnemo import Mnemo
+from inspeximus import Inspeximus
 from huggingface_hub import hf_hub_download
 import pandas as pd
 import torch
@@ -47,7 +47,7 @@ def load_embed(hf="sentence-transformers/all-MiniLM-L6-v2"):
 
 
 def build_store(lines, embed):
-    st = Mnemo(None, embed=embed)
+    st = Inspeximus(None, embed=embed)
     st.semantic_threshold = 1
     for ln in lines:
         p = parse_fact(ln)

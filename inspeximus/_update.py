@@ -1,10 +1,10 @@
 """Deterministic, opt-out "a newer version exists" check — the standard pip/npm/gh courtesy.
 
-`check_for_update()` returns a one-line ASCII notice (or None) when the installed agora-mnemo is behind the
+`check_for_update()` returns a one-line ASCII notice (or None) when the installed agora-inspeximus is behind the
 latest on PyPI. It is:
   - throttled to at most once per 24h (cached in <cache_dir>/.update_check.json) so it never nags per-call;
   - fail-open: any network/parse error, or being offline, returns None silently and never blocks;
-  - opt-out: MNEMO_NO_UPDATE_CHECK=1 disables it entirely;
+  - opt-out: INSPEXIMUS_NO_UPDATE_CHECK=1 disables it entirely;
   - ASCII-only, so it is safe to print on a non-UTF-8 console.
 
 Callers pick the output stream: the Claude Code plugin prints it to stdout (SessionStart, injected as
@@ -16,7 +16,7 @@ import os
 import time
 import urllib.request
 
-_PYPI_JSON = "https://pypi.org/pypi/agora-mnemo/json"
+_PYPI_JSON = "https://pypi.org/pypi/agora-inspeximus/json"
 _TTL_S = 24 * 3600
 
 
@@ -44,11 +44,11 @@ def _is_newer(latest, current):
 
 
 def check_for_update(current_version, cache_dir=None, timeout=1.5):
-    """Return a one-line notice if a newer agora-mnemo is on PyPI, else None. Fully fail-open."""
-    if os.environ.get("MNEMO_NO_UPDATE_CHECK", "").strip().lower() in ("1", "true", "yes"):
+    """Return a one-line notice if a newer agora-inspeximus is on PyPI, else None. Fully fail-open."""
+    if os.environ.get("INSPEXIMUS_NO_UPDATE_CHECK", "").strip().lower() in ("1", "true", "yes"):
         return None
     try:
-        cache_dir = cache_dir or os.path.join(os.path.expanduser("~"), ".mnemo")
+        cache_dir = cache_dir or os.path.join(os.path.expanduser("~"), ".inspeximus")
         os.makedirs(cache_dir, exist_ok=True)
         cache = os.path.join(cache_dir, ".update_check.json")
 
@@ -77,9 +77,9 @@ def check_for_update(current_version, cache_dir=None, timeout=1.5):
         if latest and _is_newer(latest, current_version):
             return (
                 f"[inspeximus] A new version is available: {latest} (you have {current_version}).\n"
-                "        Update:  pip install -U agora-mnemo   |   "
+                "        Update:  pip install -U agora-inspeximus   |   "
                 "changelog: https://github.com/DanceNitra/inspeximus/blob/main/CHANGELOG.md\n"
-                "        (silence this with MNEMO_NO_UPDATE_CHECK=1)")
+                "        (silence this with INSPEXIMUS_NO_UPDATE_CHECK=1)")
     except Exception:
         return None
     return None

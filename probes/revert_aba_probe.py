@@ -17,15 +17,15 @@ Measured on the real store, both in-stream paths:
     re-assertion down another path is a different id and cannot satisfy it. The channel still owes the land
     (unconditional by design), but it lands a specific INSTANCE, not "the current value that looks like X".
 
-Deterministic, no LLM, no network. RUN: python mnemo/probes/revert_aba_probe.py
+Deterministic, no LLM, no network. RUN: python inspeximus/probes/revert_aba_probe.py
 """
 import sys, pathlib, json, re
-sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / "mnemo_pypi"))
-from mnemo import Mnemo, new_receipt_keypair, sign_revert, __version__
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / "inspeximus_pypi"))
+from inspeximus import Inspeximus, new_receipt_keypair, sign_revert, __version__
 
 sk, pk = new_receipt_keypair()
 signer = lambda i: sign_revert(sk, i)
-R = {"mnemo_version": __version__}
+R = {"inspeximus_version": __version__}
 
 
 def cur(m, k="region"):
@@ -36,7 +36,7 @@ def cur(m, k="region"):
 # ── RELATIVE under ABA — base binds to the active id, target to the id-linked predecessor. ─────
 # echo_guard OFF so the re-assertion of A is a live new record (a genuine ABA state move), which is the
 # adversarial case: the base id no longer matches -> conflict, never landing against the look-alike.
-m = Mnemo(path=None, revert_pubkey=pk); m.echo_guard = False
+m = Inspeximus(path=None, revert_pubkey=pk); m.echo_guard = False
 m.remember("region is A", key="region", object="A")                    # rec1
 m.remember("correction: region is now B", key="region", object="B")    # rec2 active
 i = m.revert_intent("region")                                          # base = rec2 id
@@ -47,7 +47,7 @@ i2 = m.revert_intent("region"); res2 = m.submit_revert(i2, signer(i2))   # fresh
 R["relative_reverts_id_linked_predecessor"] = (res2.get("ok") and res2.get("reverted_to_object") == "B")
 
 # ── ABSOLUTE, 0.7.15: the intent carries the target record id -> instance-bound. ───────────────
-m2 = Mnemo(path=None, revert_pubkey=pk); m2.echo_guard = False
+m2 = Inspeximus(path=None, revert_pubkey=pk); m2.echo_guard = False
 m2.remember("region is A [survey-1]", key="region", object="A")        # rec1 — the A the user means
 m2.remember("correction: region is now B", key="region", object="B")
 i3 = m2.restore_intent("region", "A")                                  # 0.7.15 mint: restore:region=A@<rec1>#..

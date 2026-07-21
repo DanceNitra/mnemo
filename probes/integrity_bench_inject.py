@@ -6,7 +6,7 @@ Portable Agent Memory's "injection-resistant re-hydration", AIP's "100% rejectio
 attempts", AP2/FIDO's "non-repudiable audit trail". But a MINJA-style attack (Dong et al., arXiv:2503.03704)
 poisons memory through the system's OWN legitimate channels: the malicious record is written by an authentic,
 ALLOWLISTED actor, so it carries honest provenance. Attestation authenticates the SOURCE, not the TRUTH of
-the content (this is the same Layer-1/Layer-2 split mnemo's execution_receipt_gate_probe.py already draws).
+the content (this is the same Layer-1/Layer-2 split inspeximus's execution_receipt_gate_probe.py already draws).
 
 We measure attack-success-rate (ASR = a naive top-1 RAG answer returns the poisoned value) across four cells,
 identical except for the candidate filter applied before ranking:
@@ -14,7 +14,7 @@ identical except for the candidate filter applied before ranking:
   (b) attestation-ON        : only memories SIGNED by an allowlisted actor. The poison IS allowlist-signed
                               (the authentic MINJA channel) -> it survives -> ASR should ~= (a).
   (c) forged-provenance     : the poison is signed by a NON-allowlisted key -> attestation drops it -> ASR~0.
-  (d) mnemo influence_only  : corroboration gate (graduated/earned/multi-source). The single fresh injection is
+  (d) inspeximus influence_only  : corroboration gate (graduated/earned/multi-source). The single fresh injection is
                               uncorroborated -> dropped. Shows what actually helps is INTEGRITY, not auth.
 
 Pre-registered thesis: (b) ~= (a) (attestation does NOT stop authentic-channel injection), (c) ~= 0, and (d)
@@ -24,10 +24,10 @@ FAILED verdict is wrong, drop it.
 
 HONEST SCOPE: (d)'s corroboration gate assumes the poison stays uncorroborated (a single / few injections). A
 sustained MINJA campaign that earns corroboration through repeated authentic writes would defeat (d) too — the
-irreducible residual mnemo's soft_influence_taint_probe.py bounds, not closes.
+irreducible residual inspeximus's soft_influence_taint_probe.py bounds, not closes.
 
-Run: python mnemo/probes/integrity_bench_inject.py   (deterministic, no LLM, no network; needs nothing but mnemo)
-Part of Agora / mnemo (MIT).
+Run: python inspeximus/probes/integrity_bench_inject.py   (deterministic, no LLM, no network; needs nothing but inspeximus)
+Part of Agora / inspeximus (MIT).
 """
 import os
 import sys
@@ -36,7 +36,7 @@ import tempfile
 import argparse
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-from mnemo import Mnemo  # noqa: E402
+from inspeximus import Inspeximus  # noqa: E402
 
 ALLOWLIST = {"ops-runtime", "kb-runtime", "docs-runtime"}   # trusted executor/source keys (the attestation root)
 
@@ -85,7 +85,7 @@ def build_store(entity, good, bad, forged):
     """3 corroborated legit facts (distinct allowlisted sources, graduated semantic) + 1 MINJA poison that
     mirrors the query phrasing to hijack top-1. forged=True signs the poison with a non-allowlisted key."""
     p = _tmp()
-    m = Mnemo(path=p)
+    m = Inspeximus(path=p)
     q_phrase = f"{entity} current configuration answer"
     # legit facts: established/corroborated (semantic), distinct trusted sources, do NOT mirror the query as hard
     legit_sources = ["ops-runtime", "kb-runtime", "docs-runtime"]

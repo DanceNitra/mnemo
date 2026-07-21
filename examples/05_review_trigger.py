@@ -1,4 +1,4 @@
-"""Read-path review trigger (mnemo 1.9.2-1.9.7) — the mirror of a write-time hold-for-review.
+"""Read-path review trigger (inspeximus 1.9.2-1.9.7) — the mirror of a write-time hold-for-review.
 
 A store can be confidently WRONG: a correction lands, the record settles, and later a contradicting observation
 arrives. You do not want to silently trust every contradiction (an attacker or a stray transcript line can
@@ -8,11 +8,11 @@ supersedes; a human/steward closes the review with resolve_reopened().
 
 Run:  python examples/05_review_trigger.py
 """
-from mnemo import Mnemo
+from inspeximus import Inspeximus
 
 
 def main():
-    m = Mnemo(path=None); m.echo_guard = True
+    m = Inspeximus(path=None); m.echo_guard = True
 
     m.remember("the deploy region is Frankfurt", key="svc/region", object="Frankfurt")
     m.remember("correction: the deploy region is now Ohio", key="svc/region", object="Ohio")
@@ -55,7 +55,7 @@ def main():
           f"recall hit clean again: {'under_review' not in m.recall('svc/region', k=1)[0]}")
 
     print("\nHonest scope: observe() FLAGS, it never decides. Distinguishing a legitimate contradiction from an\n"
-          "injected one is an authority call, not a content call. Pass Mnemo(support_authorities=[...]) to\n"
+          "injected one is an authority call, not a content call. Pass Inspeximus(support_authorities=[...]) to\n"
           "require signed grounds (self-minted grounds then count zero), and a steward still owns the verdict.")
 
 

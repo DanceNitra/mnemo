@@ -2,7 +2,7 @@
  "metric": "LLM-calls & tokens per op, by phase; extract 'site' shows where extraction is paid",
  "n": 10,
  "systems": {
-  "mnemo": {
+  "inspeximus": {
    "extract": {
     "llm_calls_per_op": 0.0,
     "tokens_per_op": 0.0,

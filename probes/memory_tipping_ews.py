@@ -1,10 +1,10 @@
 """MEMORY TIPPING POINTS probe: is catastrophic forgetting in an agent memory a SECOND-ORDER (critical-slowing-
 down-warned) transition or a FIRST-ORDER (silent) one — and does the answer depend on the CAUSE of degradation?
 
-Honest design (the anti-'true-by-construction' rule): the degradation dynamics EMERGE from a real mnemo store
+Honest design (the anti-'true-by-construction' rule): the degradation dynamics EMERGE from a real inspeximus store
 with real embeddings — we do NOT hand-pick a q*(forcing) whose transition order we choose. We only supply:
  - a workload: facts subject->value; quality q_t = fraction of a query sample whose recall top-1 = current value;
- - a RESTORING FORCE: each step we reinforce (mnemo credit) a random subset of correct facts, so their
+ - a RESTORING FORCE: each step we reinforce (inspeximus credit) a random subset of correct facts, so their
    value-weighted recall standing is refreshed — the dynamical 'return to equilibrium' CSD needs to be meaningful;
  - a FORCING that ramps each step, in three regimes:
      A capacity      : add unrelated distractor facts (retrieval SNR pressure);
@@ -23,7 +23,7 @@ from pathlib import Path
 import torch
 from transformers import AutoModel, AutoTokenizer
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-from mnemo import Mnemo
+from inspeximus import Inspeximus
 
 random.seed(20260716)
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
@@ -112,13 +112,13 @@ def run_regime(embed, regime, seed):
     random.seed(seed * 1000 + hash(regime) % 997)
     subs = random.sample(SUBJ, NBASE)
     cur = {s: random.choice(VAL) for s in subs}
-    st = Mnemo(None, embed=embed); st.semantic_threshold = 1
+    st = Inspeximus(None, embed=embed); st.semantic_threshold = 1
     for s in subs:
         st.remember(f"the {s} is {cur[s]}", key=s, object=cur[s])
     q_series = []
     dpool = iter(DISTR)
     for t in range(STEPS):
-        # RESTORING FORCE: reinforce a random subset of correct facts (mnemo credit raises value-weight)
+        # RESTORING FORCE: reinforce a random subset of correct facts (inspeximus credit raises value-weight)
         for s in random.sample(subs, max(1, NBASE // 6)):
             rid = None
             for h in st.recall(f"the {s} is {cur[s]}", k=3, mode="semantic"):

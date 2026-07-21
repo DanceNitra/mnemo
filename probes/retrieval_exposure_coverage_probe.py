@@ -2,7 +2,7 @@
 
 Tests icophy's cross-framework hypothesis (DeepSeek-V3 #1462): "the fastest way to raise the earned-outcome
 coverage of memory is to close retrieval loops — a memory that is retrieved and acted on generates a natural
-outcome signal; unused memory stays dark." Measured on Agora's OWN live store (8 dungeon-agent mnemo files).
+outcome signal; unused memory stays dark." Measured on Agora's OWN live store (8 dungeon-agent inspeximus files).
 
 FINDING (verified 2nd-way + per-store; the AUDIT is the point):
  1. STRUCTURAL, not correlational: 0 of the earned-outcome (good>0) records were NEVER retrieved — earned
@@ -16,7 +16,7 @@ FINDING (verified 2nd-way + per-store; the AUDIT is the point):
 Exposure proxy: last_access > ts + 1s (last_access is set ONLY at creation and in recall() -> a value above
 creation-time means recalled at least once). Age confound noted: exposure concentrates in the oldest tertile.
 
-RUN: python mnemo/probes/retrieval_exposure_coverage_probe.py
+RUN: python inspeximus/probes/retrieval_exposure_coverage_probe.py
 """
 import json, glob, sys
 sys.stdout.reconfigure(errors="replace")
@@ -65,8 +65,8 @@ def main():
            "per_store": {k: {"active": v[0], "exposed": v[1], "conversion_pct": round(v[2]*100, 2),
                              "corr_exposed_pct": round(v[3]*100, 2), "corr_unexposed_pct": round(v[4]*100, 2)}
                          for k, v in per.items()}}
-    json.dump(out, open("mnemo/probes/retrieval_exposure_coverage_probe_result.json", "w"), indent=2)
-    print("\n-> mnemo/probes/retrieval_exposure_coverage_probe_result.json")
+    json.dump(out, open("inspeximus/probes/retrieval_exposure_coverage_probe_result.json", "w"), indent=2)
+    print("\n-> inspeximus/probes/retrieval_exposure_coverage_probe_result.json")
 
 if __name__ == "__main__":
     main()

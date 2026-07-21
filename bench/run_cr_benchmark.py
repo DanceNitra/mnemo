@@ -1,14 +1,14 @@
 """Iterative multi-hop retrieval + supersession on MemoryAgentBench CR. The single-shot ceiling is the
 retrieval hit-rate (answer-fact entities aren't in the question). Iterative: recall -> LLM names the next
-entity -> recall again (2 hops) -> answer. Compares base_full vs mnemo single-shot vs mnemo iterative,
+entity -> recall again (2 hops) -> answer. Compares base_full vs inspeximus single-shot vs inspeximus iterative,
 their metric (substring_exact_match). Writes _cr_iter.json."""
 import os, sys, json, time, string, re, urllib.request
 from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor
 
 sys.path.insert(0, os.path.dirname(__file__))
-from memoryagentbench_cr import fact_lines, consolidate_with_mnemo, _SYS
-from mnemo import Mnemo
+from memoryagentbench_cr import fact_lines, consolidate_with_inspeximus, _SYS
+from inspeximus import Inspeximus
 from huggingface_hub import hf_hub_download
 import pandas as pd
 
@@ -82,7 +82,7 @@ def em(pred, golds):
 
 
 def eval_row(df, ridx):
-    row = df.iloc[ridx]; lines = fact_lines(row["context"]); cons, st = consolidate_with_mnemo(lines)
+    row = df.iloc[ridx]; lines = fact_lines(row["context"]); cons, st = consolidate_with_inspeximus(lines)
     fits = len("\n".join(lines)) <= FULLCTX_CHAR_CAP           # can full-context even fit the model window?
     qs = list(row["questions"])[:N]
     golds = [list(g) if hasattr(g, "__len__") and not isinstance(g, str) else [g] for g in list(row["answers"])[:N]]
@@ -99,7 +99,7 @@ def eval_row(df, ridx):
     s = sum(r[1] for r in rs); it = sum(r[2] for r in rs)
     out = {"row": ridx, "facts": len(lines), "n": N,
            "base_full": (round(sum(r[0] for r in rs) / N, 3) if fits else "N/A (context exceeds window)"),
-           "mnemo_single": round(s / N, 3), "mnemo_iterative": round(it / N, 3)}
+           "inspeximus_single": round(s / N, 3), "inspeximus_iterative": round(it / N, 3)}
     return out
 
 

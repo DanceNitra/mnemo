@@ -6,7 +6,7 @@ from concurrent.futures import ThreadPoolExecutor
 sys.path.insert(0, os.path.dirname(__file__))
 import run_cr_benchmark as R          # reuse iterative(), answer(), em(), config, _SYS
 from memoryagentbench_cr import fact_lines
-from mnemo import Mnemo
+from inspeximus import Inspeximus
 from huggingface_hub import hf_hub_download
 import pandas as pd
 
@@ -18,7 +18,7 @@ OUT = Path(__file__).with_name("_control_rawiter.json")
 def eval_row(df, ridx):
     row = df.iloc[ridx]
     lines = fact_lines(row["context"])
-    raw = Mnemo(None)                 # accumulate store: NO keyed supersession
+    raw = Inspeximus(None)                 # accumulate store: NO keyed supersession
     for ln in lines:
         raw.remember(ln)
     qs = list(row["questions"])[:N]

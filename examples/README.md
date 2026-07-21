@@ -1,6 +1,6 @@
-# mnemo examples
+# inspeximus examples
 
-Runnable, copy-paste examples. Each is self-contained and needs only `pip install agora-mnemo`.
+Runnable, copy-paste examples. Each is self-contained and needs only `pip install inspeximus`.
 
 | file | shows |
 |---|---|
@@ -10,7 +10,7 @@ Runnable, copy-paste examples. Each is self-contained and needs only `pip instal
 | [`04_encryption.py`](04_encryption.py) | AES-256-GCM **encryption-at-rest** + **crypto-shredding** erasure (needs `cryptography`) |
 
 ```bash
-pip install agora-mnemo
+pip install inspeximus
 python 01_basics.py
 ```
 

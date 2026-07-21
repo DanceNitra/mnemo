@@ -3,7 +3,7 @@
 Zero LLM calls. For every probe in the pilot's 24 files we ask one question per arm:
 does the context that arm hands the answerer actually CONTAIN the evidence turns?
 
-If mnemo/naive coverage is far below session_rag's, then the pilot's P2/P3 null is
+If inspeximus/naive coverage is far below session_rag's, then the pilot's P2/P3 null is
 uninterpretable: supersession cannot correct a stale value the retriever never returned.
 That is a harness property, not a product property, and it must be measured before any
 conclusion about the integrity layer is recorded.
@@ -56,7 +56,7 @@ def main(files, topk_variants=(20,)):
         lc = json.loads((HERE / "data_lc" / name).read_text(encoding="utf-8"))
         ev_sents = evidence_sentences(lc)
         probes = [a for a in (lc.get("answer") or []) if a.get("question") and a.get("expected_answer")]
-        stores = {"mnemo": pilot.build_mnemo(lc, True), "naive": pilot.build_mnemo(lc, False),
+        stores = {"inspeximus": pilot.build_inspeximus(lc, True), "naive": pilot.build_inspeximus(lc, False),
                   "session_rag": pilot.build_bm25_sessions(lc)}
         print(f"[{fi}/{len(files)}] {name:24} evidence_sents={len(ev_sents):3} probes={len(probes)}",
               flush=True)
@@ -65,8 +65,8 @@ def main(files, topk_variants=(20,)):
             ctxs = {"session_rag": pilot.recall_bm25(stores["session_rag"], q)}
             for k in topk_variants:
                 pilot.TOPK = k
-                ctxs[f"mnemo@{k}"] = pilot.recall_mnemo(stores["mnemo"], q, True)
-                ctxs[f"naive@{k}"] = pilot.recall_mnemo(stores["naive"], q, False)
+                ctxs[f"inspeximus@{k}"] = pilot.recall_inspeximus(stores["inspeximus"], q, True)
+                ctxs[f"naive@{k}"] = pilot.recall_inspeximus(stores["naive"], q, False)
             pilot.TOPK = 20
             for arm, ctx in ctxs.items():
                 ctx = ctx[:12000]      # the exact truncation the pilot applied

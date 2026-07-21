@@ -1,7 +1,7 @@
 """
-tenant_isolation_probe.py — MEASURED receipt for mnemo 1.6.0 hard tenant isolation. MIT.
+tenant_isolation_probe.py — MEASURED receipt for inspeximus 1.6.0 hard tenant isolation. MIT.
 
-CLAIM UNDER TEST: a Mnemo store shared across tenants (via store.for_tenant(t)) NEVER surfaces or mutates one
+CLAIM UNDER TEST: a Inspeximus store shared across tenants (via store.for_tenant(t)) NEVER surfaces or mutates one
 tenant's data through another tenant's handle — read, keyed supersession, echo, shared-subject erasure, and
 PII sweep are all confined to the acting tenant. Fail-CLOSED and non-bypassable from the content path.
 
@@ -26,7 +26,7 @@ RUN:  python tenant_isolation_probe.py            (add --json for machine-readab
 import json, os, sys
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from mnemo import Mnemo  # noqa: E402
+from inspeximus import Inspeximus  # noqa: E402
 
 TENANTS = ["acme", "globex", "initech", "umbrella", "hooli"]
 SECRET = "{t}-DEPLOY-SECRET-{i:03d}"
@@ -34,7 +34,7 @@ SECRET = "{t}-DEPLOY-SECRET-{i:03d}"
 
 def _build_shared_store():
     """One physical store, one view per tenant. Each tenant writes an adversarial, boundary-stressing set."""
-    store = Mnemo(pii_detect=True)
+    store = Inspeximus(pii_detect=True)
     store.echo_guard = True                       # exercise the echo path under tenancy too
     views = {t: store.for_tenant(t) for t in TENANTS}
     for i, t in enumerate(TENANTS):
@@ -148,7 +148,7 @@ def _over_erase(store, views):
 def _fail_open_baseline():
     """The soft alternative: one unscoped store; the caller FORGOT to pass scope=. Recall sees everything ->
     leaks by construction. This is what tenant isolation replaces."""
-    m = Mnemo()
+    m = Inspeximus()
     for i, t in enumerate(TENANTS):
         m.remember(f"{t} deploy secret is " + SECRET.format(t=t, i=i))
     hits = m.recall("deploy secret", k=50)        # no scope arg -> all tenants
@@ -190,7 +190,7 @@ def main():
         print(json.dumps(result, indent=2))
         return
     hi = result["hard_isolation"]
-    print(f"mnemo 1.6.0 tenant isolation — {len(TENANTS)} tenants, one shared store\n")
+    print(f"inspeximus 1.6.0 tenant isolation — {len(TENANTS)} tenants, one shared store\n")
     print(f"  read leak rate            {hi['read_leak_rate']:.2f}  ({hi['leaked']}/{hi['cross_tenant_recalls']} cross-tenant recalls; name+value detection)")
     print(f"  cross-tenant supersede    {hi['cross_supersede']}     (foreign facts wrongly retired by a keyed write)")
     print(f"  consolidation cross-links {hi['consolidation_cross_links']}     (dream pass linked across tenants)")

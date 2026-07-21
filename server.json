@@ -1,46 +1,46 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
-  "name": "io.github.DanceNitra/mnemo",
+  "name": "io.github.DanceNitra/inspeximus",
   "description": "Self-correcting agent memory + MCP server: recall, supersede/revert/review corrections, erasure.",
   "repository": {
-    "url": "https://github.com/DanceNitra/mnemo",
+    "url": "https://github.com/DanceNitra/inspeximus",
     "source": "github"
   },
   "version": "1.24.4",
-  "websiteUrl": "https://pypi.org/project/agora-mnemo/",
+  "websiteUrl": "https://pypi.org/project/inspeximus/",
   "packages": [
     {
       "registryType": "pypi",
-      "identifier": "agora-mnemo",
+      "identifier": "inspeximus",
       "version": "1.24.4",
       "transport": {
         "type": "stdio"
       },
       "environmentVariables": [
         {
-          "name": "MNEMO_PATH",
-          "description": "Path to the JSON memory file the server persists to (defaults to ./mnemo_memory.json).",
+          "name": "INSPEXIMUS_PATH",
+          "description": "Path to the JSON memory file the server persists to (defaults to ./inspeximus_memory.json).",
           "isRequired": false,
           "format": "string",
           "isSecret": false
         },
         {
-          "name": "MNEMO_ECHO_GUARD",
+          "name": "INSPEXIMUS_ECHO_GUARD",
           "description": "1 (default) blocks a restated retired value from resurrecting a corrected fact; 0 = legacy keyed supersession.",
           "isRequired": false,
           "format": "string",
           "isSecret": false
         },
         {
-          "name": "MNEMO_EMBED_URL",
+          "name": "INSPEXIMUS_EMBED_URL",
           "description": "Optional OpenAI-compatible /embeddings endpoint for SEMANTIC recall (e.g. http://localhost:11434/v1/embeddings for local Ollama). Unset = deterministic lexical recall.",
           "isRequired": false,
           "format": "string",
           "isSecret": false
         },
         {
-          "name": "MNEMO_EMBED_MODEL",
-          "description": "Embedding model id used with MNEMO_EMBED_URL (default: text-embedding-3-small; for Ollama use e.g. nomic-embed-text).",
+          "name": "INSPEXIMUS_EMBED_MODEL",
+          "description": "Embedding model id used with INSPEXIMUS_EMBED_URL (default: text-embedding-3-small; for Ollama use e.g. nomic-embed-text).",
           "isRequired": false,
           "format": "string",
           "isSecret": false

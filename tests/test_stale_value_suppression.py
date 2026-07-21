@@ -10,12 +10,12 @@ import pathlib
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
 
-from mnemo.mnemo import Mnemo, regex_extractor   # noqa: E402
+from inspeximus.core import Inspeximus, regex_extractor   # noqa: E402
 
 
 def _smeared_store():
     """One correction, keyed; the retired value also stated by four records that carry no key."""
-    m = Mnemo(path=None)
+    m = Inspeximus(path=None)
     m.extractor = regex_extractor
     m.remember("my title is Junior Data Analyst")                      # keyed, later superseded
     m.remember("Congratulations on the Junior Data Analyst role!")     # echo, unkeyed
@@ -54,7 +54,7 @@ def test_the_correction_itself_is_never_suppressed():
 
 def test_substring_values_decide_correctly_both_directions():
     """'Data Analyst' retired vs 'Senior Data Analyst' current: a substring must not fake a match."""
-    m = Mnemo(path=None)
+    m = Inspeximus(path=None)
     m.extractor = regex_extractor
     m.remember("my title is Data Analyst")
     m.remember("Nice, Data Analyst suits you.")

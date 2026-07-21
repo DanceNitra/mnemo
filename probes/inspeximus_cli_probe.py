@@ -1,10 +1,10 @@
-"""mnemo_cli_probe.py — the `mnemo` shell CLI (remember/recall/revert/forget/list/stats).
+"""inspeximus_cli_probe.py — the `inspeximus` shell CLI (remember/recall/revert/forget/list/stats).
 
-Drives mnemo.cli.main(argv) against a temp store and asserts the correction lifecycle works from the command
+Drives inspeximus.cli.main(argv) against a temp store and asserts the correction lifecycle works from the command
 line: a keyed re-write supersedes (recall shows current-truth), revert rolls back, forget hard-deletes."""
 import sys, pathlib, tempfile, os, io, contextlib
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
-from mnemo import cli
+from inspeximus import cli
 
 
 def _run(*argv):
@@ -42,7 +42,7 @@ def run():
     ok["F --json emits JSON"] = out.strip().startswith("{")
 
     print("=" * 58)
-    print("mnemo CLI — remember/recall/revert/forget/list/stats")
+    print("inspeximus CLI — remember/recall/revert/forget/list/stats")
     print("=" * 58)
     for k, v in ok.items():
         print(f"  [{'PASS' if v else 'FAIL'}] {k}")

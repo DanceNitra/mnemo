@@ -1,21 +1,21 @@
 """rich_mcp_probe.py — the MCP server exposes the 3 MCP primitives (tools + resources + prompts), not tools-only.
 
-A "rich" MCP server ships all three primitives and covers the product's real surface. Before this, mnemo's MCP was
+A "rich" MCP server ships all three primitives and covers the product's real surface. Before this, inspeximus's MCP was
 tools-only and exposed ~19 of ~60 methods (none of the integrity/governance surface). Asserts (each able to FAIL):
   1. the new GOVERNANCE/INTEGRITY tools are registered (forget_subject, governance_report, verify_writes,
      pii_report, forget_pii, influence_gate_report, why_recalled, supersession_report).
-  2. RESOURCES are registered (mnemo://digest, mnemo://contradictions, mnemo://governance) + the memory/{id} template.
+  2. RESOURCES are registered (inspeximus://digest, inspeximus://contradictions, inspeximus://governance) + the memory/{id} template.
   3. PROMPTS are registered (recall_before_answer, consolidate_session, review_contradictions).
   4. recall exposes the new mmr + trusted_only params and they work end-to-end.
   5. a governance tool actually returns a real report (callable, not just registered).
 """
 import os, sys, tempfile, asyncio
-os.environ["MNEMO_PATH"] = os.path.join(tempfile.gettempdir(), "rich_mcp_probe_store.json")
-os.environ["MNEMO_EMBED_URL"] = ""                 # lexical, no embedder / no GPU
-if os.path.exists(os.environ["MNEMO_PATH"]):
-    os.remove(os.environ["MNEMO_PATH"])
+os.environ["INSPEXIMUS_PATH"] = os.path.join(tempfile.gettempdir(), "rich_mcp_probe_store.json")
+os.environ["INSPEXIMUS_EMBED_URL"] = ""                 # lexical, no embedder / no GPU
+if os.path.exists(os.environ["INSPEXIMUS_PATH"]):
+    os.remove(os.environ["INSPEXIMUS_PATH"])
 sys.path.insert(0, ".")
-import mnemo.mnemo_mcp as M
+import inspeximus.mcp as M
 
 FAILS = []
 def check(n, c):

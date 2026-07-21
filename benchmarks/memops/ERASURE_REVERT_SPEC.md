@@ -5,7 +5,7 @@ and decision rules are fixed here first, including the ones that can go against 
 
 ## Why this probe exists
 
-The MemOps pilot settled one thing: on "what is the current value", mnemo's keyed supersession buys
+The MemOps pilot settled one thing: on "what is the current value", inspeximus's keyed supersession buys
 **nothing measurable** over a naive keep-all store (0.593 vs 0.592; P2/P3 REFUTED). That is the second
 independent null after MAB. The honest reading is that a strong answerer handed 150 sentences of history
 resolves corrections by itself — the write-side integrity layer has no room to help.
@@ -26,10 +26,10 @@ so judge instability (the acknowledged weakness of the pilot) cannot touch it.
    competent-engineer path: delete every record whose text contains the value. Both are real erasure
    implementations and are scored as such.
 2. **The claim is never "they cannot do it".** It is: how many steps, is it deterministic, does it need
-   external knowledge, and what residue is left. ([[competitors-CAN-erase-revert-mnemo-moat-is-determinism]])
-3. **Deletion by literal value is the shared baseline.** mnemo does NOT get to use a lineage-aware
+   external knowledge, and what residue is left. ([[competitors-CAN-erase-revert-inspeximus-moat-is-determinism]])
+3. **Deletion by literal value is the shared baseline.** inspeximus does NOT get to use a lineage-aware
    `forget_subject` unless the other arms get their nearest equivalent, because the ingest wrote no
-   subject provenance. Any mnemo advantage must come from what the store DOES, not from a richer API call.
+   subject provenance. Any inspeximus advantage must come from what the store DOES, not from a richer API call.
 4. **Any zero from a competitor is our bug until a positive control says otherwise** — the rule the mem0
    arm already taught us this session (20 memories vs 262).
 
@@ -55,10 +55,10 @@ forgotten value → measure, with zero LLM calls:
 
 | # | Prediction | SUPPORTED if | REFUTED if |
 |---|---|---|---|
-| E1 | mnemo and naive keep-all tie on literal `retrieval_leakage` | both ≤ 0.05 | either > 0.05 |
+| E1 | inspeximus and naive keep-all tie on literal `retrieval_leakage` | both ≤ 0.05 | either > 0.05 |
 | E2 | mem0 shows higher `paraphrase_residue` than the verbatim arms | ≥ 15 pp higher | < 15 pp, or lower |
-| E3 | mnemo has zero `raw_residue`; at least one other arm does not | mnemo 0 and some arm > 0 | mnemo > 0 |
-| E4 | mnemo is deterministic across repeats; the LLM-extraction arm is not | mnemo identical 3/3, mem0 not | mnemo differs across repeats |
+| E3 | inspeximus has zero `raw_residue`; at least one other arm does not | inspeximus 0 and some arm > 0 | inspeximus > 0 |
+| E4 | inspeximus is deterministic across repeats; the LLM-extraction arm is not | inspeximus identical 3/3, mem0 not | inspeximus differs across repeats |
 
 E2 is the load-bearing one and it is a real risk to us: if mem0's paraphrases delete just as cleanly,
 "verbatim storage makes erasure verifiable" loses its evidence and we say so.
@@ -84,7 +84,7 @@ current value → compare to the gold predecessor.
 
 | # | Prediction | SUPPORTED if | REFUTED if |
 |---|---|---|---|
-| R1 | mnemo `revert_exact` ≥ 0.8 | ≥ 0.8 | < 0.8 |
+| R1 | inspeximus `revert_exact` ≥ 0.8 | ≥ 0.8 | < 0.8 |
 | R2 | naive keep-all needs external knowledge to undo | `needs_external_knowledge` = true | it can undo unaided |
 | R3 | mem0's history DB makes its predecessor recoverable too | `predecessor_recoverable` = true for mem0 | false |
 
@@ -96,25 +96,25 @@ not a capability claim. That is the framing this session's pilot already forced 
 
 # RESULT + PARKED (2026-07-20)
 
-Ran `mnemo` and `naive` only; 18 scenario-units on 12 workers, 493 s.
+Ran `inspeximus` and `naive` only; 18 scenario-units on 12 workers, 493 s.
 
 | test | arm | result |
 |---|---|---|
-| A (erasure) | mnemo | leak 0.000 · paraphrase residue 0.000 · over-forget 0.000 · raw residue 0 files · deterministic 4/4 |
+| A (erasure) | inspeximus | leak 0.000 · paraphrase residue 0.000 · over-forget 0.000 · raw residue 0 files · deterministic 4/4 |
 | A (erasure) | naive | identical on every metric |
-| B (revert) | mnemo | revert_exact 3/9 (3 of 5 real chains) · predecessor recoverable 0/9 · needs external knowledge 3/9 |
+| B (revert) | inspeximus | revert_exact 3/9 (3 of 5 real chains) · predecessor recoverable 0/9 · needs external knowledge 3/9 |
 | B (revert) | naive | revert_exact 0/9 · needs external knowledge **9/9** |
 
 - **E1 SUPPORTED** (tie on literal leakage, as predicted against ourselves).
-- **E3 REFUTED as written** — mnemo's raw residue is zero, but so is naive's, so the "and some arm > 0"
+- **E3 REFUTED as written** — inspeximus's raw residue is zero, but so is naive's, so the "and some arm > 0"
   clause never fired.
-- **R1 REFUTED** — 0.6 on real chains against a 0.8 threshold. mnemo reverts in one call and without the
+- **R1 REFUTED** — 0.6 on real chains against a 0.8 threshold. inspeximus reverts in one call and without the
   caller knowing the old value, but only where the deterministic extractor keyed the chain; `recoverable
   0/9` says supersession never fired on the rest.
 - **R2 SUPPORTED** — naive cannot undo unaided in 9 of 9.
 
 **E2, E4 and R3 remain UNTESTED**: they compare against an LLM-extracting store, and the `mem0` arm was
-not run (~4 h of LLM ingest). Until it is, the only honest statement is about mnemo versus a keyless
+not run (~4 h of LLM ingest). Until it is, the only honest statement is about inspeximus versus a keyless
 version of itself — not versus a competing product.
 
 **PARKED at the owner's decision**, and correctly: this benchmark family has now produced three nulls and

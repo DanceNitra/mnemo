@@ -33,16 +33,16 @@ reversibility checkpoint on the first irreversible use), not here.
 Run:  python execution_receipt_gate_probe.py
 """
 import os, sys, tempfile
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "mnemo")))
-from mnemo import Mnemo, new_source_keypair, attest
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "inspeximus")))
+from inspeximus import Inspeximus, new_source_keypair, attest
 
 
 def _store():
     fd, p = tempfile.mkstemp(suffix=".json"); os.close(fd); os.remove(p)
     try:
-        return Mnemo(path=p)
+        return Inspeximus(path=p)
     except TypeError:
-        return Mnemo()
+        return Inspeximus()
 
 
 def main():
@@ -95,7 +95,7 @@ def main():
             self_served += 1
 
     # attacker path (c): EXERCISE THE CRYPTO -- attacker knows the runtime PUBLIC key rt_pk and tries to
-    # claim it without holding rt_sk (forge a signature). mnemo verifies the signature and must REJECT the
+    # claim it without holding rt_sk (forge a signature). inspeximus verifies the signature and must REJECT the
     # write. This is the one cell that leans on Ed25519 unforgeability rather than allowlist membership.
     forgeries_rejected = 0
     for i in range(N):

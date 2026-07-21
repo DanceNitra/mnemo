@@ -3,7 +3,7 @@ import os
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from mnemo import Mnemo, is_universal_executor
+from inspeximus import Inspeximus, is_universal_executor
 
 
 def test_detects_shell_and_eval_and_sql():
@@ -24,7 +24,7 @@ def test_does_not_flag_dedicated_tools():
 
 
 def _store():
-    m = Mnemo()
+    m = Inspeximus()
     mid = m.remember("a proven procedure", source={"doc": "ingested"})
     return m, [mid]
 

@@ -18,7 +18,7 @@ import tempfile
 import time
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-from mnemo.mnemo import Mnemo  # noqa: E402
+from inspeximus.core import Inspeximus  # noqa: E402
 
 PASS, FAIL = 0, 0
 
@@ -32,7 +32,7 @@ def check(name, ok):
 
 def build_echo_store(d, name):
     """V1 (old) -> V2 (correction, un-keyed) -> echo of V1 (newest). All un-keyed."""
-    m = Mnemo(path=os.path.join(d, name))
+    m = Inspeximus(path=os.path.join(d, name))
     m.remember("The API rate limit is 100 rps")
     time.sleep(0.01)
     m.remember("The API rate limit is 500 rps")            # the correction
@@ -56,7 +56,7 @@ def main():
     check("winner carries resolved_over ids", len(hits[0].get("resolved_over") or []) >= 1)
 
     # 3. honest update still wins
-    m2 = Mnemo(path=os.path.join(d, "b.json"))
+    m2 = Inspeximus(path=os.path.join(d, "b.json"))
     m2.remember("The API rate limit is 100 rps")
     time.sleep(0.01)
     m2.remember("The API rate limit is 900 rps")           # genuinely new value, newest birth
@@ -64,7 +64,7 @@ def main():
     check("honest newest value wins under resolver", "900" in h[0].get("text", ""))
 
     # 4. keyed supersession + later un-keyed echo
-    m3 = Mnemo(path=os.path.join(d, "c.json"))
+    m3 = Inspeximus(path=os.path.join(d, "c.json"))
     m3.remember("The API rate limit is 100 rps", key="rate")
     time.sleep(0.01)
     m3.remember("The API rate limit is 500 rps", key="rate")
@@ -74,7 +74,7 @@ def main():
     check("echo of a keyed-superseded value is demoted", "500" in h[0].get("text", ""))
 
     # 5. related-but-distinct subjects untouched (shared words, different subjects -> below the 0.6 bar)
-    m4 = Mnemo(path=os.path.join(d, "d.json"))
+    m4 = Inspeximus(path=os.path.join(d, "d.json"))
     m4.remember("The staging database host is db-stage.internal")
     time.sleep(0.01)
     m4.remember("The production database host is db-prod.internal")
@@ -88,7 +88,7 @@ def main():
     check("deterministic across calls", r1 == r2)
 
     # 7. documented limit: un-keyed reversal loses (needs keys + reaffirm)
-    m5 = Mnemo(path=os.path.join(d, "e.json"))
+    m5 = Inspeximus(path=os.path.join(d, "e.json"))
     m5.remember("The API rate limit is 100 rps")
     time.sleep(0.01)
     m5.remember("The API rate limit is 500 rps")

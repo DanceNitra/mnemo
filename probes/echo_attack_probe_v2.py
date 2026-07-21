@@ -10,7 +10,7 @@ deterministic and reproducible.
 Policies (all get: per-message sims, ordered value-bearing events with their {old|new} object, echo idxs):
   cosine            - similarity only, no update semantics
   recency           - last-mention-wins (strawman)
-  tie_recent        - mnemo 0.6.8 near-tie recency reorder (HONEST SELF-ATTACK)
+  tie_recent        - inspeximus 0.6.8 near-tie recency reorder (HONEST SELF-ATTACK)
   mem0_faithful     - v1 ADD/UPDATE/DELETE proxy: a contradicting new object UPDATEs (replaces) current
                       => last-writer-wins at the object level (no hash, no ledger)
   graphiti_faithful - bi-temporal: an edge is expired only if old.valid_at < new.valid_at; valid_at
@@ -27,14 +27,14 @@ outrank the best NEW-value message. For the structured policies (recency/mem0/gr
 "stale" = the policy's final surviving object for the fact is an OLD value. Controls: no-echo arm =
 false-invalidation baseline.
 
-RUN: python -u mnemo/probes/echo_attack_probe_v2.py   (needs echo_attack_paraphrases.json from the gen step)
+RUN: python -u inspeximus/probes/echo_attack_probe_v2.py   (needs echo_attack_paraphrases.json from the gen step)
 """
 import json, os, sys, time, hashlib
 sys.stdout.reconfigure(errors="replace")
 sys.path.insert(0, os.path.dirname(__file__))
 from echo_attack_probe import build_fixture, embed, cos, _norm, _cache, CACHE, TIE_EPS
 
-PARA = "mnemo/probes/echo_attack_paraphrases.json"
+PARA = "inspeximus/probes/echo_attack_paraphrases.json"
 MODELS = ["deepseek-v4-flash", "kimi-k2.7-code", "glm-5.2"]
 
 def object_of(text, old_vals, answer):
@@ -179,8 +179,8 @@ def main():
             d = f"  (Δ {rates[name]-base:+.3f})" if (base is not None and arm != "no_echo") else ""
             print(f"  {name:18s} stale={rates[name]:.3f}{d}")
     json.dump(_cache, open(CACHE, "w"))
-    json.dump(results, open("mnemo/probes/echo_attack_probe_v2_result.json", "w"), indent=2)
-    print(f"\n{time.time()-t0:.0f}s -> mnemo/probes/echo_attack_probe_v2_result.json")
+    json.dump(results, open("inspeximus/probes/echo_attack_probe_v2_result.json", "w"), indent=2)
+    print(f"\n{time.time()-t0:.0f}s -> inspeximus/probes/echo_attack_probe_v2_result.json")
 
 if __name__ == "__main__":
     main()

@@ -1,4 +1,4 @@
-"""RAMR operating-point dimension / mnemo demo: agent memory under EVOLVING + CONTAMINATED context.
+"""RAMR operating-point dimension / inspeximus demo: agent memory under EVOLVING + CONTAMINATED context.
 
 Motivated by the AI-coding finding (Crucible fc5c22): bare models lose where the human holds context
 the model lacks -> the binding constraint is CONTEXT/MEMORY QUALITY. This measures it head-to-head.
@@ -11,14 +11,14 @@ A stream of facts in three regimes (operating points):
 Query each subject for its CURRENT value under three retrieval strategies:
   cosine  : top-1 most-similar over ALL records (naive semantic store; no supersession, no corroboration)
   recency : newest record matching the subject (naive recency store)
-  mnemo   : supersession key (retires stale) + corroboration gate (repetition != corroboration) + value
-Expected: each NAIVE store wins some operating points and fails others; only mnemo is robust across all.
-Cloud-free: local nomic embedder (Ollama). MIT. Part of Agora / mnemo.
+  inspeximus   : supersession key (retires stale) + corroboration gate (repetition != corroboration) + value
+Expected: each NAIVE store wins some operating points and fails others; only inspeximus is robust across all.
+Cloud-free: local nomic embedder (Ollama). MIT. Part of Agora / inspeximus.
 """
 import sys, os, json, time, tempfile, urllib.request
 HERE = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.dirname(HERE))   # parent dir holds mnemo.py -> `from mnemo import Mnemo`
-from mnemo import Mnemo
+sys.path.insert(0, os.path.dirname(HERE))   # parent dir holds inspeximus.py -> `from inspeximus import Inspeximus`
+from inspeximus import Inspeximus
 
 _EC = {}
 def nomic(text):
@@ -42,7 +42,7 @@ def query(s): return "what is the current value for %s" % s
 
 def main():
     fd, path = tempfile.mkstemp(suffix=".json"); os.close(fd)
-    m = Mnemo(path=path, embed=nomic)
+    m = Inspeximus(path=path, embed=nomic)
     m.semantic_threshold = 0   # force SEMANTIC recall (we gave it the nomic embedder) - fair vs the cosine baseline
     truth = {}          # subject -> correct current value
     raw = []            # (subject, text, value, ts) for the naive baselines
@@ -88,7 +88,7 @@ def main():
     embs = {idx: nomic(txt) for idx,(s,txt,v,ts) in enumerate(raw)}
 
     cats = ["stable","superseded","poisoned"]
-    score = {st:{c:0 for c in cats} for st in ["cosine","recency","mnemo"]}
+    score = {st:{c:0 for c in cats} for st in ["cosine","recency","inspeximus"]}
     tot   = {c:0 for c in cats}
     for c_i, cat in enumerate(cats):
         subs = [subj(i) for i in range(c_i*N, (c_i+1)*N)]
@@ -101,19 +101,19 @@ def main():
             # recency: newest matching record
             newest = max(cand, key=lambda idx: raw[idx][3])
             if raw[newest][2]==truth[s]: score["recency"][cat]+=1
-            # mnemo recall
+            # inspeximus recall
             res = m.recall(q, k=3)
             mv = parse_val(res[0]["text"]) if res else None
-            if mv==truth[s]: score["mnemo"][cat]+=1
+            if mv==truth[s]: score["inspeximus"][cat]+=1
 
     print("=== Agent memory across operating points (n=%d/regime) ===" % N)
     print("strategy   | stable | superseded | poisoned | OVERALL")
-    for st in ["cosine","recency","mnemo"]:
+    for st in ["cosine","recency","inspeximus"]:
         ov = sum(score[st][c] for c in cats)/(3*N)
         print("  %-8s |  %2d/%d  |    %2d/%d   |   %2d/%d  |  %.0f%%" % (
             st, score[st]["stable"],N, score[st]["superseded"],N, score[st]["poisoned"],N, 100*ov))
     print("\nMEASURED: a naive cosine store fails on superseded (supersession blind spot) and poisoned; "
-          "a recency store fixes superseded but still fails poisoned (newest=freshest lie); mnemo "
+          "a recency store fixes superseded but still fails poisoned (newest=freshest lie); inspeximus "
           "(supersession key + corroboration gate) is the only one robust ACROSS all operating points.")
     print("This is the memory 'operating-point trap': each single mechanism wins one regime and loses "
           "another. Ties to Crucible fc5c22 (AI coding) - context/memory quality is the binding lever.")

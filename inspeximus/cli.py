@@ -1,15 +1,15 @@
-"""mnemo CLI — script the memory layer from the shell, no Python or MCP server needed.
+"""inspeximus CLI — script the memory layer from the shell, no Python or MCP server needed.
 
-    mnemo remember "the deploy channel is BLUE-9" --key deploy-channel
-    mnemo remember "the deploy channel is RED-2"  --key deploy-channel   # supersedes
-    mnemo recall  "what is the deploy channel?"                          # -> RED-2 (current-truth)
-    mnemo revert  deploy-channel                                         # roll back to BLUE-9
-    mnemo list -n 10                                                     # recent active memories
-    mnemo forget --key deploy-channel                                    # or --id <id> / --contains <substr>
-    mnemo stats
+    inspeximus remember "the deploy channel is BLUE-9" --key deploy-channel
+    inspeximus remember "the deploy channel is RED-2"  --key deploy-channel   # supersedes
+    inspeximus recall  "what is the deploy channel?"                          # -> RED-2 (current-truth)
+    inspeximus revert  deploy-channel                                         # roll back to BLUE-9
+    inspeximus list -n 10                                                     # recent active memories
+    inspeximus forget --key deploy-channel                                    # or --id <id> / --contains <substr>
+    inspeximus stats
 
-Store path: --path, else $MNEMO_PATH, else ./mnemo_memory.json (same default as the MCP server, so the CLI
-and `mnemo-mcp` share one store). Recall is lexical by default; set $MNEMO_EMBED_URL (+ $MNEMO_EMBED_MODEL) to
+Store path: --path, else $INSPEXIMUS_PATH, else ./inspeximus_memory.json (same default as the MCP server, so the CLI
+and `inspeximus-mcp` share one store). Recall is lexical by default; set $INSPEXIMUS_EMBED_URL (+ $INSPEXIMUS_EMBED_MODEL) to
 any OpenAI-compatible /embeddings endpoint (e.g. local Ollama) for semantic recall. Zero dependencies."""
 from __future__ import annotations
 import argparse
@@ -19,13 +19,13 @@ import sys
 
 
 def _embedder():
-    """Optional embedder (urllib, zero-dep) — enabled only if MNEMO_EMBED_URL is set. Fail-open."""
-    url = os.environ.get("MNEMO_EMBED_URL", "").strip()
+    """Optional embedder (urllib, zero-dep) — enabled only if INSPEXIMUS_EMBED_URL is set. Fail-open."""
+    url = os.environ.get("INSPEXIMUS_EMBED_URL", "").strip()
     if not url:
         return None
     import urllib.request
-    model = os.environ.get("MNEMO_EMBED_MODEL", "text-embedding-3-small").strip()
-    key = os.environ.get("MNEMO_EMBED_KEY", "").strip()
+    model = os.environ.get("INSPEXIMUS_EMBED_MODEL", "text-embedding-3-small").strip()
+    key = os.environ.get("INSPEXIMUS_EMBED_KEY", "").strip()
 
     def embed(text: str):
         body = json.dumps({"model": model, "input": text}).encode()
@@ -40,11 +40,11 @@ def _embedder():
 
 
 def _store(path, persist_vectors: bool = False):
-    from inspeximus import Mnemo
-    p = path or os.environ.get("MNEMO_PATH") or "mnemo_memory.json"
+    from inspeximus import Inspeximus
+    p = path or os.environ.get("INSPEXIMUS_PATH") or "inspeximus_memory.json"
     # persist_vectors stays OFF by default (vectors are a re-derivable cache; writing them balloons the store
     # file on every command). `reembed` opts in — persisting is the entire point of that command.
-    return Mnemo(path=p, embed=_embedder(), persist_vectors=persist_vectors)
+    return Inspeximus(path=p, embed=_embedder(), persist_vectors=persist_vectors)
 
 
 def _out(obj, as_json):
@@ -57,8 +57,8 @@ def _out(obj, as_json):
 
 
 def main(argv=None):
-    ap = argparse.ArgumentParser(prog="mnemo", description="mnemo — the self-correcting memory layer (CLI).")
-    ap.add_argument("--path", help="store file (default: $MNEMO_PATH or ./mnemo_memory.json)")
+    ap = argparse.ArgumentParser(prog="inspeximus", description="inspeximus — the self-correcting memory layer (CLI).")
+    ap.add_argument("--path", help="store file (default: $INSPEXIMUS_PATH or ./inspeximus_memory.json)")
     ap.add_argument("--json", action="store_true", help="emit JSON")
     sub = ap.add_subparsers(dest="cmd", required=True)
 
@@ -87,7 +87,7 @@ def main(argv=None):
     sub.add_parser("stats", help="store summary")
 
     br = sub.add_parser("browse", help="render a self-contained offline HTML memory browser")
-    br.add_argument("--out", default="mnemo_browser.html", help="output HTML file")
+    br.add_argument("--out", default="inspeximus_browser.html", help="output HTML file")
     br.add_argument("--open", action="store_true", help="open it in the default browser after writing")
 
     dc = sub.add_parser("decision", help="store a DECISION (what you chose + why), topic-keyed + supersedable")
@@ -104,7 +104,7 @@ def main(argv=None):
     wy = sub.add_parser("why", help="explain why memories were recalled for a query (per-channel breakdown)")
     wy.add_argument("query")
 
-    di = sub.add_parser("distill", help="LLM-distill a transcript into memories (needs MNEMO_LLM_URL)")
+    di = sub.add_parser("distill", help="LLM-distill a transcript into memories (needs INSPEXIMUS_LLM_URL)")
     di.add_argument("--file", help="read text from a file (else stdin)")
 
     re_ = sub.add_parser("reembed", help="rebuild embeddings for records that have none (after an embed-recipe "
@@ -174,7 +174,7 @@ def main(argv=None):
 
     elif a.cmd == "reembed":
         if m.embed is None:
-            print("reembed: no embedder configured (set MNEMO_EMBED_URL, or .mnemo/config.json {\"embed\":{...}})",
+            print("reembed: no embedder configured (set INSPEXIMUS_EMBED_URL, or .inspeximus/config.json {\"embed\":{...}})",
                   file=sys.stderr)
             return 2
         m = _store(a.path, persist_vectors=True)      # re-open so the rebuilt vectors actually reach disk

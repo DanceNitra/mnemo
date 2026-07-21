@@ -1,14 +1,14 @@
-"""mnemo_session_adapter_probe.py — MnemoSession faithfully implements the OpenAI Agents `Session` protocol.
+"""inspeximus_session_adapter_probe.py — InspeximusSession faithfully implements the OpenAI Agents `Session` protocol.
 
 Verifies the adapter's contract WITHOUT the SDK installed (the protocol is matched structurally). Checks map
-to the SDK's documented Session semantics + mnemo's honest governance bonus.
+to the SDK's documented Session semantics + inspeximus's honest governance bonus.
 """
 import sys, pathlib, asyncio, tempfile
-# test the SHIPPED package layout (mnemo_pypi/mnemo/ is the real package with integrations/), so
-# `from mnemo.integrations...` resolves exactly as an installed user would import it.
-sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / "mnemo_pypi"))
-from mnemo import Mnemo, new_receipt_keypair
-from mnemo.integrations.openai_agents import MnemoSession
+# test the SHIPPED package layout (inspeximus_pypi/inspeximus/ is the real package with integrations/), so
+# `from inspeximus.integrations...` resolves exactly as an installed user would import it.
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / "inspeximus_pypi"))
+from inspeximus import Inspeximus, new_receipt_keypair
+from inspeximus.integrations.openai_agents import InspeximusSession
 
 
 def item(role, content):
@@ -20,7 +20,7 @@ async def run():
     tmp = pathlib.Path(tempfile.mkdtemp())
     path = str(tmp / "sessions.json")
 
-    s = MnemoSession("user-42", path=path)
+    s = InspeximusSession("user-42", path=path)
 
     # empty session
     ok["A empty get -> []"] = (await s.get_items()) == []
@@ -42,14 +42,14 @@ async def run():
     ok["G pop shrank history"] = (await s.get_items()) == [item("user", "hi"), item("assistant", "hello")]
 
     # multi-session isolation on ONE shared store
-    store = Mnemo(path=str(tmp / "shared.json"))
-    sa = MnemoSession("A", store=store); sb = MnemoSession("B", store=store)
+    store = Inspeximus(path=str(tmp / "shared.json"))
+    sa = InspeximusSession("A", store=store); sb = InspeximusSession("B", store=store)
     await sa.add_items([item("user", "a1")]); await sb.add_items([item("user", "b1"), item("user", "b2")])
     ok["H session isolation"] = ((await sa.get_items()) == [item("user", "a1")]
                                  and (await sb.get_items()) == [item("user", "b1"), item("user", "b2")])
 
     # persistence across a reopen (same path)
-    s2 = MnemoSession("user-42", path=path)
+    s2 = InspeximusSession("user-42", path=path)
     ok["I persistence across reopen"] = (await s2.get_items()) == [item("user", "hi"), item("assistant", "hello")]
 
     # clear removes only this session
@@ -59,8 +59,8 @@ async def run():
 
     # governance bonus: erasure leaves an accounted-for, tamper-evident trail
     sk, pk = new_receipt_keypair()
-    gstore = Mnemo(path=str(tmp / "gov.json"), receipts=True, receipt_key=sk, receipt_pubkey=pk)
-    gs = MnemoSession("user-9", store=gstore)
+    gstore = Inspeximus(path=str(tmp / "gov.json"), receipts=True, receipt_key=sk, receipt_pubkey=pk)
+    gs = InspeximusSession("user-9", store=gstore)
     await gs.add_items([item("user", "delete me later"), item("assistant", "ok")])
     r = gs.forget_subject(request_id="dsar-1")
     verify_ok, _ = gstore.verify_writes(expected_pubkey=pk)
@@ -69,7 +69,7 @@ async def run():
                                              and gstore.erasure_report()["tombstoned_total"] == 2)
 
     print("=" * 66)
-    print("MnemoSession — OpenAI Agents Session protocol (faithful + governance)")
+    print("InspeximusSession — OpenAI Agents Session protocol (faithful + governance)")
     print("=" * 66)
     for k, v in ok.items():
         print(f"  [{'PASS' if v else 'FAIL'}] {k}")

@@ -7,7 +7,7 @@ name: release
 #
 # One-time setup on PyPI (owner, web UI — cannot be done from here):
 #   https://pypi.org/manage/project/inspeximus/settings/publishing/
-#   Owner: DanceNitra · Repository: mnemo · Workflow: release.yml · Environment: pypi
+#   Owner: DanceNitra · Repository: inspeximus · Workflow: release.yml · Environment: pypi
 # After that, publishing needs no secret at all.
 
 on:

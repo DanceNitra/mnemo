@@ -15,7 +15,7 @@ Pre-registered checks (memories are back-dated by editing ts so 'old' is determi
 """
 import sys, pathlib, time
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
-from mnemo import Mnemo
+from inspeximus import Inspeximus
 
 DAY = 86400.0
 
@@ -33,7 +33,7 @@ def main():
 
     # A/B: keyed value change -> old value superseded; both back-dated old. Retention drops the old
     # superseded value but KEEPS the current active value.
-    m = Mnemo(path=None)
+    m = Inspeximus(path=None)
     old = m.remember("region is frankfurt", key="cfg::region", object="frankfurt")
     new = m.remember("region is ohio", key="cfg::region", object="ohio")     # supersedes frankfurt
     _age(m, old, 40); _age(m, new, 40)                                       # both 40 days old
@@ -44,7 +44,7 @@ def main():
     ok["B current keyed value KEPT (even if old)"] = new in alive
 
     # C: old un-keyed episodic turn -> expired
-    m = Mnemo(path=None)
+    m = Inspeximus(path=None)
     e = m.remember("user said hi three weeks ago", mtype="episodic")
     _age(m, e, 40)
     r = m.remember("user said hi just now", mtype="episodic")               # recent -> kept
@@ -54,21 +54,21 @@ def main():
     ok["E recent memory KEPT"] = r in ids
 
     # D: semantic fact never expired
-    m = Mnemo(path=None)
+    m = Inspeximus(path=None)
     s = m.remember("water boils at 100c at sea level", mtype="semantic")
     _age(m, s, 400)
     m.apply_retention(max_age_days=30)
     ok["D semantic fact KEPT (even if old)"] = any(x["id"] == s for x in m.items)
 
     # F: drop_superseded=False preserves history
-    m = Mnemo(path=None)
+    m = Inspeximus(path=None)
     o2 = m.remember("v is 1", key="k", object="1"); n2 = m.remember("v is 2", key="k", object="2")
     _age(m, o2, 40); _age(m, n2, 40)
     m.apply_retention(max_age_days=30, drop_superseded=False)
     ok["F drop_superseded=False preserves superseded"] = any(x["id"] == o2 for x in m.items)
 
     # G: sleep(retention_days=) applies + reports
-    m = Mnemo(path=None)
+    m = Inspeximus(path=None)
     x1 = m.remember("stale note", mtype="episodic"); _age(m, x1, 40)
     rep = m.sleep(retention_days=30)
     ok["G sleep(retention_days=) applies + reports"] = ("retention" in rep and rep["retention"]["expired"] >= 1

@@ -1,4 +1,4 @@
-"""The OPT-IN temporal gate (`Mnemo.temporal_gate`), measured as a shipped feature. Suggested by hannune (r/RAG).
+"""The OPT-IN temporal gate (`Inspeximus.temporal_gate`), measured as a shipped feature. Suggested by hannune (r/RAG).
 
 A corroborating link proves independence of source, never independence of TIMING. Genuinely independent sources
 rarely write within seconds of each other; a coordinated forgery writes its witnesses in a burst. `temporal_gate`
@@ -7,7 +7,7 @@ rarely write within seconds of each other; a coordinated forgery writes its witn
 _distinct_sources collapses one canonical source, but on TIME. So a 2-witness burst counts as one; two witnesses
 spread out in time count as two.
 
-Three cases, real mnemo (`_corroborated`), timestamps set explicitly:
+Three cases, real inspeximus (`_corroborated`), timestamps set explicitly:
   1. genuine recovery, witnesses SPREAD OUT (hours apart, 2 sources)   -> corroborated OFF and ON  (untouched)
   2. BURST forgery, 2 witnesses co-arrive within the window            -> corroborated OFF, BLOCKED ON  (the win)
   3. PATIENT forgery, 2 witnesses spaced BEYOND the window             -> corroborated OFF and ON  (honest limit)
@@ -16,23 +16,23 @@ FALSIFIER: if the gate blocked the spread-out genuine recovery (case 1 ON) or fa
 ON), it would be useless or too costly. Neither holds. Case 3 is the honest limit: a patient attacker who spaces
 writes out defeats a timing signal (patience buys past it -- the sleeper again).
 
-Deterministic, zero-dependency. MIT. Part of Agora / mnemo.
-Run:  python mnemo/probes/temporal_gate_demo.py
+Deterministic, zero-dependency. MIT. Part of Agora / inspeximus.
+Run:  python inspeximus/probes/temporal_gate_demo.py
 """
 import os
 import sys
 import tempfile
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
-from mnemo import Mnemo
+from inspeximus import Inspeximus
 
 WINDOW = 60.0   # seconds; witnesses arriving within this of each other collapse to one anchor
 
 
 def _build(temporal_gate, witness_offsets, sources):
     """A store: claim P at t=1000 with 2 corroborating links whose ts = 1000 + offset (seconds), from the given
-    source docs. Returns whether real mnemo counts P as corroborated under the given temporal_gate."""
-    m = Mnemo(os.path.join(tempfile.mkdtemp(), "t.jsonl"))
+    source docs. Returns whether real inspeximus counts P as corroborated under the given temporal_gate."""
+    m = Inspeximus(os.path.join(tempfile.mkdtemp(), "t.jsonl"))
     m.temporal_gate = temporal_gate
     P = m.remember("contested value under override", source={"doc": "origin"})
     links = [m.remember(f"witness {i}", source={"doc": s}) for i, s in enumerate(sources)]
@@ -45,7 +45,7 @@ def _build(temporal_gate, witness_offsets, sources):
 
 
 def main():
-    print("=== mnemo temporal_gate (opt-in): do corroborating witnesses have to arrive INDEPENDENTLY in time? ===\n")
+    print("=== inspeximus temporal_gate (opt-in): do corroborating witnesses have to arrive INDEPENDENTLY in time? ===\n")
     cases = [
         ("genuine recovery, witnesses SPREAD OUT (0s, 3h)", [0.0, 10800.0], ["indep-lab", "indep-forum"]),
         ("BURST forgery, 2 witnesses co-arrive (0s, 5s)", [0.0, 5.0], ["forged-a", "forged-b"]),

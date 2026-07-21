@@ -1,7 +1,7 @@
 {
  "ok": true,
  "n_entities": 12,
- "mnemo": {
+ "inspeximus": {
   "retain_ms_median": 0.012,
   "retain_ms_p95": 0.022,
   "recall_ms_median": 0.02,

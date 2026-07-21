@@ -10,7 +10,7 @@ unconstrained. Asserts (each able to FAIL):
 """
 import sys
 sys.path.insert(0, ".")
-from mnemo import Mnemo
+from inspeximus import Inspeximus
 
 FAILS = []
 def check(n, c):
@@ -18,7 +18,7 @@ def check(n, c):
     if not c: FAILS.append(n)
 
 def fresh():
-    m = Mnemo(path=None)                                    # lexical, no GPU
+    m = Inspeximus(path=None)                                    # lexical, no GPU
     m.remember("shared coffee preference is black", user_id="U")                       # user-level (U)
     m.remember("coffee note from session one is latte", user_id="U", session_id="S1")  # U / S1
     m.remember("coffee note from session two is espresso", user_id="U", session_id="S2")  # U / S2
@@ -54,7 +54,7 @@ check("4 legacy recall (no ids) sees all 5", len(h4) == 5)
 # remember_decision/distill_and_remember then wrote records with NO tenant stamp (visible to every other
 # view) and graph()/subgraph() returned every tenant's edges — a cross-tenant leak through the newer surface.
 import tempfile as _tf, os as _os
-mt = Mnemo(path=_os.path.join(_tf.mkdtemp(), "t.json"))
+mt = Inspeximus(path=_os.path.join(_tf.mkdtemp(), "t.json"))
 acme, other = mt.for_tenant("acme"), mt.for_tenant("other")
 _id = acme.remember_decision("acme picked RED", because="blue failed", topic="colour")
 _rec = [r for r in mt.items if r.get("id") == _id]

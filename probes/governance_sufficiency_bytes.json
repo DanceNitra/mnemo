@@ -26,7 +26,7 @@
     "sth_hash": "d3acc92b599e27baea40758feaab184a0d1f774d4268827eee75ccec676458f0"
    }
   },
-  "scope": "Erasure is within THIS mnemo store only (not the app's vector store, prompt logs, or backups); covers the subject PLUS its derived_from lineage. Tamper-evident integrity primitive, NOT a compliance certification. The tombstone proves the ACT of deletion, never the content; its signature is load-bearing only against a non-holder of receipt_key. Anchor the chain head externally for operator-adversarial audit."
+  "scope": "Erasure is within THIS inspeximus store only (not the app's vector store, prompt logs, or backups); covers the subject PLUS its derived_from lineage. Tamper-evident integrity primitive, NOT a compliance certification. The tombstone proves the ACT of deletion, never the content; its signature is load-bearing only against a non-holder of receipt_key. Anchor the chain head externally for operator-adversarial audit."
  },
  "write_receipts": [
   {

@@ -1,4 +1,4 @@
-"""MnemoStore — a LangGraph `BaseStore` backed by mnemo (with queryable value history).
+"""InspeximusStore — a LangGraph `BaseStore` backed by inspeximus (with queryable value history).
 
 LangGraph agents persist long-term state through a `BaseStore` (`put`/`get`/`search`/`delete` over
 `(namespace, key)`), and LangMem sits on top of any BaseStore — so one adapter reaches both. A custom store
@@ -6,18 +6,18 @@ implements `batch`/`abatch`; the high-level accessors delegate to them.
 
 The honest differentiator vs the built-in `InMemoryStore`: LangGraph's own store is last-write-wins with NO
 history — a second `put` on the same key silently overwrites the first, and the old value is gone.
-`MnemoStore` gives identical put/get/search/delete semantics BUT keeps the superseded values on mnemo's
+`InspeximusStore` gives identical put/get/search/delete semantics BUT keeps the superseded values on inspeximus's
 bi-temporal supersession ledger, so you additionally get `history(namespace, key)` (every value the key has
 held, in order), point-in-time reads, tamper-evident receipts, and `forget_subject` erasure — governance a
-plain KV store can't offer. (mnemo's supersession itself is not the novelty here: BaseStore already overwrites
-on same-key put; the novelty is that mnemo *keeps and can prove* what the value used to be.)
+plain KV store can't offer. (inspeximus's supersession itself is not the novelty here: BaseStore already overwrites
+on same-key put; the novelty is that inspeximus *keeps and can prove* what the value used to be.)
 
-    from inspeximus.integrations.langgraph import MnemoStore
-    store = MnemoStore(path="lg.json")
+    from inspeximus.integrations.langgraph import InspeximusStore
+    store = InspeximusStore(path="lg.json")
     store.put(("user", "42"), "timezone", {"tz": "UTC"})
     store.put(("user", "42"), "timezone", {"tz": "PST"})   # overwrites, like InMemoryStore
     store.get(("user", "42"), "timezone").value            # -> {"tz": "PST"}
-    store.history(("user", "42"), "timezone")              # -> [{"tz": "UTC"}, {"tz": "PST"}]  (mnemo-only)
+    store.history(("user", "42"), "timezone")              # -> [{"tz": "UTC"}, {"tz": "PST"}]  (inspeximus-only)
 
 Importing this module imports LangGraph (it subclasses BaseStore) — it is an opt-in extra; `import inspeximus`
 never pulls it in, so the core stays zero-dependency.
@@ -41,13 +41,13 @@ def _dt(ts: float) -> datetime:
     return datetime.fromtimestamp(ts or 0, tz=timezone.utc)
 
 
-class MnemoStore(BaseStore):
-    """LangGraph BaseStore over a mnemo store; keeps queryable value history the built-in store discards."""
+class InspeximusStore(BaseStore):
+    """LangGraph BaseStore over a inspeximus store; keeps queryable value history the built-in store discards."""
 
     def __init__(self, path: str | None = None, store: Any = None):
         if store is None:
-            from inspeximus import Mnemo
-            store = Mnemo(path=path)
+            from inspeximus import Inspeximus
+            store = Inspeximus(path=path)
         self.store = store
 
     @staticmethod
@@ -118,25 +118,25 @@ class MnemoStore(BaseStore):
     async def abatch(self, ops) -> list:
         return self.batch(ops)
 
-    # ── mnemo-only bonus: the history a plain KV store discards ──
+    # ── inspeximus-only bonus: the history a plain KV store discards ──
     def history(self, namespace: tuple[str, ...], key: str) -> list[dict]:
         """Every value this (namespace, key) has held, oldest-first — including superseded ones the built-in
-        InMemoryStore would have overwritten and lost. Backed by mnemo's bi-temporal supersession ledger."""
+        InMemoryStore would have overwritten and lost. Backed by inspeximus's bi-temporal supersession ledger."""
         mk = self._mkey(namespace, key)
         rows = [r for r in self.store.items if (r.get("meta") or {}).get("mkey") == mk]
         rows.sort(key=lambda r: r.get("valid_from", r.get("ts", 0)))
         return [(r.get("meta") or {}).get("value") for r in rows]
 
 
-class MnemoSaver(BaseCheckpointSaver):
-    """LangGraph `BaseCheckpointSaver` backed by mnemo — the THREAD-STATE half of LangGraph memory (MnemoStore is
+class InspeximusSaver(BaseCheckpointSaver):
+    """LangGraph `BaseCheckpointSaver` backed by inspeximus — the THREAD-STATE half of LangGraph memory (InspeximusStore is
     the long-term half). Persists checkpoints + pending writes so a graph can resume, with the SAME contract as
-    SqliteSaver/PostgresSaver, but in a single zero-dependency mnemo JSON file (no DB, no server). Checkpoints and
-    writes are stored as mnemo records (payloads serialized via LangGraph's own serde, base64 in meta), tagged
+    SqliteSaver/PostgresSaver, but in a single zero-dependency inspeximus JSON file (no DB, no server). Checkpoints and
+    writes are stored as inspeximus records (payloads serialized via LangGraph's own serde, base64 in meta), tagged
     `_langgraph` so they never pollute normal recall.
 
-        from inspeximus.integrations.langgraph import MnemoSaver
-        graph = builder.compile(checkpointer=MnemoSaver(path="threads.json"))
+        from inspeximus.integrations.langgraph import InspeximusSaver
+        graph = builder.compile(checkpointer=InspeximusSaver(path="threads.json"))
 
     Async methods delegate to the sync ones (a local file store has no real I/O concurrency to exploit); fine for
     single-process agents. Importing this module imports LangGraph — opt-in; `import inspeximus` never pulls it in."""
@@ -144,8 +144,8 @@ class MnemoSaver(BaseCheckpointSaver):
     def __init__(self, path: str | None = None, store: Any = None, serde: Any = None):
         super().__init__(serde=serde)
         if store is None:
-            from inspeximus import Mnemo
-            store = Mnemo(path=path)
+            from inspeximus import Inspeximus
+            store = Inspeximus(path=path)
         self.store = store
 
     @staticmethod

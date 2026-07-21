@@ -28,8 +28,8 @@ Falsifier (pre-registered):
   * If NO ordering ever leaves a stale derived fact active under the naive policy A, then reordering is
     harmless in practice and there is no shareable news -> also a KILL (we do not ship "everything is fine").
 
-Run: python mnemo/probes/toki_concurrency_probe.py   (cloud-free; no LLM, no network; needs numpy)
-Part of Agora / mnemo (MIT). Reuses the fact triples from supersession_replication.py.
+Run: python inspeximus/probes/toki_concurrency_probe.py   (cloud-free; no LLM, no network; needs numpy)
+Part of Agora / inspeximus (MIT). Reuses the fact triples from supersession_replication.py.
 """
 import os
 import sys
@@ -37,7 +37,7 @@ import tempfile
 import numpy as np
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from mnemo import Mnemo  # noqa: E402
+from inspeximus import Inspeximus  # noqa: E402
 from probes.supersession_replication import FACTS  # noqa: E402
 
 
@@ -98,7 +98,7 @@ def _build(policy, ordering, fact):
     s, r, old, new, rephrase = fact
     key = f"{s}::{r}".replace(" ", "-").lower()
     path = _tmp_store()
-    m = Mnemo(path=path, receipts=True)
+    m = Inspeximus(path=path, receipts=True)
 
     def write_root_old():
         return m.remember(f"{s} {r}: {old}", key=key, object=old, source={"doc": s})

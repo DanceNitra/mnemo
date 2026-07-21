@@ -51,7 +51,7 @@ jobs:
           fi
 
   basestore-parity:
-    name: MnemoStore vs LangGraph's own store
+    name: InspeximusStore vs LangGraph's own store
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

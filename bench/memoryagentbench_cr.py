@@ -1,9 +1,9 @@
 """
-MemoryAgentBench — Conflict Resolution (FactConsolidation) external benchmark, mnemo vs accumulate baseline.
+MemoryAgentBench — Conflict Resolution (FactConsolidation) external benchmark, inspeximus vs accumulate baseline.
 
 Why this bench: MemoryAgentBench (Hu et al., arXiv:2507.05257) reports that on the Conflict-Resolution axis
 EVERY evaluated memory system (mem0, MemGPT, Cognee, BM25 RAG, full-context GPT-4o) scores single digits
-(<=7%). CR = "update outdated information instead of accumulating", which is exactly mnemo's supersession.
+(<=7%). CR = "update outdated information instead of accumulating", which is exactly inspeximus's supersession.
 This is neutral, published, external ground, not a self-authored probe.
 
 Task (FactConsolidation, multi-hop, ~6k context): a numbered stream of facts where the SAME (subject,
@@ -12,7 +12,7 @@ An accumulate store surfaces the stale value and the LLM chains the wrong fact.
 
 Fairness: SAME LLM for both arms (Ollama Cloud), the ONLY difference is the memory layer:
   - baseline "accumulate": the LLM sees ALL fact lines (stale + updated).
-  - mnemo "consolidate": each parseable fact is remember()'d with key=(subject|relation); a later
+  - inspeximus "consolidate": each parseable fact is remember()'d with key=(subject|relation); a later
     restatement supersedes the earlier, so the LLM sees only the LATEST value per key.
 We report the baseline number too, so the <=7% claim is reproduced under our protocol, not assumed.
 """
@@ -75,13 +75,13 @@ def fact_lines(context: str):
             for l in context.split("\n") if re.match(r"^\d+\.\s", l)]
 
 
-def consolidate_with_mnemo(lines):
-    """Feed facts into mnemo in stream order; a later restatement of the same (entity|relation) key
+def consolidate_with_inspeximus(lines):
+    """Feed facts into inspeximus in stream order; a later restatement of the same (entity|relation) key
     supersedes the earlier. Return the ACTIVE consolidated fact list (latest per key + unmatched)."""
     import os, sys
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-    from mnemo import Mnemo
-    st = Mnemo(None)                       # no embedder needed: keyed supersession, not semantic recall
+    from inspeximus import Inspeximus
+    st = Inspeximus(None)                       # no embedder needed: keyed supersession, not semantic recall
     passthrough = []
     for ln in lines:
         p = parse_fact(ln)
@@ -118,29 +118,29 @@ def _correct(output, gold_list):
 
 def run_eval(row, n_questions=25, k=30):
     lines = fact_lines(row["context"])
-    consolidated, st = consolidate_with_mnemo(lines)      # st: mnemo store, keyed-superseded
+    consolidated, st = consolidate_with_inspeximus(lines)      # st: inspeximus store, keyed-superseded
     # a RAW-accumulate store (all facts, no supersession) for a same-retrieval fair contrast
-    from mnemo import Mnemo
-    raw = Mnemo(None)
+    from inspeximus import Inspeximus
+    raw = Inspeximus(None)
     for ln in lines:
         raw.remember(ln)
     qs = list(row["questions"])[:n_questions]
     golds = list(row["answers"])[:n_questions]
-    hits = {"base_full": 0, "mnemo_full": 0, "raw_retr": 0, "mnemo_retr": 0}
+    hits = {"base_full": 0, "inspeximus_full": 0, "raw_retr": 0, "inspeximus_retr": 0}
     for q, gold in zip(qs, golds):
         gl = list(gold) if hasattr(gold, "__len__") and not isinstance(gold, str) else [gold]
         # full-context arms
         if _correct(_llm(lines, q), gl):
             hits["base_full"] += 1
         if _correct(_llm(consolidated, q), gl):
-            hits["mnemo_full"] += 1
+            hits["inspeximus_full"] += 1
         # retrieval arms: lexical top-k, SAME retriever; only supersession differs
         raw_hits = [h["text"] for h in raw.recall(q, k=k, mode="lexical")]
         mn_hits = [h["text"] for h in st.recall(q, k=k, mode="lexical")]
         if _correct(_llm(raw_hits, q), gl):
             hits["raw_retr"] += 1
         if _correct(_llm(mn_hits, q), gl):
-            hits["mnemo_retr"] += 1
+            hits["inspeximus_retr"] += 1
     n = len(qs)
     return {"n": n, "facts": len(lines), "consolidated": len(consolidated), "k": k,
             **{f"{key}_acc": round(v / n, 3) for key, v in hits.items()}}
@@ -166,7 +166,7 @@ if __name__ == "__main__":
             else:
                 keys[pr[0]] += 1
         conflicts = sum(1 for k, n in keys.items() if n > 1)
-        active, st = consolidate_with_mnemo(lines)
+        active, st = consolidate_with_inspeximus(lines)
         tot_facts += len(lines); tot_active += len(active)
         tot_conflicts += conflicts; tot_unmatched += unmatched
         print(f"row {i}: facts={len(lines)} matched_keys={len(keys)} conflicts={conflicts} "

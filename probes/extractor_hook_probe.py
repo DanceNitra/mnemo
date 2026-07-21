@@ -7,7 +7,7 @@ extractor never breaks a write. The extractor here is a tiny deterministic regex
 """
 import sys, pathlib, re
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
-from mnemo import Mnemo
+from inspeximus import Inspeximus
 
 # toy deterministic extractor: "<entity> <rel> is <value>" -> (key="<entity>::<rel>", object="<value>")
 _PAT = re.compile(r"(?P<subj>[\w ]+?)\s+(?:is|=)\s+(?P<val>[\w.\-]+)\s*$", re.I)
@@ -28,14 +28,14 @@ def main():
     ok = {}
 
     # baseline: NO extractor -> plain free-text writes do NOT supersede (both stay active)
-    m = Mnemo(path=None)
+    m = Inspeximus(path=None)
     m.remember("server timezone is UTC")
     m.remember("server timezone is PST")
     active_no = [r for r in m.items if r.get("status") == "active"]
     ok["A no extractor -> no auto-supersession (append-only)"] = len(active_no) == 2
 
     # with extractor: the same free-text writes now key + supersede automatically -> current-truth
-    m = Mnemo(path=None)
+    m = Inspeximus(path=None)
     m.extractor = extract
     m.remember("server timezone is UTC")
     m.remember("server timezone is PST")     # same key -> supersedes UTC, no manual key=
@@ -43,7 +43,7 @@ def main():
         and len([r for r in m.items if r.get("status") == "active"]) == 1)
 
     # echo_guard composes: restating the superseded value does not resurrect it
-    m = Mnemo(path=None); m.extractor = extract; m.echo_guard = True
+    m = Inspeximus(path=None); m.extractor = extract; m.echo_guard = True
     m.remember("region is frankfurt"); m.remember("region is ohio")
     r = m.remember("region is frankfurt")    # echo of superseded value, via extractor-derived key/object
     rec = next(x for x in m.items if x["id"] == r)
@@ -51,7 +51,7 @@ def main():
         and _active_val(m, "fact::region") == "ohio")
 
     # check_conflict composes: a new free-text value is flagged as a keyed change before you commit
-    m = Mnemo(path=None); m.extractor = extract
+    m = Inspeximus(path=None); m.extractor = extract
     m.remember("retry cap is 5")
     k, obj = extract("retry cap is 12")
     conflicts = m.check_conflict("retry cap is 12", key=k, object=obj)
@@ -59,20 +59,20 @@ def main():
 
     # forget_subject composes: erase by the extractor-derived source is untouched; here confirm keying didn't
     # break plain source-based erasure (governance still whole)
-    m = Mnemo(path=None); m.extractor = extract
+    m = Inspeximus(path=None); m.extractor = extract
     m.remember("alice email is a@x.test", source={"doc": "user-alice"})
     er = m.forget_subject("user-alice")
     ok["E forget_subject still works with extractor on"] = (er["erased"] == 1)
 
     # fail-open: a broken extractor never breaks a write (falls back to plain append)
-    m = Mnemo(path=None)
+    m = Inspeximus(path=None)
     m.extractor = lambda t: (_ for _ in ()).throw(RuntimeError("boom"))
     rid = m.remember("this should still be stored")
     ok["F broken extractor -> fail-open (write still lands)"] = (
         any(x["id"] == rid and x.get("status") == "active" for x in m.items))
 
     # explicit key wins: an extractor never overrides a caller-supplied key
-    m = Mnemo(path=None); m.extractor = extract
+    m = Inspeximus(path=None); m.extractor = extract
     m.remember("port is 8080", key="explicit::port", object="8080")
     ok["G explicit key overrides extractor"] = (_active_val(m, "explicit::port") == "8080"
         and _active_val(m, "fact::port") is None)

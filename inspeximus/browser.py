@@ -1,16 +1,16 @@
-"""mnemo.browser — a zero-dependency, offline memory browser.
+"""inspeximus.browser — a zero-dependency, offline memory browser.
 
-Every competitor ships a console/inspector to SEE what the agent remembers; mnemo had none. This renders the store
+Every competitor ships a console/inspector to SEE what the agent remembers; inspeximus had none. This renders the store
 into a SINGLE self-contained HTML file (all data inlined, vanilla JS, inline CSS — no server, no build, works
 offline, opens in any browser). Shows each memory's text, type, tags, value, status (active/superseded), key, and
 time, with client-side search + filters, plus a header summary (counts, cohorts, contradictions). Read-only by
 design (viewing, not editing — edits go through the audited remember/revert/forget path).
 
 Usage:
-    from inspeximus import Mnemo
+    from inspeximus import Inspeximus
     from inspeximus.browser import render_html, write_html
-    write_html(Mnemo("memory.json"), "mnemo_browser.html")   # then open the file
-or via the CLI: `mnemo browse [--out FILE] [--open]`.
+    write_html(Inspeximus("memory.json"), "inspeximus_browser.html")   # then open the file
+or via the CLI: `inspeximus browse [--out FILE] [--open]`.
 """
 from __future__ import annotations
 import json, html, datetime
@@ -50,7 +50,7 @@ def _summary(store, rows):
 
 _TEMPLATE = """<!doctype html><html><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>mnemo memory browser</title>
+<title>inspeximus memory browser</title>
 <style>
 :root{{--bg:#fff;--fg:#1f2328;--muted:#59636e;--border:#d1d9e0;--card:#f6f8fa;--accent:#0d7d84;--stale:#cf222e}}
 @media(prefers-color-scheme:dark){{:root{{--bg:#0d1117;--fg:#e6edf3;--muted:#8b949e;--border:#30363d;--card:#161b22;--accent:#39c5bb;--stale:#f85149}}}}
@@ -72,7 +72,7 @@ main{{padding:14px 20px;display:grid;gap:10px;max-width:1100px;margin:0 auto}}
 .empty{{color:var(--muted);text-align:center;padding:40px}}
 </style></head><body>
 <header>
-<h1>mnemo <small>memory browser &mdash; read-only, offline</small></h1>
+<h1>inspeximus <small>memory browser &mdash; read-only, offline</small></h1>
 <div class="stats">{stats}</div>
 <div class="controls">
 <input type="search" id="q" placeholder="search text / key / tag&hellip;">
@@ -126,7 +126,7 @@ def render_html(store) -> str:
     return _TEMPLATE.format(stats=stats, data=data)
 
 
-def write_html(store, path: str = "mnemo_browser.html") -> str:
+def write_html(store, path: str = "inspeximus_browser.html") -> str:
     """Render + write the browser to `path`; returns the path."""
     with open(path, "w", encoding="utf-8") as f:
         f.write(render_html(store))

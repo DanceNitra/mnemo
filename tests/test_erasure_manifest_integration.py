@@ -7,8 +7,8 @@ import tempfile
 
 import pytest
 
-from mnemo import Mnemo
-from mnemo.deletion_manifest import DeletionManifest, ErasureTarget
+from inspeximus import Inspeximus
+from inspeximus.deletion_manifest import DeletionManifest, ErasureTarget
 
 SECRET = "type-1 diabetes"
 SUBJECT = "user:alice"
@@ -40,7 +40,7 @@ class FakeIndex(ErasureTarget):
 
 @pytest.fixture()
 def store(tmp_path):
-    m = Mnemo(path=str(tmp_path / "m.json"))
+    m = Inspeximus(path=str(tmp_path / "m.json"))
     m.remember(f"Alice's medical condition is {SECRET}.", key="alice::medical",
                object=SECRET, source={"doc": SUBJECT})
     m.remember("Bob likes tea.", key="bob::pref", source={"doc": "user:bob"})
@@ -61,7 +61,7 @@ def test_wired_target_completes_and_chain_verifies(store):
     man = out["manifest"]
     assert man["complete"] is True
     assert man["residual_targets"] == []
-    assert [e["target"] for e in man["entries"]] == ["mnemo-store", "app-vector-index"]
+    assert [e["target"] for e in man["entries"]] == ["inspeximus-store", "app-vector-index"]
     assert all(e["verified_absent"] for e in man["entries"])
     ok, problems = DeletionManifest().verify(man)
     assert ok, problems
@@ -78,7 +78,7 @@ def test_leaky_target_is_named_not_hidden(store):
     assert man["complete"] is False
     assert man["residual_targets"] == ["app-vector-index"]
     # the store itself is clean even when the fan-out leaks
-    self_entry = next(e for e in man["entries"] if e["target"] == "mnemo-store")
+    self_entry = next(e for e in man["entries"] if e["target"] == "inspeximus-store")
     assert self_entry["verified_absent"] is True
     ok, _ = DeletionManifest().verify(man)
     assert ok
@@ -111,7 +111,7 @@ def test_erroring_target_recorded_as_incomplete(store):
 
 
 def test_tenant_view_passthrough(tmp_path):
-    m = Mnemo(path=str(tmp_path / "t.json"))
+    m = Inspeximus(path=str(tmp_path / "t.json"))
     t = m.for_tenant("acme")
     t.remember(f"Alice's condition is {SECRET}.", key="a::c", object=SECRET, source={"doc": SUBJECT})
     m.register_erasure_target(FakeIndex())

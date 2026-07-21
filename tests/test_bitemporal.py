@@ -4,11 +4,11 @@ import os
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from mnemo import Mnemo
+from inspeximus import Inspeximus
 
 
 def _store_with_correction():
-    m = Mnemo()
+    m = Inspeximus()
     a = m.remember("region is us-east", key="db::region", valid_from=100.0)
     b = m.remember("region is eu-west", key="db::region", valid_from=200.0)   # a genuine correction
     by = {r["id"]: r for r in m.items}

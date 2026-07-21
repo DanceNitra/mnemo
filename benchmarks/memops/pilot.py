@@ -1,14 +1,14 @@
 """Phase 2 — pilot: 5 memory arms on MemOps long-context data. Zero external spend (Ollama Cloud only).
 
 Design note that decides everything (recorded because it is the load-bearing choice):
-mnemo's supersession is KEYED. If we ingest raw conversation chunks with no keys, no key ever collides,
-supersession never fires, and `mnemo` is `naive` BY CONSTRUCTION — the test would be rigged to a null.
-So the mnemo arm uses its shipped deterministic `regex_extractor` to derive keys from user turns, which
+inspeximus's supersession is KEYED. If we ingest raw conversation chunks with no keys, no key ever collides,
+supersession never fires, and `inspeximus` is `naive` BY CONSTRUCTION — the test would be rigged to a null.
+So the inspeximus arm uses its shipped deterministic `regex_extractor` to derive keys from user turns, which
 is how the product is actually meant to consume raw text. The naive arm ingests the SAME turns with no
 extractor, no echo_guard, no read-time resolver. Every other thing (granularity, retriever, k, answerer,
 judge, prompts) is identical, so any delta is the integrity layer and nothing else.
 
-Granularity: TURN level for the mnemo/naive pair (keys can only be derived per statement) and SESSION
+Granularity: TURN level for the inspeximus/naive pair (keys can only be derived per statement) and SESSION
 level for the `session_rag` arm — which doubles as a measurement of what turn-level granularity costs us
 inside our own harness. The paper reports session 0.845 vs turn 0.618, so absolute numbers here will sit
 below their table; we are not comparing to their table (see PREREGISTRATION.md).
@@ -24,7 +24,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 HERE = pathlib.Path(__file__).resolve().parent
-from mnemo.mnemo import Mnemo, regex_extractor  # noqa: E402
+from inspeximus.core import Inspeximus, regex_extractor  # noqa: E402
 
 ANSWER_BASE, ANSWER_MODEL = "https://ollama.com/v1", "deepseek-v4-flash"
 JUDGE_BASE, JUDGE_MODEL, JUDGE_KEY = "http://localhost:11434/v1", "glm-5.2:cloud", "local"
@@ -134,7 +134,7 @@ def sessions_of(scenario):
 
 
 def units_of(scenario):
-    """Ingestion units, IDENTICAL for the mnemo and naive arms.
+    """Ingestion units, IDENTICAL for the inspeximus and naive arms.
 
     Two harness bugs found in the first dry run and fixed here (both mine, not the product's):
       1. prefixing the text with "user: " made regex_extractor return None on everything — it matches from
@@ -153,8 +153,8 @@ def units_of(scenario):
     return out
 
 
-def build_mnemo(scenario, keyed: bool):
-    m = Mnemo(path=None)
+def build_inspeximus(scenario, keyed: bool):
+    m = Inspeximus(path=None)
     if keyed:
         m.extractor = regex_extractor
         m.echo_guard = True
@@ -166,7 +166,7 @@ def build_mnemo(scenario, keyed: bool):
     return m
 
 
-def recall_mnemo(m, q, keyed):
+def recall_inspeximus(m, q, keyed):
     hits = m.recall(q, k=TOPK, mode="lexical", reinforce=False,
                     resolve_conflicts=keyed) or []
     return "\n".join(f"- {h.get('text','')}" for h in hits)
@@ -175,7 +175,7 @@ def recall_mnemo(m, q, keyed):
 def build_mem0(scenario, scenario_id):
     """mem0 with its OWN LLM extraction pipeline, pointed at Ollama Cloud (zero external spend).
     This is the arm that makes the head-to-head internally valid: same data, same answerer, same judge,
-    so the only difference is verbatim-keyed storage (mnemo) vs LLM-extracted storage (mem0)."""
+    so the only difference is verbatim-keyed storage (inspeximus) vs LLM-extracted storage (mem0)."""
     import tempfile
     from mem0 import Memory
     # mem0's extractor model is deliberately the STRONGER of the two we can run for free
@@ -259,10 +259,10 @@ def run(files, arms):
         print(f"[{fi}/{len(files)}] {name:24} op={op:14} probes={len(probes)}", flush=True)
 
         stores = {}
-        if "mnemo" in arms:
-            stores["mnemo"] = build_mnemo(lc, True)
+        if "inspeximus" in arms:
+            stores["inspeximus"] = build_inspeximus(lc, True)
         if "naive" in arms:
-            stores["naive"] = build_mnemo(lc, False)
+            stores["naive"] = build_inspeximus(lc, False)
         if "session_rag" in arms:
             stores["session_rag"] = build_bm25_sessions(lc)
         if "mem0" in arms:
@@ -270,11 +270,11 @@ def run(files, arms):
             t_m0 = time.time()
             stores["mem0"] = build_mem0(lc, sid)
             print(f"     mem0 ingested {len(sessions_of(lc))} sessions in {time.time()-t_m0:.0f}s "
-                  f"(its LLM extraction runs here; mnemo's ingest is free)", flush=True)
-        if "mnemo" in stores:
-            keyed_n = sum(1 for r in stores["mnemo"].items if r.get("key"))
-            sup_n = sum(1 for r in stores["mnemo"].items if r.get("status") == "superseded")
-            print(f"     mnemo store: {len(stores['mnemo'].items)} records, {keyed_n} keyed, "
+                  f"(its LLM extraction runs here; inspeximus's ingest is free)", flush=True)
+        if "inspeximus" in stores:
+            keyed_n = sum(1 for r in stores["inspeximus"].items if r.get("key"))
+            sup_n = sum(1 for r in stores["inspeximus"].items if r.get("status") == "superseded")
+            print(f"     inspeximus store: {len(stores['inspeximus'].items)} records, {keyed_n} keyed, "
                   f"{sup_n} superseded by the integrity layer", flush=True)
 
         def one(task):
@@ -287,7 +287,7 @@ def run(files, arms):
             elif arm == "mem0":
                 ctx = recall_mem0(stores[arm], q, name.rsplit(".", 1)[0])
             else:
-                ctx = recall_mnemo(stores[arm], q, arm == "mnemo")
+                ctx = recall_inspeximus(stores[arm], q, arm == "inspeximus")
             resp = call(ANSWER_BASE, ANSWER_MODEL, ANSWER_KEY,
                         ANSWER_PROMPT.format(context=ctx[:12000], question=q), 1200)
             if not resp:
@@ -343,7 +343,7 @@ if __name__ == "__main__":
     n_files = int(sys.argv[1]) if len(sys.argv) > 1 else 2
     TAG = sys.argv[3] if len(sys.argv) > 3 else "run"
     globals()["TAG"] = TAG
-    arms = sys.argv[2].split(",") if len(sys.argv) > 2 else ["mnemo", "naive", "no_context", "session_rag"]
+    arms = sys.argv[2].split(",") if len(sys.argv) > 2 else ["inspeximus", "naive", "no_context", "session_rag"]
     names = sorted(p.name for p in (HERE / "data_lc").glob("*.json"))
     # stratify: round-robin across operation types
     import collections

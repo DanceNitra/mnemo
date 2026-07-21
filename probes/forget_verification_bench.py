@@ -23,8 +23,8 @@ RUN:  python forget_verification_bench.py        (optional local Ollama nomic em
 import json, os, sys, urllib.request
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from mnemo import new_source_keypair
-from mnemo.erasure_auditor import (  # noqa: E402
+from inspeximus import new_source_keypair
+from inspeximus.erasure_auditor import (  # noqa: E402
     ErasureAuditor, TextStoreProbe, VectorIndexProbe, KVCacheProbe,
     QdrantSoftDeleteProbe, PgVectorSoftDeleteProbe, S3VersioningProbe,
     verify_compliance_receipt, ed25519_signer, ed25519_verify,

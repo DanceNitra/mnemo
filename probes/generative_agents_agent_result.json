@@ -10,7 +10,7 @@
    "n_queries": 9,
    "errors": 0,
    "ga_agent_acc": 1.0,
-   "mnemo_agent_acc": 1.0
+   "inspeximus_agent_acc": 1.0
   },
   {
    "contra": 0.5,
@@ -18,7 +18,7 @@
    "n_queries": 19,
    "errors": 0,
    "ga_agent_acc": 0.947,
-   "mnemo_agent_acc": 1.0
+   "inspeximus_agent_acc": 1.0
   },
   {
    "contra": 0.9,
@@ -26,7 +26,7 @@
    "n_queries": 37,
    "errors": 0,
    "ga_agent_acc": 0.838,
-   "mnemo_agent_acc": 1.0
+   "inspeximus_agent_acc": 1.0
   }
  ]
 }

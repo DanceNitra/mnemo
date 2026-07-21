@@ -20,16 +20,16 @@ TWO measurements:
     Poison-safety of the explicit path = the safety of the recall that picked the driver (use
     influence_only for high-stakes so a hijack poison is never selected as driver).
 
-RUN: python mnemo/probes/outcome_propagation_probe.py
+RUN: python inspeximus/probes/outcome_propagation_probe.py
 """
 import os, sys, tempfile, json
 sys.stdout.reconfigure(errors="replace")
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "mnemo")))
-from mnemo import Mnemo
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "inspeximus")))
+from inspeximus import Inspeximus
 
 def _store():
     fd, p = tempfile.mkstemp(suffix=".json"); os.close(fd); os.remove(p)
-    return Mnemo(path=p)
+    return Inspeximus(path=p)
 
 def _rng(seed):
     s = seed
@@ -101,8 +101,8 @@ def main():
                                 "params": {"scored": 0.6, "manual": 0.3}},
            "poison_earn_pct": {mode: round(poison_earn(mode)*100, 1)
                                for mode in ("full_set", "driving_only", "explicit")}}
-    json.dump(out, open("mnemo/probes/outcome_propagation_probe_result.json", "w"), indent=2)
-    print("\n-> mnemo/probes/outcome_propagation_probe_result.json")
+    json.dump(out, open("inspeximus/probes/outcome_propagation_probe_result.json", "w"), indent=2)
+    print("\n-> inspeximus/probes/outcome_propagation_probe_result.json")
 
 if __name__ == "__main__":
     main()

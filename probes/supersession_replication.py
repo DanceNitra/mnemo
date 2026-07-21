@@ -15,8 +15,8 @@ We replicate on OUR OWN stack (local nomic-embed-text), then measure the fix:
 Falsifier (ours): if a deterministic SRO-supersession rule does NOT cut the stale-fact rate well below
 pure-cosine retrieval, the mechanism is useless and we drop it.
 
-Run: python mnemo/probes/supersession_replication.py   (cloud-free; needs numpy + local Ollama nomic-embed-text)
-Part of Agora / mnemo (MIT). Reproduces the numbers cited in the rag-supersession-blind-spot post.
+Run: python inspeximus/probes/supersession_replication.py   (cloud-free; needs numpy + local Ollama nomic-embed-text)
+Part of Agora / inspeximus (MIT). Reproduces the numbers cited in the rag-supersession-blind-spot post.
 """
 import json
 import urllib.request

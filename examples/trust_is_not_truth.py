@@ -1,11 +1,11 @@
 """Source trust is an authorization control, not a correctness one — run it and see.
 
-    pip install agora-mnemo
+    pip install agora-inspeximus
     python trust_is_not_truth.py
 
 Standalone on purpose: no repo checkout, no path juggling, one dependency that installs from PyPI.
 
-Why it exists. mnemo ships a provenance gate: writes can be signed with an Ed25519 source key, a trust
+Why it exists. inspeximus ships a provenance gate: writes can be signed with an Ed25519 source key, a trust
 root is configured once, and `recall(trusted_only=True)` returns only what chains to that root. On the
 usual poisoning fixture it scores perfectly — and that score is close to meaningless, because in those
 fixtures every TRUE fact is signed by the trusted key and every POISONED one by the attacker. Truth and
@@ -20,7 +20,7 @@ extension any scheme keyed on a source LABEL, which is strictly weaker than a si
 The claim a provenance gate earns is "rejects writes from untrusted sources". It never earns "returns
 the true value". A mistaken or compromised high-trust source is precisely the case it cannot see.
 """
-from mnemo import Mnemo, attest, new_source_keypair
+from inspeximus import Inspeximus, attest, new_source_keypair
 
 TRUSTED_SK, TRUSTED_PK = new_source_keypair()      # the configured trust root
 UNKNOWN_SK, UNKNOWN_PK = new_source_keypair()      # some source nobody vouched for
@@ -31,7 +31,7 @@ WRONG = "My bank is Zephyr Trust."
 
 
 def store():
-    m = Mnemo(path=None)
+    m = Inspeximus(path=None)
     m.strict_corroboration = True
     m.trust_seeds = {"key:" + TRUSTED_PK}
     return m

@@ -1,13 +1,13 @@
-# mnemo probes — runnable memory-reliability tests
+# inspeximus probes — runnable memory-reliability tests
 
 Small, single-file, cloud-free probes for the two failure modes that hit persistent agent memory hardest:
 **what to keep when the store is finite** and **how to keep a false memory from hardening into a durable
-trait**. They are the reference implementations behind the mechanisms shipped in [`mnemo`](../).
+trait**. They are the reference implementations behind the mechanisms shipped in [`inspeximus`](../).
 
 | probe | runs | shows |
 |---|---|---|
 | [`eviction_twotier.py`](eviction_twotier.py) | `python eviction_twotier.py` (numpy only) | No single eviction rule wins all workloads; a **two-tier store** (value-protected + recency-aged) matches/beats the best single rule in every regime. |
-| [`corroboration_poison.py`](corroboration_poison.py) | `python corroboration_poison.py` (uses `../mnemo.py`) | A recall-pumped, self-asserted false memory **must not** graduate to durable memory; corroboration-gating (earned outcome or distinct, entity-resolved sources) blocks it while legit memories still graduate. |
+| [`corroboration_poison.py`](corroboration_poison.py) | `python corroboration_poison.py` (uses `../inspeximus.py`) | A recall-pumped, self-asserted false memory **must not** graduate to durable memory; corroboration-gating (earned outcome or distinct, entity-resolved sources) blocks it while legit memories still graduate. |
 
 Both print a verdict line. MIT-licensed — link them or vendor them, whatever suits.
 

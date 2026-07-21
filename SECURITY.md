@@ -1,17 +1,17 @@
 # Security model
 
-Honest scope: mnemo has had a **first internal security pass** (2026-07-13), not a formal third-party
-pentest. This document states what mnemo defends, what it does not, and the known residual footguns — so you
+Honest scope: inspeximus has had a **first internal security pass** (2026-07-13), not a formal third-party
+pentest. This document states what inspeximus defends, what it does not, and the known residual footguns — so you
 can decide what to rely on. If you find an issue, open a GitHub issue or security advisory.
 
-## What mnemo is (threat model)
+## What inspeximus is (threat model)
 
-mnemo is an **in-process Python library** plus an optional **stdio MCP server** (`mnemo-mcp`). It is not a
+inspeximus is an **in-process Python library** plus an optional **stdio MCP server** (`inspeximus-mcp`). It is not a
 network service and does not open sockets (the MCP server speaks over stdio and trusts the host that launched
 it). The realistic adversary is therefore **the content you store** — a memory written from an untrusted user
 conversation, a poisoned document, a compromised tool result — not a remote attacker hitting an endpoint.
 
-That content threat is the thing mnemo is actually built to address: keyed supersession, `echo_guard`,
+That content threat is the thing inspeximus is actually built to address: keyed supersession, `echo_guard`,
 `retract_lineage`, the corroboration-gated influence path (`recall(influence_only=True)`), the authorized-revert
 channel, and the tamper-evident write receipts. See the README and `probes/` for the measured behaviour and its
 honest limits.
@@ -47,5 +47,5 @@ honest limits.
 
 ## Reporting
 
-Open a GitHub issue (or a private security advisory) on https://github.com/DanceNitra/mnemo. This is an
+Open a GitHub issue (or a private security advisory) on https://github.com/DanceNitra/inspeximus. This is an
 open-source project maintained on a best-effort basis; there is no formal SLA.

@@ -3,11 +3,11 @@ value. A restatement whose grounds the ledger has already seen (or that carries 
 silenced even though it disagrees on value; only a contradiction resting on grounds NOT in the justification set
 reopens, and corroboration counts DISTINCT novel supports. So replay collapses into echo by construction and the
 value-disagreement DoS lever falls off, while an honest late correction bringing new ground still gets through."""
-from mnemo import Mnemo
+from inspeximus import Inspeximus
 
 
 def _store(tmp_path):
-    return Mnemo(str(tmp_path / "m.json"))
+    return Inspeximus(str(tmp_path / "m.json"))
 
 
 def test_two_distinct_novel_grounds_reopen(tmp_path):

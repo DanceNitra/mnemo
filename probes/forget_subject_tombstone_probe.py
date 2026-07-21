@@ -23,12 +23,12 @@ Pre-registered checks map 1:1 to the intake-gate's design constraints:
 """
 import sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
-from mnemo import Mnemo, new_receipt_keypair
+from inspeximus import Inspeximus, new_receipt_keypair
 
 
 def _store(tmp):
     sk, pk = new_receipt_keypair()
-    return Mnemo(path=str(tmp / "s.json"), receipts=True, receipt_key=sk, receipt_pubkey=pk), pk
+    return Inspeximus(path=str(tmp / "s.json"), receipts=True, receipt_key=sk, receipt_pubkey=pk), pk
 
 
 def main():

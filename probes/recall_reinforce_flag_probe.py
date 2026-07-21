@@ -13,7 +13,7 @@ depend on prior queries — an order-dependent confound for eval/benchmark and a
 """
 import sys
 sys.path.insert(0, ".")
-from mnemo import Mnemo
+from inspeximus import Inspeximus
 
 FAILS = []
 def check(n, c):
@@ -21,7 +21,7 @@ def check(n, c):
     if not c: FAILS.append(n)
 
 def fresh():
-    m = Mnemo(path=None)
+    m = Inspeximus(path=None)
     for i, t in enumerate([
         "the capital of France is Paris", "photosynthesis converts light to chemical energy",
         "Paris hosted the 2024 Olympics", "the mitochondria is the powerhouse of the cell",

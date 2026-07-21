@@ -44,7 +44,7 @@ def _sha256(b) -> str:
 
 class ErasureTarget:
     """Adapter protocol for one place a subject's data can live. Implement erase() + still_recoverable().
-    `name` should identify the store to an auditor (e.g. 'mnemo-store', 'qdrant-index', 'retrieval-log')."""
+    `name` should identify the store to an auditor (e.g. 'inspeximus-store', 'qdrant-index', 'retrieval-log')."""
     name = "unnamed-target"
 
     def erase(self, subject: str) -> dict:

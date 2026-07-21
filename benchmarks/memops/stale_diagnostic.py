@@ -1,9 +1,9 @@
-"""Why did the mnemo arm trend WORSE on stale_value (0.211 vs naive 0.125)?
+"""Why did the inspeximus arm trend WORSE on stale_value (0.211 vs naive 0.125)?
 
 Two rival explanations, and they have opposite consequences:
   (A) NULL — the retriever simply never returns the corrected value, both arms guess from history,
       and the difference is 3 probes of noise. Nothing to fix.
-  (B) BUG — mnemo's keyed layer (supersession + read-time conflict resolution) actively drops or
+  (B) BUG — inspeximus's keyed layer (supersession + read-time conflict resolution) actively drops or
       demotes the CURRENT value while keeping an older one. That would be the integrity layer
       producing the exact failure it exists to prevent.
 
@@ -62,14 +62,14 @@ def main():
         ev = json.loads((HERE / "data" / name).read_text(encoding="utf-8"))
         cur, stale = chain_values(ev)
         probes = [a for a in (lc.get("answer") or []) if a.get("question") and a.get("expected_answer")]
-        stores = {"mnemo": pilot.build_mnemo(lc, True), "naive": pilot.build_mnemo(lc, False)}
+        stores = {"inspeximus": pilot.build_inspeximus(lc, True), "naive": pilot.build_inspeximus(lc, False)}
         # does the integrity layer even see this chain? (a store where nothing was superseded
         # cannot be blamed for a stale answer)
-        sup = [r for r in stores["mnemo"].items if r.get("status") == "superseded"]
+        sup = [r for r in stores["inspeximus"].items if r.get("status") == "superseded"]
         print(f"{name:20} current={cur} stale={stale} superseded_records={len(sup)}")
         for a in probes:
-            for arm in ("mnemo", "naive"):
-                ctx = norm(pilot.recall_mnemo(stores[arm], a["question"], arm == "mnemo")[:12000])
+            for arm in ("inspeximus", "naive"):
+                ctx = norm(pilot.recall_inspeximus(stores[arm], a["question"], arm == "inspeximus")[:12000])
                 has_cur = any(v in ctx for v in cur)
                 has_stale = any(v in ctx for v in stale)
                 acc[arm]["n"] += 1

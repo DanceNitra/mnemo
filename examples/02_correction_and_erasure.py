@@ -1,15 +1,15 @@
 """
-mnemo example 02 — correction & erasure as first-class channels.
+inspeximus example 02 — correction & erasure as first-class channels.
 
-    pip install agora-mnemo
+    pip install agora-inspeximus
     python 02_correction_and_erasure.py
 
-This is what mnemo is built for: a corrected fact stays corrected, a restated stale value does not resurrect
+This is what inspeximus is built for: a corrected fact stays corrected, a restated stale value does not resurrect
 it, and a delete is auditable. All zero-dependency, no LLM.
 """
-from mnemo import Mnemo
+from inspeximus import Inspeximus
 
-m = Mnemo()
+m = Inspeximus()
 
 # 1) ECHO GUARD — a restated OLD value must not resurrect after a correction.
 m.echo_guard = True

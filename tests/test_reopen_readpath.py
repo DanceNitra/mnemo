@@ -3,11 +3,11 @@ observe() is a POST-write review trigger: when independent evidence CONTRADICTS 
 record, corroborate it and REOPEN the interval for steward review — catching the confident wrong-merge that
 write-time can never catch, and giving the value-obscuring revert something to key on, WITHOUT flooding on a
 single benign restatement. Receipt: probes/reopen_interval_readpath.py."""
-from mnemo import Mnemo
+from inspeximus import Inspeximus
 
 
 def _store(tmp_path, name="m.json"):
-    return Mnemo(str(tmp_path / name))
+    return Inspeximus(str(tmp_path / name))
 
 
 def test_single_contradiction_does_not_reopen(tmp_path):

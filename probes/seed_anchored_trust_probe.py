@@ -1,6 +1,6 @@
 """seed_anchored_trust_probe.py — close the ONE Sybil axis symmetric corroboration cannot.
 
-mnemo's corroboration bar (>=2 distinct sources, or with strict_corroboration >=2 distinct Ed25519
+inspeximus's corroboration bar (>=2 distinct sources, or with strict_corroboration >=2 distinct Ed25519
 keys) is SYMMETRIC: every source/key is interchangeable. Cheng & Friedman (2005, "Sybilproof
 reputation mechanisms") prove no symmetric reputation function is Sybilproof, and Douceur (2002,
 "The Sybil Attack") shows distinct identities/keys are FREE to mint — so an attacker who supplies N
@@ -8,7 +8,7 @@ unrelated source strings (default rail) or holds N keypairs (strict rail) manufa
 witnesses at zero cost and clears the bar. The only structural fix is ASYMMETRIC, flow-based trust
 anchored to a costly/seeded root (Gyongyi et al. 2004, TrustRank).
 
-This probe measures mnemo's opt-in `trust_seeds` (+ `trust_hops`): a corroborating witness counts
+This probe measures inspeximus's opt-in `trust_seeds` (+ `trust_hops`): a corroborating witness counts
 only if its source is in the trust closure grown from the app's seeds via vouch edges. A Sybil's
 un-vouched sources contribute ZERO trusted witnesses.
 
@@ -28,18 +28,18 @@ HONEST LIMITS (disclosed, not closed): inert without >=1 seed; RELOCATES the res
 free identities" to "earn ONE endorsement from a seeded node" (a compromised/careless seed leaks
 trust into its vouched subtree — Cheng-Friedman's asymmetric-flow residual); assumes the app's seed
 list and the link/provenance graph are themselves sound (attribution). Textbook mechanism (TrustRank /
-reputation-flow); the contribution is shipping it as a zero-dependency opt-in that closes mnemo's own
+reputation-flow); the contribution is shipping it as a zero-dependency opt-in that closes inspeximus's own
 disclosed symmetric-corroboration hole.
 """
 import sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
-from mnemo import Mnemo
+from inspeximus import Inspeximus
 
 
 def _build(seeds=None, vouch_witnesses=False, earned=False):
     """One store: a poison/claim fact P corroborated by 3 witnesses, plus an optional seeded operator
     'op' that (in the vouch arm) endorses the witnesses. Returns (store, P_id)."""
-    m = Mnemo(path=None)
+    m = Inspeximus(path=None)
     if seeds:
         m.trust_seeds = set(seeds)
     # the fact whose irreversible influence we meter

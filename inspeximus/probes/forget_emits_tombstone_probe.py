@@ -14,12 +14,12 @@ import sys
 import tempfile
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2]))
-from inspeximus.mnemo import Mnemo  # noqa: E402
+from inspeximus.core import Inspeximus  # noqa: E402
 
 
 def main():
     d = pathlib.Path(tempfile.mkdtemp(prefix="forget_tomb_"))
-    m = Mnemo(path=str(d / "store.jsonl"))
+    m = Inspeximus(path=str(d / "store.jsonl"))
     keep = m.remember("My manager is Rachel Tseng.")
     drop = m.remember("My employee ID is MCG-20250115-47.")
     m._save(force=True)

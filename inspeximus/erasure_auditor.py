@@ -123,7 +123,7 @@ class QdrantSoftDeleteProbe(StoreProbe):
     """Qdrant marks deleted points in a bitmask and only physically drops them once a segment crosses the
     optimizer's `deleted_threshold` (default 0.2, with a 1000-vector minimum) — so scattered deletes on a
     mid-size collection can sit on disk below that line indefinitely. Recovery = deleted vectors are still
-    physically present with compaction not yet triggered. Pass your qdrant client + collection; mnemo has NO
+    physically present with compaction not yet triggered. Pass your qdrant client + collection; inspeximus has NO
     qdrant dependency — the probe only calls `get_collection` on the client you pass."""
     kind = "vector-soft-delete"
 
@@ -151,7 +151,7 @@ class QdrantSoftDeleteProbe(StoreProbe):
 class PgVectorSoftDeleteProbe(StoreProbe):
     """pgvector inherits Postgres MVCC: a deleted row's tuple is dead but stays ON DISK until VACUUM runs, and the
     HNSW graph is only repaired at vacuum time — so 'DELETE returned' is not 'gone from disk/index'. Recovery =
-    dead tuples exist for the table (VACUUM pending). Pass a DB-API connection + table name; mnemo has NO psycopg
+    dead tuples exist for the table (VACUUM pending). Pass a DB-API connection + table name; inspeximus has NO psycopg
     dependency — the probe runs one read-only query on the cursor you pass."""
     kind = "vector-soft-delete"
 
@@ -174,7 +174,7 @@ class S3VersioningProbe(StoreProbe):
     """A versioned object store (S3 + most snapshot stores): a 'delete' on a versioned bucket just writes a DELETE
     MARKER — the prior object version stays and is one list-versions call away. Recovery = object versions (or
     delete markers hiding live versions) still exist for the subject's prefix. Pass a boto3-style client + bucket
-    + prefix; mnemo has NO boto3 dependency — the probe only calls `list_object_versions` on the client you pass."""
+    + prefix; inspeximus has NO boto3 dependency — the probe only calls `list_object_versions` on the client you pass."""
     kind = "object-store-soft-delete"
 
     def __init__(self, name: str, s3, bucket, prefix: str = ""):

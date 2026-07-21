@@ -3,7 +3,7 @@ cues are CORRELATED (not near-orthogonal like speaker x time), does the PRODUCT 
 shared evidence and flip below the SUM?
 
 Setup (real corpus, one controlled variable — the honest way to isolate an interaction, not a rigged knob):
-  - Store = real LoCoMo turns + real nomic embeddings + the SHIPPED mnemo hybrid ranking (same as
+  - Store = real LoCoMo turns + real nomic embeddings + the SHIPPED inspeximus hybrid ranking (same as
     locomo_composed_soft_filters.py). Questions with an exact resolvable speaker (cue A = the correct speaker,
     truthful, reused from the alias arm).
   - cue A(turn) = (turn.speaker == the question's named speaker).   [truthful]
@@ -15,7 +15,7 @@ Setup (real corpus, one controlled variable — the honest way to isolate an int
   We MEASURE and report the realized phi correlation between matchA and matchB over the pool at each level, so
   the x-axis is measured, not assumed. The whole range is swept (no cherry-picked operating point).
 
-Arms (all via the SHIPPED prefer scoring; pref formula identical to mnemo.recall, verified by the sibling
+Arms (all via the SHIPPED prefer scoring; pref formula identical to inspeximus.recall, verified by the sibling
 probe's 0/1568 self-check):
   hybrid   : no cue                                            pref = 1
   single_A : cue A only                                        pref = 1 + T*G*matchA        [invariant in c]
@@ -46,10 +46,10 @@ gold, and cue A are real LoCoMo.
 Reuses the warm embed cache + local nomic. Deterministic (seeded hashes; no Math.random/Date). MIT.
 Run: LOCOMO_PATH=agora_output/lab/data/locomo10.json \
      LOCOMO_CACHE=agora_output/lab/data/locomo_confweighted_cache.json \
-     python mnemo/probes/locomo_correlated_cue_composition.py"""
+     python inspeximus/probes/locomo_correlated_cue_composition.py"""
 import json, re, ast, time, hashlib, os, urllib.request, math, random, sys
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-from mnemo import Mnemo, _PREFER_GAIN
+from inspeximus import Inspeximus, _PREFER_GAIN
 
 DATA = os.environ.get("LOCOMO_PATH", "agora_output/lab/data/locomo10.json")
 CACHE = os.environ.get("LOCOMO_CACHE", "agora_output/lab/data/locomo_confweighted_cache.json")
@@ -108,7 +108,7 @@ for ci, d0 in enumerate(D):
     turns = []
     for sk in sorted([k for k in conv if re.fullmatch(r"session_\d+", k)], key=lambda s: int(s.split("_")[1])):
         for t in conv[sk]: turns.append((t["dia_id"], t["text"], t["speaker"]))
-    m = Mnemo(embed=embed); m.semantic_threshold = 1; dia2id = {}
+    m = Inspeximus(embed=embed); m.semantic_threshold = 1; dia2id = {}
     for dia, txt, spk in turns:
         dia2id[dia] = m.remember(txt, meta={"speaker": spk, "dia": dia})
     id2dia = {v: k for k, v in dia2id.items()}; turnset = set(dia2id); N = len(turns)
@@ -212,5 +212,5 @@ for c in LEVELS:
     lev["unconditional"] = {"n": len(d_all), "recall@20": allrow,
                             "product_minus_sum": {"delta": round(mean(d_all), 4), "ci95": [round(lo_a, 4), round(hi_a, 4)]}}
     out["levels"][str(c)] = lev
-json.dump(out, open("mnemo/probes/locomo_correlated_cue_composition_result.json", "w"), indent=1)
-print("\nsaved: mnemo/probes/locomo_correlated_cue_composition_result.json")
+json.dump(out, open("inspeximus/probes/locomo_correlated_cue_composition_result.json", "w"), indent=1)
+print("\nsaved: inspeximus/probes/locomo_correlated_cue_composition_result.json")

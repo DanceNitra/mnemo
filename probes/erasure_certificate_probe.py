@@ -7,7 +7,7 @@ is genuinely gone. Then we tamper (flip a tombstone, hide an un-erased id) and c
 """
 import sys, pathlib, tempfile, os, json, copy
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
-from mnemo import Mnemo, new_receipt_keypair, sign_erasure, verify_erasure_certificate
+from inspeximus import Inspeximus, new_receipt_keypair, sign_erasure, verify_erasure_certificate
 
 SECRET = "Alice Meyer SSN 441-90-2277"
 
@@ -16,7 +16,7 @@ def run():
     ok = {}
     tmp = os.path.join(tempfile.mkdtemp(), "store.json")
     sk, pub = new_receipt_keypair()
-    m = Mnemo(path=tmp, receipts=True, receipt_key=sk, receipt_pubkey=pub)
+    m = Inspeximus(path=tmp, receipts=True, receipt_key=sk, receipt_pubkey=pub)
     m.remember(SECRET, key="alice::ssn", source={"doc": "alice"}, pii=True)
     m.remember("the deploy channel is BLUE-9", key="deploy")   # bystander
     m._save(force=True)

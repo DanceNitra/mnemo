@@ -14,7 +14,7 @@ import sys
 import tempfile
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-from mnemo.mnemo import Mnemo  # noqa: E402
+from inspeximus.core import Inspeximus  # noqa: E402
 
 PASS, FAIL = 0, 0
 
@@ -30,7 +30,7 @@ def main() -> int:
     d = tempfile.mkdtemp()
 
     # 1. determinism
-    m = Mnemo(path=os.path.join(d, "a.json"))
+    m = Inspeximus(path=os.path.join(d, "a.json"))
     m.remember("The API rate limit is 100 rps", key="rate-limit")
     m.remember("Deploys go out on Tuesdays", key="deploy-day")
     w1 = m.witness()
@@ -50,7 +50,7 @@ def main() -> int:
     check("out-of-band text edit changes digest", not m.verify_witness(w3)["digest_match"])
 
     # 3. receipts tip anchoring
-    m2 = Mnemo(path=os.path.join(d, "b.json"), receipts=True)
+    m2 = Inspeximus(path=os.path.join(d, "b.json"), receipts=True)
     m2.remember("fact one", key="f1")
     wr = m2.witness()
     check("witness carries receipts_tip when receipts on", "receipts_tip" in wr)
@@ -59,7 +59,7 @@ def main() -> int:
     check("new write breaks receipts_tip match", vr["receipts_tip_match"] is False and not vr["valid"])
 
     # 4. index coherence
-    m3 = Mnemo(path=os.path.join(d, "c.json"))                           # lexical
+    m3 = Inspeximus(path=os.path.join(d, "c.json"))                           # lexical
     m3.remember("lexical only")
     c = m3.index_coherence()
     check("lexical store coherent by construction", c["coherent"] and not c["embedder_configured"])
@@ -70,7 +70,7 @@ def main() -> int:
             v[i % 8] += ch / 255.0
         return v
 
-    m4 = Mnemo(path=os.path.join(d, "e.json"), embed=toy_embed,
+    m4 = Inspeximus(path=os.path.join(d, "e.json"), embed=toy_embed,
                persist_vectors=True, embed_id="toy-v1")
     m4.remember("embedded fact one")
     m4.remember("embedded fact two")
@@ -81,7 +81,7 @@ def main() -> int:
     c5 = m4.index_coherence()
     check("index lagging store detected", (not c5["coherent"]) and c5["missing_vecs"] == 1)
     m4._save()
-    m5 = Mnemo(path=os.path.join(d, "e.json"), embed=toy_embed,
+    m5 = Inspeximus(path=os.path.join(d, "e.json"), embed=toy_embed,
                persist_vectors=True, embed_id="toy-v2")                  # recipe changed
     c6 = m5.index_coherence()
     check("recipe mismatch reported against sidecar",

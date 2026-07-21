@@ -1,4 +1,4 @@
-"""The evidence-grade RATCHET (mnemo 0.6.0): a claim's grade + novelty can only move UP on an EXTERNAL
+"""The evidence-grade RATCHET (inspeximus 0.6.0): a claim's grade + novelty can only move UP on an EXTERNAL
 event, never self-assigned. This probe shows (1) the ratchet holds (a generator can't upgrade its own
 claim), (2) forge-cost (climbing costs distinct identities -- Douceur), and (3) replay: run our own 32
 audited storefront claims through the ratchet and reproduce the audit's headline (0/32 'novel') for free.
@@ -7,14 +7,14 @@ Operationalizes the flagship "Labels failed more than measurements": novelty was
 self-assigned at write time; here it becomes a status a claim EARNS from an external empty prior-art
 search -- so the over-labeling that audit found cannot happen in the first place.
 
-Run: python mnemo/probes/evidence_grade_ratchet.py    MIT. Part of Agora / mnemo.
+Run: python inspeximus/probes/evidence_grade_ratchet.py    MIT. Part of Agora / inspeximus.
 """
 import importlib.util, os
 
-_core = os.path.join(os.path.dirname(__file__), "..", "mnemo.py")
-_spec = importlib.util.spec_from_file_location("mnemo_core", _core)
+_core = os.path.join(os.path.dirname(__file__), "..", "inspeximus.py")
+_spec = importlib.util.spec_from_file_location("inspeximus_core", _core)
 _m = importlib.util.module_from_spec(_spec); _spec.loader.exec_module(_m)
-Mnemo = _m.Mnemo
+Inspeximus = _m.Inspeximus
 
 _score = os.path.join(os.path.dirname(__file__), "meta_audit_scoring.py")
 _ss = importlib.util.spec_from_file_location("mas", _score)
@@ -24,7 +24,7 @@ POSTS, SUBSTANTIVE, OVER_FRAMED, HONEST = _mas.POSTS, _mas.SUBSTANTIVE, _mas.OVE
 
 def test_ratchet_property():
     print("=== 1. RATCHET PROPERTY: a generator cannot upgrade its own claim ===")
-    m = Mnemo()
+    m = Inspeximus()
     cid = m.remember("Two-tier memory beats every single eviction rule -- a new law.",
                      source={"doc": "generator-self"})
     g = m.grade(cid); print(f"  fresh self-asserted claim:            grade={g['grade']:>12}  novel={g['novel']}")
@@ -62,7 +62,7 @@ def test_forge_cost():
     print("=== 2. FORGE-COST: climbing the ladder costs distinct identities (Douceur) ===")
     print(f"  {'attacker identities':>20} | {'best grade reachable':>20} | {'can forge novel?':>16}")
     for k in (1, 2, 3):
-        m = Mnemo()
+        m = Inspeximus()
         cid = m.remember("My planted value is the current, authoritative one.", source={"doc": "attacker-0"})
         keys = [f"attacker-{i}" for i in range(k)]         # k Sybil identities the attacker controls
         for key in keys:
@@ -83,7 +83,7 @@ def test_replay_32():
     # ACTUALLY earned: a reproduction ONLY if the measurement stood (over-framed + already-honest tiers), and
     # a prior_art_empty ONLY if the external prior-art search came back empty (NONE of ours did -- over-framed
     # = prior art FOUND; substantive = the claim was wrong; honest = never claimed novelty).
-    m = Mnemo()
+    m = Inspeximus()
     rows = []
     for (audit_no, idx, slug, verdict, tier, borderline, reason, prior_art) in POSTS:
         cid = m.remember(f"[{slug}] {reason}", source={"doc": f"agora-generator::{slug}"})
@@ -98,7 +98,7 @@ def test_replay_32():
     print(f"  posts: {len(rows)}")
     print(f"  NOVEL reachable by the ratchet: {novel}/{len(rows)}   "
           f"(the audit's headline was 0/32 'novel as first framed')")
-    print(f"  confidence-grade distribution: " + ", ".join(f"{k}={gc.get(k,0)}" for k in Mnemo._GRADES))
+    print(f"  confidence-grade distribution: " + ", ".join(f"{k}={gc.get(k,0)}" for k in Inspeximus._GRADES))
     sub_claimed = sum(1 for t, g in rows if t == SUBSTANTIVE and g["grade"] == "claimed")
     print(f"  substantive-wrong stuck at 'claimed' (no reproduction): "
           f"{sub_claimed}/{sum(1 for t,_ in rows if t==SUBSTANTIVE)}")
@@ -111,4 +111,4 @@ if __name__ == "__main__":
     test_ratchet_property()
     test_forge_cost()
     test_replay_32()
-    print("mnemo", _m.__version__, "-- evidence-grade ratchet green.")
+    print("inspeximus", _m.__version__, "-- evidence-grade ratchet green.")

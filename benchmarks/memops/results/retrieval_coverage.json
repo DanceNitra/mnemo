@@ -9,7 +9,7 @@
  {
   "file": "A01_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.021505376344086023,
   "chars": 1135
  },
@@ -23,7 +23,7 @@
  {
   "file": "A01_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.0967741935483871,
   "chars": 4587
  },
@@ -37,7 +37,7 @@
  {
   "file": "A01_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.11827956989247312,
   "chars": 12000
  },
@@ -58,7 +58,7 @@
  {
   "file": "A01_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.021505376344086023,
   "chars": 1135
  },
@@ -72,7 +72,7 @@
  {
   "file": "A01_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.0967741935483871,
   "chars": 4587
  },
@@ -86,7 +86,7 @@
  {
   "file": "A01_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.11827956989247312,
   "chars": 12000
  },
@@ -107,7 +107,7 @@
  {
   "file": "A01_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.021505376344086023,
   "chars": 1235
  },
@@ -121,7 +121,7 @@
  {
   "file": "A01_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.053763440860215055,
   "chars": 4914
  },
@@ -135,7 +135,7 @@
  {
   "file": "A01_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.0967741935483871,
   "chars": 12000
  },
@@ -156,7 +156,7 @@
  {
   "file": "A01_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.021505376344086023,
   "chars": 1235
  },
@@ -170,7 +170,7 @@
  {
   "file": "A01_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.053763440860215055,
   "chars": 4914
  },
@@ -184,7 +184,7 @@
  {
   "file": "A01_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.0967741935483871,
   "chars": 12000
  },
@@ -205,7 +205,7 @@
  {
   "file": "A01_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.010752688172043012,
   "chars": 1486
  },
@@ -219,7 +219,7 @@
  {
   "file": "A01_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.06451612903225806,
   "chars": 5141
  },
@@ -233,7 +233,7 @@
  {
   "file": "A01_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.07526881720430108,
   "chars": 12000
  },
@@ -254,7 +254,7 @@
  {
   "file": "A01_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.010752688172043012,
   "chars": 1486
  },
@@ -268,7 +268,7 @@
  {
   "file": "A01_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.06451612903225806,
   "chars": 5141
  },
@@ -282,7 +282,7 @@
  {
   "file": "A01_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.07526881720430108,
   "chars": 12000
  },
@@ -303,7 +303,7 @@
  {
   "file": "A01_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.03225806451612903,
   "chars": 1040
  },
@@ -317,7 +317,7 @@
  {
   "file": "A01_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.06451612903225806,
   "chars": 4883
  },
@@ -331,7 +331,7 @@
  {
   "file": "A01_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.10752688172043011,
   "chars": 12000
  },
@@ -352,7 +352,7 @@
  {
   "file": "A01_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.03225806451612903,
   "chars": 1040
  },
@@ -366,7 +366,7 @@
  {
   "file": "A01_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.06451612903225806,
   "chars": 4883
  },
@@ -380,7 +380,7 @@
  {
   "file": "A01_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.10752688172043011,
   "chars": 12000
  },
@@ -401,7 +401,7 @@
  {
   "file": "A01_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.010752688172043012,
   "chars": 1321
  },
@@ -415,7 +415,7 @@
  {
   "file": "A01_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.053763440860215055,
   "chars": 4461
  },
@@ -429,7 +429,7 @@
  {
   "file": "A01_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.11827956989247312,
   "chars": 12000
  },
@@ -450,7 +450,7 @@
  {
   "file": "A01_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.010752688172043012,
   "chars": 1321
  },
@@ -464,7 +464,7 @@
  {
   "file": "A01_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.053763440860215055,
   "chars": 4461
  },
@@ -478,7 +478,7 @@
  {
   "file": "A01_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.11827956989247312,
   "chars": 12000
  },
@@ -499,7 +499,7 @@
  {
   "file": "A01_remember.json",
   "op": "remember",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.05194805194805195,
   "chars": 1018
  },
@@ -513,7 +513,7 @@
  {
   "file": "A01_remember.json",
   "op": "remember",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.06493506493506493,
   "chars": 4148
  },
@@ -527,7 +527,7 @@
  {
   "file": "A01_remember.json",
   "op": "remember",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.15584415584415584,
   "chars": 12000
  },
@@ -548,7 +548,7 @@
  {
   "file": "A01_remember.json",
   "op": "remember",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.05194805194805195,
   "chars": 1018
  },
@@ -562,7 +562,7 @@
  {
   "file": "A01_remember.json",
   "op": "remember",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.06493506493506493,
   "chars": 4148
  },
@@ -576,7 +576,7 @@
  {
   "file": "A01_remember.json",
   "op": "remember",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.15584415584415584,
   "chars": 12000
  },
@@ -597,7 +597,7 @@
  {
   "file": "A01_remember.json",
   "op": "remember",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.03896103896103896,
   "chars": 1247
  },
@@ -611,7 +611,7 @@
  {
   "file": "A01_remember.json",
   "op": "remember",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.07792207792207792,
   "chars": 4528
  },
@@ -625,7 +625,7 @@
  {
   "file": "A01_remember.json",
   "op": "remember",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.12987012987012986,
   "chars": 12000
  },
@@ -646,7 +646,7 @@
  {
   "file": "A01_remember.json",
   "op": "remember",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.03896103896103896,
   "chars": 1247
  },
@@ -660,7 +660,7 @@
  {
   "file": "A01_remember.json",
   "op": "remember",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.07792207792207792,
   "chars": 4528
  },
@@ -674,7 +674,7 @@
  {
   "file": "A01_remember.json",
   "op": "remember",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.12987012987012986,
   "chars": 12000
  },
@@ -695,7 +695,7 @@
  {
   "file": "A01_remember.json",
   "op": "remember",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.03896103896103896,
   "chars": 2189
  },
@@ -709,7 +709,7 @@
  {
   "file": "A01_remember.json",
   "op": "remember",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.1038961038961039,
   "chars": 6581
  },
@@ -723,7 +723,7 @@
  {
   "file": "A01_remember.json",
   "op": "remember",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.12987012987012986,
   "chars": 12000
  },
@@ -744,7 +744,7 @@
  {
   "file": "A01_remember.json",
   "op": "remember",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.03896103896103896,
   "chars": 2189
  },
@@ -758,7 +758,7 @@
  {
   "file": "A01_remember.json",
   "op": "remember",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.1038961038961039,
   "chars": 6581
  },
@@ -772,7 +772,7 @@
  {
   "file": "A01_remember.json",
   "op": "remember",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.12987012987012986,
   "chars": 12000
  },
@@ -793,7 +793,7 @@
  {
   "file": "A01_remember.json",
   "op": "remember",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.03896103896103896,
   "chars": 1012
  },
@@ -807,7 +807,7 @@
  {
   "file": "A01_remember.json",
   "op": "remember",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.05194805194805195,
   "chars": 5571
  },
@@ -821,7 +821,7 @@
  {
   "file": "A01_remember.json",
   "op": "remember",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.05194805194805195,
   "chars": 12000
  },
@@ -842,7 +842,7 @@
  {
   "file": "A01_remember.json",
   "op": "remember",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.03896103896103896,
   "chars": 1012
  },
@@ -856,7 +856,7 @@
  {
   "file": "A01_remember.json",
   "op": "remember",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.05194805194805195,
   "chars": 5571
  },
@@ -870,7 +870,7 @@
  {
   "file": "A01_remember.json",
   "op": "remember",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.05194805194805195,
   "chars": 12000
  },
@@ -891,7 +891,7 @@
  {
   "file": "A01_remember.json",
   "op": "remember",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.03896103896103896,
   "chars": 1480
  },
@@ -905,7 +905,7 @@
  {
   "file": "A01_remember.json",
   "op": "remember",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.05194805194805195,
   "chars": 4971
  },
@@ -919,7 +919,7 @@
  {
   "file": "A01_remember.json",
   "op": "remember",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.1038961038961039,
   "chars": 12000
  },
@@ -940,7 +940,7 @@
  {
   "file": "A01_remember.json",
   "op": "remember",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.03896103896103896,
   "chars": 1480
  },
@@ -954,7 +954,7 @@
  {
   "file": "A01_remember.json",
   "op": "remember",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.05194805194805195,
   "chars": 4971
  },
@@ -968,7 +968,7 @@
  {
   "file": "A01_remember.json",
   "op": "remember",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.1038961038961039,
   "chars": 12000
  },
@@ -989,7 +989,7 @@
  {
   "file": "A01_remember.json",
   "op": "remember",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.025974025974025976,
   "chars": 3221
  },
@@ -1003,7 +1003,7 @@
  {
   "file": "A01_remember.json",
   "op": "remember",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.05194805194805195,
   "chars": 8362
  },
@@ -1017,7 +1017,7 @@
  {
   "file": "A01_remember.json",
   "op": "remember",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.05194805194805195,
   "chars": 8362
  },
@@ -1038,7 +1038,7 @@
  {
   "file": "A01_remember.json",
   "op": "remember",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.025974025974025976,
   "chars": 3221
  },
@@ -1052,7 +1052,7 @@
  {
   "file": "A01_remember.json",
   "op": "remember",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.05194805194805195,
   "chars": 8362
  },
@@ -1066,7 +1066,7 @@
  {
   "file": "A01_remember.json",
   "op": "remember",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.05194805194805195,
   "chars": 8362
  },
@@ -1087,7 +1087,7 @@
  {
   "file": "A01_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.04054054054054054,
   "chars": 798
  },
@@ -1101,7 +1101,7 @@
  {
   "file": "A01_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.10810810810810811,
   "chars": 4018
  },
@@ -1115,7 +1115,7 @@
  {
   "file": "A01_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.1891891891891892,
   "chars": 12000
  },
@@ -1136,7 +1136,7 @@
  {
   "file": "A01_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.04054054054054054,
   "chars": 798
  },
@@ -1150,7 +1150,7 @@
  {
   "file": "A01_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.10810810810810811,
   "chars": 4018
  },
@@ -1164,7 +1164,7 @@
  {
   "file": "A01_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.1891891891891892,
   "chars": 12000
  },
@@ -1185,7 +1185,7 @@
  {
   "file": "A01_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.02702702702702703,
   "chars": 1025
  },
@@ -1199,7 +1199,7 @@
  {
   "file": "A01_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.04054054054054054,
   "chars": 4567
  },
@@ -1213,7 +1213,7 @@
  {
   "file": "A01_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.13513513513513514,
   "chars": 12000
  },
@@ -1234,7 +1234,7 @@
  {
   "file": "A01_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.02702702702702703,
   "chars": 1025
  },
@@ -1248,7 +1248,7 @@
  {
   "file": "A01_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.04054054054054054,
   "chars": 4567
  },
@@ -1262,7 +1262,7 @@
  {
   "file": "A01_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.13513513513513514,
   "chars": 12000
  },
@@ -1283,7 +1283,7 @@
  {
   "file": "A01_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.05405405405405406,
   "chars": 962
  },
@@ -1297,7 +1297,7 @@
  {
   "file": "A01_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.10810810810810811,
   "chars": 3696
  },
@@ -1311,7 +1311,7 @@
  {
   "file": "A01_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.20270270270270271,
   "chars": 12000
  },
@@ -1332,7 +1332,7 @@
  {
   "file": "A01_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.05405405405405406,
   "chars": 962
  },
@@ -1346,7 +1346,7 @@
  {
   "file": "A01_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.10810810810810811,
   "chars": 3696
  },
@@ -1360,7 +1360,7 @@
  {
   "file": "A01_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.20270270270270271,
   "chars": 12000
  },
@@ -1381,7 +1381,7 @@
  {
   "file": "A01_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.06756756756756757,
   "chars": 1601
  },
@@ -1395,7 +1395,7 @@
  {
   "file": "A01_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.10810810810810811,
   "chars": 4989
  },
@@ -1409,7 +1409,7 @@
  {
   "file": "A01_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.17567567567567569,
   "chars": 12000
  },
@@ -1430,7 +1430,7 @@
  {
   "file": "A01_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.06756756756756757,
   "chars": 1601
  },
@@ -1444,7 +1444,7 @@
  {
   "file": "A01_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.10810810810810811,
   "chars": 4989
  },
@@ -1458,7 +1458,7 @@
  {
   "file": "A01_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.17567567567567569,
   "chars": 12000
  },
@@ -1479,7 +1479,7 @@
  {
   "file": "A01_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.04054054054054054,
   "chars": 1058
  },
@@ -1493,7 +1493,7 @@
  {
   "file": "A01_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.0945945945945946,
   "chars": 4337
  },
@@ -1507,7 +1507,7 @@
  {
   "file": "A01_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.17567567567567569,
   "chars": 12000
  },
@@ -1528,7 +1528,7 @@
  {
   "file": "A01_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.04054054054054054,
   "chars": 1058
  },
@@ -1542,7 +1542,7 @@
  {
   "file": "A01_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.0945945945945946,
   "chars": 4337
  },
@@ -1556,7 +1556,7 @@
  {
   "file": "A01_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.17567567567567569,
   "chars": 12000
  },
@@ -1577,7 +1577,7 @@
  {
   "file": "A01_update.json",
   "op": "update",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.014084507042253521,
   "chars": 897
  },
@@ -1591,7 +1591,7 @@
  {
   "file": "A01_update.json",
   "op": "update",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.07042253521126761,
   "chars": 4569
  },
@@ -1605,7 +1605,7 @@
  {
   "file": "A01_update.json",
   "op": "update",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.14084507042253522,
   "chars": 12000
  },
@@ -1626,7 +1626,7 @@
  {
   "file": "A01_update.json",
   "op": "update",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.014084507042253521,
   "chars": 897
  },
@@ -1640,7 +1640,7 @@
  {
   "file": "A01_update.json",
   "op": "update",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.07042253521126761,
   "chars": 4569
  },
@@ -1654,7 +1654,7 @@
  {
   "file": "A01_update.json",
   "op": "update",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.14084507042253522,
   "chars": 12000
  },
@@ -1675,7 +1675,7 @@
  {
   "file": "A01_update.json",
   "op": "update",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.028169014084507043,
   "chars": 1189
  },
@@ -1689,7 +1689,7 @@
  {
   "file": "A01_update.json",
   "op": "update",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.08450704225352113,
   "chars": 4537
  },
@@ -1703,7 +1703,7 @@
  {
   "file": "A01_update.json",
   "op": "update",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.1267605633802817,
   "chars": 12000
  },
@@ -1724,7 +1724,7 @@
  {
   "file": "A01_update.json",
   "op": "update",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.028169014084507043,
   "chars": 1189
  },
@@ -1738,7 +1738,7 @@
  {
   "file": "A01_update.json",
   "op": "update",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.08450704225352113,
   "chars": 4537
  },
@@ -1752,7 +1752,7 @@
  {
   "file": "A01_update.json",
   "op": "update",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.1267605633802817,
   "chars": 12000
  },
@@ -1773,7 +1773,7 @@
  {
   "file": "A01_update.json",
   "op": "update",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.028169014084507043,
   "chars": 2370
  },
@@ -1787,7 +1787,7 @@
  {
   "file": "A01_update.json",
   "op": "update",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.04225352112676056,
   "chars": 5717
  },
@@ -1801,7 +1801,7 @@
  {
   "file": "A01_update.json",
   "op": "update",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.04225352112676056,
   "chars": 12000
  },
@@ -1822,7 +1822,7 @@
  {
   "file": "A01_update.json",
   "op": "update",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.028169014084507043,
   "chars": 2370
  },
@@ -1836,7 +1836,7 @@
  {
   "file": "A01_update.json",
   "op": "update",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.04225352112676056,
   "chars": 5717
  },
@@ -1850,7 +1850,7 @@
  {
   "file": "A01_update.json",
   "op": "update",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.04225352112676056,
   "chars": 12000
  },
@@ -1871,7 +1871,7 @@
  {
   "file": "A01_update.json",
   "op": "update",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.028169014084507043,
   "chars": 924
  },
@@ -1885,7 +1885,7 @@
  {
   "file": "A01_update.json",
   "op": "update",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.08450704225352113,
   "chars": 4075
  },
@@ -1899,7 +1899,7 @@
  {
   "file": "A01_update.json",
   "op": "update",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.1267605633802817,
   "chars": 12000
  },
@@ -1920,7 +1920,7 @@
  {
   "file": "A01_update.json",
   "op": "update",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.028169014084507043,
   "chars": 924
  },
@@ -1934,7 +1934,7 @@
  {
   "file": "A01_update.json",
   "op": "update",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.08450704225352113,
   "chars": 4075
  },
@@ -1948,7 +1948,7 @@
  {
   "file": "A01_update.json",
   "op": "update",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.1267605633802817,
   "chars": 12000
  },
@@ -1969,7 +1969,7 @@
  {
   "file": "A02_forget.json",
   "op": "forget",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.07462686567164178,
   "chars": 1277
  },
@@ -1983,7 +1983,7 @@
  {
   "file": "A02_forget.json",
   "op": "forget",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.13432835820895522,
   "chars": 4963
  },
@@ -1997,7 +1997,7 @@
  {
   "file": "A02_forget.json",
   "op": "forget",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.1791044776119403,
   "chars": 12000
  },
@@ -2018,7 +2018,7 @@
  {
   "file": "A02_forget.json",
   "op": "forget",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.07462686567164178,
   "chars": 1277
  },
@@ -2032,7 +2032,7 @@
  {
   "file": "A02_forget.json",
   "op": "forget",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.13432835820895522,
   "chars": 4963
  },
@@ -2046,7 +2046,7 @@
  {
   "file": "A02_forget.json",
   "op": "forget",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.1791044776119403,
   "chars": 12000
  },
@@ -2067,7 +2067,7 @@
  {
   "file": "A02_forget.json",
   "op": "forget",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.0,
   "chars": 1295
  },
@@ -2081,7 +2081,7 @@
  {
   "file": "A02_forget.json",
   "op": "forget",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.07462686567164178,
   "chars": 4248
  },
@@ -2095,7 +2095,7 @@
  {
   "file": "A02_forget.json",
   "op": "forget",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.11940298507462686,
   "chars": 12000
  },
@@ -2116,7 +2116,7 @@
  {
   "file": "A02_forget.json",
   "op": "forget",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.0,
   "chars": 1295
  },
@@ -2130,7 +2130,7 @@
  {
   "file": "A02_forget.json",
   "op": "forget",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.07462686567164178,
   "chars": 4248
  },
@@ -2144,7 +2144,7 @@
  {
   "file": "A02_forget.json",
   "op": "forget",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.11940298507462686,
   "chars": 12000
  },
@@ -2165,7 +2165,7 @@
  {
   "file": "A02_forget.json",
   "op": "forget",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.04477611940298507,
   "chars": 1176
  },
@@ -2179,7 +2179,7 @@
  {
   "file": "A02_forget.json",
   "op": "forget",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.05970149253731343,
   "chars": 4474
  },
@@ -2193,7 +2193,7 @@
  {
   "file": "A02_forget.json",
   "op": "forget",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.13432835820895522,
   "chars": 12000
  },
@@ -2214,7 +2214,7 @@
  {
   "file": "A02_forget.json",
   "op": "forget",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.04477611940298507,
   "chars": 1176
  },
@@ -2228,7 +2228,7 @@
  {
   "file": "A02_forget.json",
   "op": "forget",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.05970149253731343,
   "chars": 4474
  },
@@ -2242,7 +2242,7 @@
  {
   "file": "A02_forget.json",
   "op": "forget",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.13432835820895522,
   "chars": 12000
  },
@@ -2263,7 +2263,7 @@
  {
   "file": "A02_forget.json",
   "op": "forget",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.05970149253731343,
   "chars": 1467
  },
@@ -2277,7 +2277,7 @@
  {
   "file": "A02_forget.json",
   "op": "forget",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.1044776119402985,
   "chars": 4986
  },
@@ -2291,7 +2291,7 @@
  {
   "file": "A02_forget.json",
   "op": "forget",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.13432835820895522,
   "chars": 12000
  },
@@ -2312,7 +2312,7 @@
  {
   "file": "A02_forget.json",
   "op": "forget",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.05970149253731343,
   "chars": 1467
  },
@@ -2326,7 +2326,7 @@
  {
   "file": "A02_forget.json",
   "op": "forget",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.1044776119402985,
   "chars": 4986
  },
@@ -2340,7 +2340,7 @@
  {
   "file": "A02_forget.json",
   "op": "forget",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.13432835820895522,
   "chars": 12000
  },
@@ -2361,7 +2361,7 @@
  {
   "file": "A02_forget.json",
   "op": "forget",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.05970149253731343,
   "chars": 1337
  },
@@ -2375,7 +2375,7 @@
  {
   "file": "A02_forget.json",
   "op": "forget",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.1791044776119403,
   "chars": 3941
  },
@@ -2389,7 +2389,7 @@
  {
   "file": "A02_forget.json",
   "op": "forget",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.2537313432835821,
   "chars": 12000
  },
@@ -2410,7 +2410,7 @@
  {
   "file": "A02_forget.json",
   "op": "forget",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.05970149253731343,
   "chars": 1337
  },
@@ -2424,7 +2424,7 @@
  {
   "file": "A02_forget.json",
   "op": "forget",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.1791044776119403,
   "chars": 3941
  },
@@ -2438,7 +2438,7 @@
  {
   "file": "A02_forget.json",
   "op": "forget",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.2537313432835821,
   "chars": 12000
  },
@@ -2459,7 +2459,7 @@
  {
   "file": "A02_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.05319148936170213,
   "chars": 1158
  },
@@ -2473,7 +2473,7 @@
  {
   "file": "A02_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.07446808510638298,
   "chars": 4577
  },
@@ -2487,7 +2487,7 @@
  {
   "file": "A02_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.1276595744680851,
   "chars": 12000
  },
@@ -2508,7 +2508,7 @@
  {
   "file": "A02_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.05319148936170213,
   "chars": 1158
  },
@@ -2522,7 +2522,7 @@
  {
   "file": "A02_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.07446808510638298,
   "chars": 4577
  },
@@ -2536,7 +2536,7 @@
  {
   "file": "A02_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.1276595744680851,
   "chars": 12000
  },
@@ -2557,7 +2557,7 @@
  {
   "file": "A02_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.031914893617021274,
   "chars": 1516
  },
@@ -2571,7 +2571,7 @@
  {
   "file": "A02_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.06382978723404255,
   "chars": 4852
  },
@@ -2585,7 +2585,7 @@
  {
   "file": "A02_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.1702127659574468,
   "chars": 12000
  },
@@ -2606,7 +2606,7 @@
  {
   "file": "A02_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.031914893617021274,
   "chars": 1516
  },
@@ -2620,7 +2620,7 @@
  {
   "file": "A02_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.06382978723404255,
   "chars": 4852
  },
@@ -2634,7 +2634,7 @@
  {
   "file": "A02_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.1702127659574468,
   "chars": 12000
  },
@@ -2655,7 +2655,7 @@
  {
   "file": "A02_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.05319148936170213,
   "chars": 1050
  },
@@ -2669,7 +2669,7 @@
  {
   "file": "A02_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.07446808510638298,
   "chars": 4186
  },
@@ -2683,7 +2683,7 @@
  {
   "file": "A02_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.1595744680851064,
   "chars": 12000
  },
@@ -2704,7 +2704,7 @@
  {
   "file": "A02_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.05319148936170213,
   "chars": 1050
  },
@@ -2718,7 +2718,7 @@
  {
   "file": "A02_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.07446808510638298,
   "chars": 4186
  },
@@ -2732,7 +2732,7 @@
  {
   "file": "A02_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.1595744680851064,
   "chars": 12000
  },
@@ -2753,7 +2753,7 @@
  {
   "file": "A02_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.02127659574468085,
   "chars": 1302
  },
@@ -2767,7 +2767,7 @@
  {
   "file": "A02_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.05319148936170213,
   "chars": 4715
  },
@@ -2781,7 +2781,7 @@
  {
   "file": "A02_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.07446808510638298,
   "chars": 12000
  },
@@ -2802,7 +2802,7 @@
  {
   "file": "A02_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.02127659574468085,
   "chars": 1302
  },
@@ -2816,7 +2816,7 @@
  {
   "file": "A02_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.05319148936170213,
   "chars": 4715
  },
@@ -2830,7 +2830,7 @@
  {
   "file": "A02_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.07446808510638298,
   "chars": 12000
  },
@@ -2851,7 +2851,7 @@
  {
   "file": "A02_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.0425531914893617,
   "chars": 1503
  },
@@ -2865,7 +2865,7 @@
  {
   "file": "A02_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.0851063829787234,
   "chars": 4882
  },
@@ -2879,7 +2879,7 @@
  {
   "file": "A02_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.1702127659574468,
   "chars": 12000
  },
@@ -2900,7 +2900,7 @@
  {
   "file": "A02_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.0425531914893617,
   "chars": 1503
  },
@@ -2914,7 +2914,7 @@
  {
   "file": "A02_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.0851063829787234,
   "chars": 4882
  },
@@ -2928,7 +2928,7 @@
  {
   "file": "A02_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.1702127659574468,
   "chars": 12000
  },
@@ -2949,7 +2949,7 @@
  {
   "file": "A02_remember.json",
   "op": "remember",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.014285714285714285,
   "chars": 1265
  },
@@ -2963,7 +2963,7 @@
  {
   "file": "A02_remember.json",
   "op": "remember",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.02857142857142857,
   "chars": 4686
  },
@@ -2977,7 +2977,7 @@
  {
   "file": "A02_remember.json",
   "op": "remember",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.04285714285714286,
   "chars": 12000
  },
@@ -2998,7 +2998,7 @@
  {
   "file": "A02_remember.json",
   "op": "remember",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.014285714285714285,
   "chars": 1265
  },
@@ -3012,7 +3012,7 @@
  {
   "file": "A02_remember.json",
   "op": "remember",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.02857142857142857,
   "chars": 4686
  },
@@ -3026,7 +3026,7 @@
  {
   "file": "A02_remember.json",
   "op": "remember",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.04285714285714286,
   "chars": 12000
  },
@@ -3047,7 +3047,7 @@
  {
   "file": "A02_remember.json",
   "op": "remember",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.02857142857142857,
   "chars": 970
  },
@@ -3061,7 +3061,7 @@
  {
   "file": "A02_remember.json",
   "op": "remember",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.07142857142857142,
   "chars": 3334
  },
@@ -3075,7 +3075,7 @@
  {
   "file": "A02_remember.json",
   "op": "remember",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.17142857142857143,
   "chars": 11384
  },
@@ -3096,7 +3096,7 @@
  {
   "file": "A02_remember.json",
   "op": "remember",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.02857142857142857,
   "chars": 970
  },
@@ -3110,7 +3110,7 @@
  {
   "file": "A02_remember.json",
   "op": "remember",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.07142857142857142,
   "chars": 3334
  },
@@ -3124,7 +3124,7 @@
  {
   "file": "A02_remember.json",
   "op": "remember",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.17142857142857143,
   "chars": 11384
  },
@@ -3145,7 +3145,7 @@
  {
   "file": "A02_remember.json",
   "op": "remember",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.02857142857142857,
   "chars": 2688
  },
@@ -3159,7 +3159,7 @@
  {
   "file": "A02_remember.json",
   "op": "remember",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.08571428571428572,
   "chars": 7384
  },
@@ -3173,7 +3173,7 @@
  {
   "file": "A02_remember.json",
   "op": "remember",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.08571428571428572,
   "chars": 12000
  },
@@ -3194,7 +3194,7 @@
  {
   "file": "A02_remember.json",
   "op": "remember",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.02857142857142857,
   "chars": 2688
  },
@@ -3208,7 +3208,7 @@
  {
   "file": "A02_remember.json",
   "op": "remember",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.08571428571428572,
   "chars": 7384
  },
@@ -3222,7 +3222,7 @@
  {
   "file": "A02_remember.json",
   "op": "remember",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.08571428571428572,
   "chars": 12000
  },
@@ -3243,7 +3243,7 @@
  {
   "file": "A02_remember.json",
   "op": "remember",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.014285714285714285,
   "chars": 1422
  },
@@ -3257,7 +3257,7 @@
  {
   "file": "A02_remember.json",
   "op": "remember",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.04285714285714286,
   "chars": 7425
  },
@@ -3271,7 +3271,7 @@
  {
   "file": "A02_remember.json",
   "op": "remember",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.08571428571428572,
   "chars": 12000
  },
@@ -3292,7 +3292,7 @@
  {
   "file": "A02_remember.json",
   "op": "remember",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.014285714285714285,
   "chars": 1422
  },
@@ -3306,7 +3306,7 @@
  {
   "file": "A02_remember.json",
   "op": "remember",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.04285714285714286,
   "chars": 7425
  },
@@ -3320,7 +3320,7 @@
  {
   "file": "A02_remember.json",
   "op": "remember",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.08571428571428572,
   "chars": 12000
  },
@@ -3341,7 +3341,7 @@
  {
   "file": "A02_remember.json",
   "op": "remember",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.02857142857142857,
   "chars": 768
  },
@@ -3355,7 +3355,7 @@
  {
   "file": "A02_remember.json",
   "op": "remember",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.04285714285714286,
   "chars": 3693
  },
@@ -3369,7 +3369,7 @@
  {
   "file": "A02_remember.json",
   "op": "remember",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.12857142857142856,
   "chars": 11396
  },
@@ -3390,7 +3390,7 @@
  {
   "file": "A02_remember.json",
   "op": "remember",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.02857142857142857,
   "chars": 768
  },
@@ -3404,7 +3404,7 @@
  {
   "file": "A02_remember.json",
   "op": "remember",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.04285714285714286,
   "chars": 3693
  },
@@ -3418,7 +3418,7 @@
  {
   "file": "A02_remember.json",
   "op": "remember",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.12857142857142856,
   "chars": 11396
  },
@@ -3439,7 +3439,7 @@
  {
   "file": "A02_remember.json",
   "op": "remember",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.02857142857142857,
   "chars": 2390
  },
@@ -3453,7 +3453,7 @@
  {
   "file": "A02_remember.json",
   "op": "remember",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.04285714285714286,
   "chars": 7470
  },
@@ -3467,7 +3467,7 @@
  {
   "file": "A02_remember.json",
   "op": "remember",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.04285714285714286,
   "chars": 12000
  },
@@ -3488,7 +3488,7 @@
  {
   "file": "A02_remember.json",
   "op": "remember",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.02857142857142857,
   "chars": 2390
  },
@@ -3502,7 +3502,7 @@
  {
   "file": "A02_remember.json",
   "op": "remember",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.04285714285714286,
   "chars": 7470
  },
@@ -3516,7 +3516,7 @@
  {
   "file": "A02_remember.json",
   "op": "remember",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.04285714285714286,
   "chars": 12000
  },
@@ -3537,7 +3537,7 @@
  {
   "file": "A02_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.0,
   "chars": 823
  },
@@ -3551,7 +3551,7 @@
  {
   "file": "A02_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.022222222222222223,
   "chars": 3879
  },
@@ -3565,7 +3565,7 @@
  {
   "file": "A02_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.07777777777777778,
   "chars": 11937
  },
@@ -3586,7 +3586,7 @@
  {
   "file": "A02_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.0,
   "chars": 823
  },
@@ -3600,7 +3600,7 @@
  {
   "file": "A02_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.022222222222222223,
   "chars": 3879
  },
@@ -3614,7 +3614,7 @@
  {
   "file": "A02_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.07777777777777778,
   "chars": 11937
  },
@@ -3635,7 +3635,7 @@
  {
   "file": "A02_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.03333333333333333,
   "chars": 1093
  },
@@ -3649,7 +3649,7 @@
  {
   "file": "A02_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.03333333333333333,
   "chars": 4708
  },
@@ -3663,7 +3663,7 @@
  {
   "file": "A02_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.07777777777777778,
   "chars": 12000
  },
@@ -3684,7 +3684,7 @@
  {
   "file": "A02_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.03333333333333333,
   "chars": 1093
  },
@@ -3698,7 +3698,7 @@
  {
   "file": "A02_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.03333333333333333,
   "chars": 4708
  },
@@ -3712,7 +3712,7 @@
  {
   "file": "A02_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.07777777777777778,
   "chars": 12000
  },
@@ -3733,7 +3733,7 @@
  {
   "file": "A02_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.044444444444444446,
   "chars": 1169
  },
@@ -3747,7 +3747,7 @@
  {
   "file": "A02_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.08888888888888889,
   "chars": 5774
  },
@@ -3761,7 +3761,7 @@
  {
   "file": "A02_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.12222222222222222,
   "chars": 12000
  },
@@ -3782,7 +3782,7 @@
  {
   "file": "A02_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.044444444444444446,
   "chars": 1169
  },
@@ -3796,7 +3796,7 @@
  {
   "file": "A02_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.08888888888888889,
   "chars": 5774
  },
@@ -3810,7 +3810,7 @@
  {
   "file": "A02_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.12222222222222222,
   "chars": 12000
  },
@@ -3831,7 +3831,7 @@
  {
   "file": "A02_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.03333333333333333,
   "chars": 637
  },
@@ -3845,7 +3845,7 @@
  {
   "file": "A02_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.07777777777777778,
   "chars": 3024
  },
@@ -3859,7 +3859,7 @@
  {
   "file": "A02_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.12222222222222222,
   "chars": 12000
  },
@@ -3880,7 +3880,7 @@
  {
   "file": "A02_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.03333333333333333,
   "chars": 637
  },
@@ -3894,7 +3894,7 @@
  {
   "file": "A02_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.07777777777777778,
   "chars": 3024
  },
@@ -3908,7 +3908,7 @@
  {
   "file": "A02_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.12222222222222222,
   "chars": 12000
  },
@@ -3929,7 +3929,7 @@
  {
   "file": "A02_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.022222222222222223,
   "chars": 1180
  },
@@ -3943,7 +3943,7 @@
  {
   "file": "A02_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.07777777777777778,
   "chars": 4832
  },
@@ -3957,7 +3957,7 @@
  {
   "file": "A02_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.13333333333333333,
   "chars": 12000
  },
@@ -3978,7 +3978,7 @@
  {
   "file": "A02_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.022222222222222223,
   "chars": 1180
  },
@@ -3992,7 +3992,7 @@
  {
   "file": "A02_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.07777777777777778,
   "chars": 4832
  },
@@ -4006,7 +4006,7 @@
  {
   "file": "A02_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.13333333333333333,
   "chars": 12000
  },
@@ -4027,7 +4027,7 @@
  {
   "file": "A02_update.json",
   "op": "update",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.043478260869565216,
   "chars": 1065
  },
@@ -4041,7 +4041,7 @@
  {
   "file": "A02_update.json",
   "op": "update",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.10869565217391304,
   "chars": 4353
  },
@@ -4055,7 +4055,7 @@
  {
   "file": "A02_update.json",
   "op": "update",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.14130434782608695,
   "chars": 12000
  },
@@ -4076,7 +4076,7 @@
  {
   "file": "A02_update.json",
   "op": "update",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.043478260869565216,
   "chars": 1065
  },
@@ -4090,7 +4090,7 @@
  {
   "file": "A02_update.json",
   "op": "update",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.10869565217391304,
   "chars": 4353
  },
@@ -4104,7 +4104,7 @@
  {
   "file": "A02_update.json",
   "op": "update",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.14130434782608695,
   "chars": 12000
  },
@@ -4125,7 +4125,7 @@
  {
   "file": "A02_update.json",
   "op": "update",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.043478260869565216,
   "chars": 1302
  },
@@ -4139,7 +4139,7 @@
  {
   "file": "A02_update.json",
   "op": "update",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.11956521739130435,
   "chars": 4623
  },
@@ -4153,7 +4153,7 @@
  {
   "file": "A02_update.json",
   "op": "update",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.18478260869565216,
   "chars": 12000
  },
@@ -4174,7 +4174,7 @@
  {
   "file": "A02_update.json",
   "op": "update",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.043478260869565216,
   "chars": 1302
  },
@@ -4188,7 +4188,7 @@
  {
   "file": "A02_update.json",
   "op": "update",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.11956521739130435,
   "chars": 4623
  },
@@ -4202,7 +4202,7 @@
  {
   "file": "A02_update.json",
   "op": "update",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.18478260869565216,
   "chars": 12000
  },
@@ -4223,7 +4223,7 @@
  {
   "file": "A02_update.json",
   "op": "update",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.010869565217391304,
   "chars": 1198
  },
@@ -4237,7 +4237,7 @@
  {
   "file": "A02_update.json",
   "op": "update",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.08695652173913043,
   "chars": 4354
  },
@@ -4251,7 +4251,7 @@
  {
   "file": "A02_update.json",
   "op": "update",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.10869565217391304,
   "chars": 12000
  },
@@ -4272,7 +4272,7 @@
  {
   "file": "A02_update.json",
   "op": "update",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.010869565217391304,
   "chars": 1198
  },
@@ -4286,7 +4286,7 @@
  {
   "file": "A02_update.json",
   "op": "update",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.08695652173913043,
   "chars": 4354
  },
@@ -4300,7 +4300,7 @@
  {
   "file": "A02_update.json",
   "op": "update",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.10869565217391304,
   "chars": 12000
  },
@@ -4321,7 +4321,7 @@
  {
   "file": "A02_update.json",
   "op": "update",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.010869565217391304,
   "chars": 938
  },
@@ -4335,7 +4335,7 @@
  {
   "file": "A02_update.json",
   "op": "update",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.08695652173913043,
   "chars": 3462
  },
@@ -4349,7 +4349,7 @@
  {
   "file": "A02_update.json",
   "op": "update",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.16304347826086957,
   "chars": 11571
  },
@@ -4370,7 +4370,7 @@
  {
   "file": "A02_update.json",
   "op": "update",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.010869565217391304,
   "chars": 938
  },
@@ -4384,7 +4384,7 @@
  {
   "file": "A02_update.json",
   "op": "update",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.08695652173913043,
   "chars": 3462
  },
@@ -4398,7 +4398,7 @@
  {
   "file": "A02_update.json",
   "op": "update",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.16304347826086957,
   "chars": 11571
  },
@@ -4419,7 +4419,7 @@
  {
   "file": "A04_forget.json",
   "op": "forget",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.04819277108433735,
   "chars": 1281
  },
@@ -4433,7 +4433,7 @@
  {
   "file": "A04_forget.json",
   "op": "forget",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.0963855421686747,
   "chars": 4365
  },
@@ -4447,7 +4447,7 @@
  {
   "file": "A04_forget.json",
   "op": "forget",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.12048192771084337,
   "chars": 12000
  },
@@ -4468,7 +4468,7 @@
  {
   "file": "A04_forget.json",
   "op": "forget",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.04819277108433735,
   "chars": 1281
  },
@@ -4482,7 +4482,7 @@
  {
   "file": "A04_forget.json",
   "op": "forget",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.0963855421686747,
   "chars": 4365
  },
@@ -4496,7 +4496,7 @@
  {
   "file": "A04_forget.json",
   "op": "forget",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.12048192771084337,
   "chars": 12000
  },
@@ -4517,7 +4517,7 @@
  {
   "file": "A04_forget.json",
   "op": "forget",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.04819277108433735,
   "chars": 1374
  },
@@ -4531,7 +4531,7 @@
  {
   "file": "A04_forget.json",
   "op": "forget",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.08433734939759036,
   "chars": 5150
  },
@@ -4545,7 +4545,7 @@
  {
   "file": "A04_forget.json",
   "op": "forget",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.12048192771084337,
   "chars": 12000
  },
@@ -4566,7 +4566,7 @@
  {
   "file": "A04_forget.json",
   "op": "forget",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.04819277108433735,
   "chars": 1374
  },
@@ -4580,7 +4580,7 @@
  {
   "file": "A04_forget.json",
   "op": "forget",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.08433734939759036,
   "chars": 5150
  },
@@ -4594,7 +4594,7 @@
  {
   "file": "A04_forget.json",
   "op": "forget",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.12048192771084337,
   "chars": 12000
  },
@@ -4615,7 +4615,7 @@
  {
   "file": "A04_forget.json",
   "op": "forget",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.03614457831325301,
   "chars": 805
  },
@@ -4629,7 +4629,7 @@
  {
   "file": "A04_forget.json",
   "op": "forget",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.04819277108433735,
   "chars": 3440
  },
@@ -4643,7 +4643,7 @@
  {
   "file": "A04_forget.json",
   "op": "forget",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.060240963855421686,
   "chars": 12000
  },
@@ -4664,7 +4664,7 @@
  {
   "file": "A04_forget.json",
   "op": "forget",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.03614457831325301,
   "chars": 805
  },
@@ -4678,7 +4678,7 @@
  {
   "file": "A04_forget.json",
   "op": "forget",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.04819277108433735,
   "chars": 3440
  },
@@ -4692,7 +4692,7 @@
  {
   "file": "A04_forget.json",
   "op": "forget",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.060240963855421686,
   "chars": 12000
  },
@@ -4713,7 +4713,7 @@
  {
   "file": "A04_forget.json",
   "op": "forget",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.060240963855421686,
   "chars": 1460
  },
@@ -4727,7 +4727,7 @@
  {
   "file": "A04_forget.json",
   "op": "forget",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.08433734939759036,
   "chars": 4268
  },
@@ -4741,7 +4741,7 @@
  {
   "file": "A04_forget.json",
   "op": "forget",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.10843373493975904,
   "chars": 12000
  },
@@ -4762,7 +4762,7 @@
  {
   "file": "A04_forget.json",
   "op": "forget",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.060240963855421686,
   "chars": 1460
  },
@@ -4776,7 +4776,7 @@
  {
   "file": "A04_forget.json",
   "op": "forget",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.08433734939759036,
   "chars": 4268
  },
@@ -4790,7 +4790,7 @@
  {
   "file": "A04_forget.json",
   "op": "forget",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.10843373493975904,
   "chars": 12000
  },
@@ -4811,7 +4811,7 @@
  {
   "file": "A04_forget.json",
   "op": "forget",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.04819277108433735,
   "chars": 1395
  },
@@ -4825,7 +4825,7 @@
  {
   "file": "A04_forget.json",
   "op": "forget",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.0963855421686747,
   "chars": 4697
  },
@@ -4839,7 +4839,7 @@
  {
   "file": "A04_forget.json",
   "op": "forget",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.14457831325301204,
   "chars": 12000
  },
@@ -4860,7 +4860,7 @@
  {
   "file": "A04_forget.json",
   "op": "forget",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.04819277108433735,
   "chars": 1395
  },
@@ -4874,7 +4874,7 @@
  {
   "file": "A04_forget.json",
   "op": "forget",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.0963855421686747,
   "chars": 4697
  },
@@ -4888,7 +4888,7 @@
  {
   "file": "A04_forget.json",
   "op": "forget",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.14457831325301204,
   "chars": 12000
  },
@@ -4909,7 +4909,7 @@
  {
   "file": "A04_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.03296703296703297,
   "chars": 822
  },
@@ -4923,7 +4923,7 @@
  {
   "file": "A04_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.07692307692307693,
   "chars": 3619
  },
@@ -4937,7 +4937,7 @@
  {
   "file": "A04_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.13186813186813187,
   "chars": 12000
  },
@@ -4958,7 +4958,7 @@
  {
   "file": "A04_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.03296703296703297,
   "chars": 822
  },
@@ -4972,7 +4972,7 @@
  {
   "file": "A04_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.07692307692307693,
   "chars": 3619
  },
@@ -4986,7 +4986,7 @@
  {
   "file": "A04_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.13186813186813187,
   "chars": 12000
  },
@@ -5007,7 +5007,7 @@
  {
   "file": "A04_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.054945054945054944,
   "chars": 921
  },
@@ -5021,7 +5021,7 @@
  {
   "file": "A04_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.12087912087912088,
   "chars": 3838
  },
@@ -5035,7 +5035,7 @@
  {
   "file": "A04_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.21978021978021978,
   "chars": 12000
  },
@@ -5056,7 +5056,7 @@
  {
   "file": "A04_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.054945054945054944,
   "chars": 921
  },
@@ -5070,7 +5070,7 @@
  {
   "file": "A04_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.12087912087912088,
   "chars": 3838
  },
@@ -5084,7 +5084,7 @@
  {
   "file": "A04_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.21978021978021978,
   "chars": 12000
  },
@@ -5105,7 +5105,7 @@
  {
   "file": "A04_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.01098901098901099,
   "chars": 1024
  },
@@ -5119,7 +5119,7 @@
  {
   "file": "A04_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.054945054945054944,
   "chars": 3641
  },
@@ -5133,7 +5133,7 @@
  {
   "file": "A04_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.12087912087912088,
   "chars": 12000
  },
@@ -5154,7 +5154,7 @@
  {
   "file": "A04_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.01098901098901099,
   "chars": 1024
  },
@@ -5168,7 +5168,7 @@
  {
   "file": "A04_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.054945054945054944,
   "chars": 3641
  },
@@ -5182,7 +5182,7 @@
  {
   "file": "A04_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.12087912087912088,
   "chars": 12000
  },
@@ -5203,7 +5203,7 @@
  {
   "file": "A04_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.054945054945054944,
   "chars": 1942
  },
@@ -5217,7 +5217,7 @@
  {
   "file": "A04_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.07692307692307693,
   "chars": 6407
  },
@@ -5231,7 +5231,7 @@
  {
   "file": "A04_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.0989010989010989,
   "chars": 12000
  },
@@ -5252,7 +5252,7 @@
  {
   "file": "A04_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.054945054945054944,
   "chars": 1942
  },
@@ -5266,7 +5266,7 @@
  {
   "file": "A04_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.07692307692307693,
   "chars": 6407
  },
@@ -5280,7 +5280,7 @@
  {
   "file": "A04_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.0989010989010989,
   "chars": 12000
  },
@@ -5301,7 +5301,7 @@
  {
   "file": "A04_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.04395604395604396,
   "chars": 1052
  },
@@ -5315,7 +5315,7 @@
  {
   "file": "A04_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.0989010989010989,
   "chars": 3856
  },
@@ -5329,7 +5329,7 @@
  {
   "file": "A04_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.21978021978021978,
   "chars": 12000
  },
@@ -5350,7 +5350,7 @@
  {
   "file": "A04_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.04395604395604396,
   "chars": 1052
  },
@@ -5364,7 +5364,7 @@
  {
   "file": "A04_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.0989010989010989,
   "chars": 3856
  },
@@ -5378,7 +5378,7 @@
  {
   "file": "A04_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.21978021978021978,
   "chars": 12000
  },
@@ -5399,7 +5399,7 @@
  {
   "file": "A04_remember.json",
   "op": "remember",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.05714285714285714,
   "chars": 1488
  },
@@ -5413,7 +5413,7 @@
  {
   "file": "A04_remember.json",
   "op": "remember",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.08571428571428572,
   "chars": 5092
  },
@@ -5427,7 +5427,7 @@
  {
   "file": "A04_remember.json",
   "op": "remember",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.12857142857142856,
   "chars": 12000
  },
@@ -5448,7 +5448,7 @@
  {
   "file": "A04_remember.json",
   "op": "remember",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.05714285714285714,
   "chars": 1488
  },
@@ -5462,7 +5462,7 @@
  {
   "file": "A04_remember.json",
   "op": "remember",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.08571428571428572,
   "chars": 5092
  },
@@ -5476,7 +5476,7 @@
  {
   "file": "A04_remember.json",
   "op": "remember",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.12857142857142856,
   "chars": 12000
  },
@@ -5497,7 +5497,7 @@
  {
   "file": "A04_remember.json",
   "op": "remember",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.07142857142857142,
   "chars": 2036
  },
@@ -5511,7 +5511,7 @@
  {
   "file": "A04_remember.json",
   "op": "remember",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.12857142857142856,
   "chars": 5501
  },
@@ -5525,7 +5525,7 @@
  {
   "file": "A04_remember.json",
   "op": "remember",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.17142857142857143,
   "chars": 12000
  },
@@ -5546,7 +5546,7 @@
  {
   "file": "A04_remember.json",
   "op": "remember",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.07142857142857142,
   "chars": 2036
  },
@@ -5560,7 +5560,7 @@
  {
   "file": "A04_remember.json",
   "op": "remember",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.12857142857142856,
   "chars": 5501
  },
@@ -5574,7 +5574,7 @@
  {
   "file": "A04_remember.json",
   "op": "remember",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.17142857142857143,
   "chars": 12000
  },
@@ -5595,7 +5595,7 @@
  {
   "file": "A04_remember.json",
   "op": "remember",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.014285714285714285,
   "chars": 1281
  },
@@ -5609,7 +5609,7 @@
  {
   "file": "A04_remember.json",
   "op": "remember",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.05714285714285714,
   "chars": 4924
  },
@@ -5623,7 +5623,7 @@
  {
   "file": "A04_remember.json",
   "op": "remember",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.11428571428571428,
   "chars": 12000
  },
@@ -5644,7 +5644,7 @@
  {
   "file": "A04_remember.json",
   "op": "remember",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.014285714285714285,
   "chars": 1281
  },
@@ -5658,7 +5658,7 @@
  {
   "file": "A04_remember.json",
   "op": "remember",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.05714285714285714,
   "chars": 4924
  },
@@ -5672,7 +5672,7 @@
  {
   "file": "A04_remember.json",
   "op": "remember",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.11428571428571428,
   "chars": 12000
  },
@@ -5693,7 +5693,7 @@
  {
   "file": "A04_remember.json",
   "op": "remember",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.02857142857142857,
   "chars": 1663
  },
@@ -5707,7 +5707,7 @@
  {
   "file": "A04_remember.json",
   "op": "remember",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.04285714285714286,
   "chars": 7025
  },
@@ -5721,7 +5721,7 @@
  {
   "file": "A04_remember.json",
   "op": "remember",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.07142857142857142,
   "chars": 12000
  },
@@ -5742,7 +5742,7 @@
  {
   "file": "A04_remember.json",
   "op": "remember",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.02857142857142857,
   "chars": 1663
  },
@@ -5756,7 +5756,7 @@
  {
   "file": "A04_remember.json",
   "op": "remember",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.04285714285714286,
   "chars": 7025
  },
@@ -5770,7 +5770,7 @@
  {
   "file": "A04_remember.json",
   "op": "remember",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.07142857142857142,
   "chars": 12000
  },
@@ -5791,7 +5791,7 @@
  {
   "file": "A04_remember.json",
   "op": "remember",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.014285714285714285,
   "chars": 1247
  },
@@ -5805,7 +5805,7 @@
  {
   "file": "A04_remember.json",
   "op": "remember",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.05714285714285714,
   "chars": 4487
  },
@@ -5819,7 +5819,7 @@
  {
   "file": "A04_remember.json",
   "op": "remember",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.1,
   "chars": 12000
  },
@@ -5840,7 +5840,7 @@
  {
   "file": "A04_remember.json",
   "op": "remember",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.014285714285714285,
   "chars": 1247
  },
@@ -5854,7 +5854,7 @@
  {
   "file": "A04_remember.json",
   "op": "remember",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.05714285714285714,
   "chars": 4487
  },
@@ -5868,7 +5868,7 @@
  {
   "file": "A04_remember.json",
   "op": "remember",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.1,
   "chars": 12000
  },
@@ -5889,7 +5889,7 @@
  {
   "file": "A04_remember.json",
   "op": "remember",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.04285714285714286,
   "chars": 2680
  },
@@ -5903,7 +5903,7 @@
  {
   "file": "A04_remember.json",
   "op": "remember",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.07142857142857142,
   "chars": 8396
  },
@@ -5917,7 +5917,7 @@
  {
   "file": "A04_remember.json",
   "op": "remember",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.07142857142857142,
   "chars": 12000
  },
@@ -5938,7 +5938,7 @@
  {
   "file": "A04_remember.json",
   "op": "remember",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.04285714285714286,
   "chars": 2680
  },
@@ -5952,7 +5952,7 @@
  {
   "file": "A04_remember.json",
   "op": "remember",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.07142857142857142,
   "chars": 8396
  },
@@ -5966,7 +5966,7 @@
  {
   "file": "A04_remember.json",
   "op": "remember",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.07142857142857142,
   "chars": 12000
  },
@@ -5987,7 +5987,7 @@
  {
   "file": "A04_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.06060606060606061,
   "chars": 1128
  },
@@ -6001,7 +6001,7 @@
  {
   "file": "A04_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.15151515151515152,
   "chars": 3804
  },
@@ -6015,7 +6015,7 @@
  {
   "file": "A04_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.25252525252525254,
   "chars": 11349
  },
@@ -6036,7 +6036,7 @@
  {
   "file": "A04_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.06060606060606061,
   "chars": 1128
  },
@@ -6050,7 +6050,7 @@
  {
   "file": "A04_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.15151515151515152,
   "chars": 3804
  },
@@ -6064,7 +6064,7 @@
  {
   "file": "A04_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.25252525252525254,
   "chars": 11349
  },
@@ -6085,7 +6085,7 @@
  {
   "file": "A04_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.06060606060606061,
   "chars": 1014
  },
@@ -6099,7 +6099,7 @@
  {
   "file": "A04_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.1111111111111111,
   "chars": 4146
  },
@@ -6113,7 +6113,7 @@
  {
   "file": "A04_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.16161616161616163,
   "chars": 12000
  },
@@ -6134,7 +6134,7 @@
  {
   "file": "A04_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.06060606060606061,
   "chars": 1014
  },
@@ -6148,7 +6148,7 @@
  {
   "file": "A04_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.1111111111111111,
   "chars": 4146
  },
@@ -6162,7 +6162,7 @@
  {
   "file": "A04_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.16161616161616163,
   "chars": 12000
  },
@@ -6183,7 +6183,7 @@
  {
   "file": "A04_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.030303030303030304,
   "chars": 972
  },
@@ -6197,7 +6197,7 @@
  {
   "file": "A04_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.09090909090909091,
   "chars": 4101
  },
@@ -6211,7 +6211,7 @@
  {
   "file": "A04_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.1414141414141414,
   "chars": 12000
  },
@@ -6232,7 +6232,7 @@
  {
   "file": "A04_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.030303030303030304,
   "chars": 972
  },
@@ -6246,7 +6246,7 @@
  {
   "file": "A04_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.09090909090909091,
   "chars": 4101
  },
@@ -6260,7 +6260,7 @@
  {
   "file": "A04_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.1414141414141414,
   "chars": 12000
  },
@@ -6281,7 +6281,7 @@
  {
   "file": "A04_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.010101010101010102,
   "chars": 1144
  },
@@ -6295,7 +6295,7 @@
  {
   "file": "A04_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.0707070707070707,
   "chars": 3665
  },
@@ -6309,7 +6309,7 @@
  {
   "file": "A04_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.12121212121212122,
   "chars": 10964
  },
@@ -6330,7 +6330,7 @@
  {
   "file": "A04_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.010101010101010102,
   "chars": 1144
  },
@@ -6344,7 +6344,7 @@
  {
   "file": "A04_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.0707070707070707,
   "chars": 3665
  },
@@ -6358,7 +6358,7 @@
  {
   "file": "A04_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.12121212121212122,
   "chars": 10964
  },
@@ -6379,7 +6379,7 @@
  {
   "file": "A04_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.020202020202020204,
   "chars": 872
  },
@@ -6393,7 +6393,7 @@
  {
   "file": "A04_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.10101010101010101,
   "chars": 3658
  },
@@ -6407,7 +6407,7 @@
  {
   "file": "A04_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.16161616161616163,
   "chars": 11244
  },
@@ -6428,7 +6428,7 @@
  {
   "file": "A04_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.020202020202020204,
   "chars": 872
  },
@@ -6442,7 +6442,7 @@
  {
   "file": "A04_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.10101010101010101,
   "chars": 3658
  },
@@ -6456,7 +6456,7 @@
  {
   "file": "A04_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.16161616161616163,
   "chars": 11244
  },
@@ -6477,7 +6477,7 @@
  {
   "file": "A05_forget.json",
   "op": "forget",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.011764705882352941,
   "chars": 1908
  },
@@ -6491,7 +6491,7 @@
  {
   "file": "A05_forget.json",
   "op": "forget",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.011764705882352941,
   "chars": 6773
  },
@@ -6505,7 +6505,7 @@
  {
   "file": "A05_forget.json",
   "op": "forget",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.058823529411764705,
   "chars": 12000
  },
@@ -6526,7 +6526,7 @@
  {
   "file": "A05_forget.json",
   "op": "forget",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.011764705882352941,
   "chars": 1908
  },
@@ -6540,7 +6540,7 @@
  {
   "file": "A05_forget.json",
   "op": "forget",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.011764705882352941,
   "chars": 6773
  },
@@ -6554,7 +6554,7 @@
  {
   "file": "A05_forget.json",
   "op": "forget",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.058823529411764705,
   "chars": 12000
  },
@@ -6575,7 +6575,7 @@
  {
   "file": "A05_forget.json",
   "op": "forget",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.03529411764705882,
   "chars": 1473
  },
@@ -6589,7 +6589,7 @@
  {
   "file": "A05_forget.json",
   "op": "forget",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.09411764705882353,
   "chars": 4907
  },
@@ -6603,7 +6603,7 @@
  {
   "file": "A05_forget.json",
   "op": "forget",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.11764705882352941,
   "chars": 12000
  },
@@ -6624,7 +6624,7 @@
  {
   "file": "A05_forget.json",
   "op": "forget",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.03529411764705882,
   "chars": 1473
  },
@@ -6638,7 +6638,7 @@
  {
   "file": "A05_forget.json",
   "op": "forget",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.09411764705882353,
   "chars": 4907
  },
@@ -6652,7 +6652,7 @@
  {
   "file": "A05_forget.json",
   "op": "forget",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.11764705882352941,
   "chars": 12000
  },
@@ -6673,7 +6673,7 @@
  {
   "file": "A05_forget.json",
   "op": "forget",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.023529411764705882,
   "chars": 972
  },
@@ -6687,7 +6687,7 @@
  {
   "file": "A05_forget.json",
   "op": "forget",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.058823529411764705,
   "chars": 3894
  },
@@ -6701,7 +6701,7 @@
  {
   "file": "A05_forget.json",
   "op": "forget",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.09411764705882353,
   "chars": 12000
  },
@@ -6722,7 +6722,7 @@
  {
   "file": "A05_forget.json",
   "op": "forget",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.023529411764705882,
   "chars": 972
  },
@@ -6736,7 +6736,7 @@
  {
   "file": "A05_forget.json",
   "op": "forget",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.058823529411764705,
   "chars": 3894
  },
@@ -6750,7 +6750,7 @@
  {
   "file": "A05_forget.json",
   "op": "forget",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.09411764705882353,
   "chars": 12000
  },
@@ -6771,7 +6771,7 @@
  {
   "file": "A05_forget.json",
   "op": "forget",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.011764705882352941,
   "chars": 1848
  },
@@ -6785,7 +6785,7 @@
  {
   "file": "A05_forget.json",
   "op": "forget",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.03529411764705882,
   "chars": 5888
  },
@@ -6799,7 +6799,7 @@
  {
   "file": "A05_forget.json",
   "op": "forget",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.047058823529411764,
   "chars": 12000
  },
@@ -6820,7 +6820,7 @@
  {
   "file": "A05_forget.json",
   "op": "forget",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.011764705882352941,
   "chars": 1848
  },
@@ -6834,7 +6834,7 @@
  {
   "file": "A05_forget.json",
   "op": "forget",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.03529411764705882,
   "chars": 5888
  },
@@ -6848,7 +6848,7 @@
  {
   "file": "A05_forget.json",
   "op": "forget",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.047058823529411764,
   "chars": 12000
  },
@@ -6869,7 +6869,7 @@
  {
   "file": "A05_forget.json",
   "op": "forget",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.09411764705882353,
   "chars": 1367
  },
@@ -6883,7 +6883,7 @@
  {
   "file": "A05_forget.json",
   "op": "forget",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.2,
   "chars": 4841
  },
@@ -6897,7 +6897,7 @@
  {
   "file": "A05_forget.json",
   "op": "forget",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.29411764705882354,
   "chars": 12000
  },
@@ -6918,7 +6918,7 @@
  {
   "file": "A05_forget.json",
   "op": "forget",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.09411764705882353,
   "chars": 1367
  },
@@ -6932,7 +6932,7 @@
  {
   "file": "A05_forget.json",
   "op": "forget",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.2,
   "chars": 4841
  },
@@ -6946,7 +6946,7 @@
  {
   "file": "A05_forget.json",
   "op": "forget",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.29411764705882354,
   "chars": 12000
  },
@@ -6967,7 +6967,7 @@
  {
   "file": "A05_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.02631578947368421,
   "chars": 708
  },
@@ -6981,7 +6981,7 @@
  {
   "file": "A05_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.06578947368421052,
   "chars": 4190
  },
@@ -6995,7 +6995,7 @@
  {
   "file": "A05_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.13157894736842105,
   "chars": 12000
  },
@@ -7016,7 +7016,7 @@
  {
   "file": "A05_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.02631578947368421,
   "chars": 708
  },
@@ -7030,7 +7030,7 @@
  {
   "file": "A05_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.06578947368421052,
   "chars": 4190
  },
@@ -7044,7 +7044,7 @@
  {
   "file": "A05_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.13157894736842105,
   "chars": 12000
  },
@@ -7065,7 +7065,7 @@
  {
   "file": "A05_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.013157894736842105,
   "chars": 1038
  },
@@ -7079,7 +7079,7 @@
  {
   "file": "A05_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.06578947368421052,
   "chars": 3982
  },
@@ -7093,7 +7093,7 @@
  {
   "file": "A05_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.10526315789473684,
   "chars": 12000
  },
@@ -7114,7 +7114,7 @@
  {
   "file": "A05_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.013157894736842105,
   "chars": 1038
  },
@@ -7128,7 +7128,7 @@
  {
   "file": "A05_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.06578947368421052,
   "chars": 3982
  },
@@ -7142,7 +7142,7 @@
  {
   "file": "A05_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.10526315789473684,
   "chars": 12000
  },
@@ -7163,7 +7163,7 @@
  {
   "file": "A05_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.039473684210526314,
   "chars": 1064
  },
@@ -7177,7 +7177,7 @@
  {
   "file": "A05_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.06578947368421052,
   "chars": 4122
  },
@@ -7191,7 +7191,7 @@
  {
   "file": "A05_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.11842105263157894,
   "chars": 12000
  },
@@ -7212,7 +7212,7 @@
  {
   "file": "A05_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.039473684210526314,
   "chars": 1064
  },
@@ -7226,7 +7226,7 @@
  {
   "file": "A05_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.06578947368421052,
   "chars": 4122
  },
@@ -7240,7 +7240,7 @@
  {
   "file": "A05_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.11842105263157894,
   "chars": 12000
  },
@@ -7261,7 +7261,7 @@
  {
   "file": "A05_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.013157894736842105,
   "chars": 2440
  },
@@ -7275,7 +7275,7 @@
  {
   "file": "A05_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.013157894736842105,
   "chars": 6856
  },
@@ -7289,7 +7289,7 @@
  {
   "file": "A05_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.013157894736842105,
   "chars": 12000
  },
@@ -7310,7 +7310,7 @@
  {
   "file": "A05_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.013157894736842105,
   "chars": 2440
  },
@@ -7324,7 +7324,7 @@
  {
   "file": "A05_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.013157894736842105,
   "chars": 6856
  },
@@ -7338,7 +7338,7 @@
  {
   "file": "A05_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.013157894736842105,
   "chars": 12000
  },
@@ -7359,7 +7359,7 @@
  {
   "file": "A05_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.02631578947368421,
   "chars": 898
  },
@@ -7373,7 +7373,7 @@
  {
   "file": "A05_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.11842105263157894,
   "chars": 4283
  },
@@ -7387,7 +7387,7 @@
  {
   "file": "A05_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.18421052631578946,
   "chars": 12000
  },
@@ -7408,7 +7408,7 @@
  {
   "file": "A05_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.02631578947368421,
   "chars": 898
  },
@@ -7422,7 +7422,7 @@
  {
   "file": "A05_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.11842105263157894,
   "chars": 4283
  },
@@ -7436,7 +7436,7 @@
  {
   "file": "A05_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.18421052631578946,
   "chars": 12000
  },
@@ -7457,7 +7457,7 @@
  {
   "file": "A05_remember.json",
   "op": "remember",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.0,
   "chars": 1233
  },
@@ -7471,7 +7471,7 @@
  {
   "file": "A05_remember.json",
   "op": "remember",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.05063291139240506,
   "chars": 4535
  },
@@ -7485,7 +7485,7 @@
  {
   "file": "A05_remember.json",
   "op": "remember",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.06329113924050633,
   "chars": 12000
  },
@@ -7506,7 +7506,7 @@
  {
   "file": "A05_remember.json",
   "op": "remember",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.0,
   "chars": 1233
  },
@@ -7520,7 +7520,7 @@
  {
   "file": "A05_remember.json",
   "op": "remember",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.05063291139240506,
   "chars": 4535
  },
@@ -7534,7 +7534,7 @@
  {
   "file": "A05_remember.json",
   "op": "remember",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.06329113924050633,
   "chars": 12000
  },
@@ -7555,7 +7555,7 @@
  {
   "file": "A05_remember.json",
   "op": "remember",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.02531645569620253,
   "chars": 1673
  },
@@ -7569,7 +7569,7 @@
  {
   "file": "A05_remember.json",
   "op": "remember",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.06329113924050633,
   "chars": 5843
  },
@@ -7583,7 +7583,7 @@
  {
   "file": "A05_remember.json",
   "op": "remember",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.10126582278481013,
   "chars": 12000
  },
@@ -7604,7 +7604,7 @@
  {
   "file": "A05_remember.json",
   "op": "remember",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.02531645569620253,
   "chars": 1673
  },
@@ -7618,7 +7618,7 @@
  {
   "file": "A05_remember.json",
   "op": "remember",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.06329113924050633,
   "chars": 5843
  },
@@ -7632,7 +7632,7 @@
  {
   "file": "A05_remember.json",
   "op": "remember",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.10126582278481013,
   "chars": 12000
  },
@@ -7653,7 +7653,7 @@
  {
   "file": "A05_remember.json",
   "op": "remember",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.05063291139240506,
   "chars": 1652
  },
@@ -7667,7 +7667,7 @@
  {
   "file": "A05_remember.json",
   "op": "remember",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.08860759493670886,
   "chars": 5721
  },
@@ -7681,7 +7681,7 @@
  {
   "file": "A05_remember.json",
   "op": "remember",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.13924050632911392,
   "chars": 12000
  },
@@ -7702,7 +7702,7 @@
  {
   "file": "A05_remember.json",
   "op": "remember",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.05063291139240506,
   "chars": 1652
  },
@@ -7716,7 +7716,7 @@
  {
   "file": "A05_remember.json",
   "op": "remember",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.08860759493670886,
   "chars": 5721
  },
@@ -7730,7 +7730,7 @@
  {
   "file": "A05_remember.json",
   "op": "remember",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.13924050632911392,
   "chars": 12000
  },
@@ -7751,7 +7751,7 @@
  {
   "file": "A05_remember.json",
   "op": "remember",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.06329113924050633,
   "chars": 2661
  },
@@ -7765,7 +7765,7 @@
  {
   "file": "A05_remember.json",
   "op": "remember",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.12658227848101267,
   "chars": 5932
  },
@@ -7779,7 +7779,7 @@
  {
   "file": "A05_remember.json",
   "op": "remember",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.13924050632911392,
   "chars": 12000
  },
@@ -7800,7 +7800,7 @@
  {
   "file": "A05_remember.json",
   "op": "remember",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.06329113924050633,
   "chars": 2661
  },
@@ -7814,7 +7814,7 @@
  {
   "file": "A05_remember.json",
   "op": "remember",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.12658227848101267,
   "chars": 5932
  },
@@ -7828,7 +7828,7 @@
  {
   "file": "A05_remember.json",
   "op": "remember",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.13924050632911392,
   "chars": 12000
  },
@@ -7849,7 +7849,7 @@
  {
   "file": "A05_remember.json",
   "op": "remember",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.06329113924050633,
   "chars": 1554
  },
@@ -7863,7 +7863,7 @@
  {
   "file": "A05_remember.json",
   "op": "remember",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.189873417721519,
   "chars": 4440
  },
@@ -7877,7 +7877,7 @@
  {
   "file": "A05_remember.json",
   "op": "remember",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.24050632911392406,
   "chars": 12000
  },
@@ -7898,7 +7898,7 @@
  {
   "file": "A05_remember.json",
   "op": "remember",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.06329113924050633,
   "chars": 1554
  },
@@ -7912,7 +7912,7 @@
  {
   "file": "A05_remember.json",
   "op": "remember",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.189873417721519,
   "chars": 4440
  },
@@ -7926,7 +7926,7 @@
  {
   "file": "A05_remember.json",
   "op": "remember",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.24050632911392406,
   "chars": 12000
  },
@@ -7947,7 +7947,7 @@
  {
   "file": "A05_remember.json",
   "op": "remember",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.02531645569620253,
   "chars": 2575
  },
@@ -7961,7 +7961,7 @@
  {
   "file": "A05_remember.json",
   "op": "remember",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.0379746835443038,
   "chars": 5340
  },
@@ -7975,7 +7975,7 @@
  {
   "file": "A05_remember.json",
   "op": "remember",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.05063291139240506,
   "chars": 12000
  },
@@ -7996,7 +7996,7 @@
  {
   "file": "A05_remember.json",
   "op": "remember",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.02531645569620253,
   "chars": 2575
  },
@@ -8010,7 +8010,7 @@
  {
   "file": "A05_remember.json",
   "op": "remember",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.0379746835443038,
   "chars": 5340
  },
@@ -8024,7 +8024,7 @@
  {
   "file": "A05_remember.json",
   "op": "remember",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.05063291139240506,
   "chars": 12000
  },
@@ -8045,7 +8045,7 @@
  {
   "file": "A05_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.010638297872340425,
   "chars": 1136
  },
@@ -8059,7 +8059,7 @@
  {
   "file": "A05_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.06382978723404255,
   "chars": 4115
  },
@@ -8073,7 +8073,7 @@
  {
   "file": "A05_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.1595744680851064,
   "chars": 11887
  },
@@ -8094,7 +8094,7 @@
  {
   "file": "A05_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.010638297872340425,
   "chars": 1136
  },
@@ -8108,7 +8108,7 @@
  {
   "file": "A05_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.06382978723404255,
   "chars": 4115
  },
@@ -8122,7 +8122,7 @@
  {
   "file": "A05_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.1595744680851064,
   "chars": 11887
  },
@@ -8143,7 +8143,7 @@
  {
   "file": "A05_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.05319148936170213,
   "chars": 1454
  },
@@ -8157,7 +8157,7 @@
  {
   "file": "A05_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.09574468085106383,
   "chars": 4641
  },
@@ -8171,7 +8171,7 @@
  {
   "file": "A05_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.2127659574468085,
   "chars": 12000
  },
@@ -8192,7 +8192,7 @@
  {
   "file": "A05_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.05319148936170213,
   "chars": 1454
  },
@@ -8206,7 +8206,7 @@
  {
   "file": "A05_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.09574468085106383,
   "chars": 4641
  },
@@ -8220,7 +8220,7 @@
  {
   "file": "A05_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.2127659574468085,
   "chars": 12000
  },
@@ -8241,7 +8241,7 @@
  {
   "file": "A05_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.06382978723404255,
   "chars": 809
  },
@@ -8255,7 +8255,7 @@
  {
   "file": "A05_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.18085106382978725,
   "chars": 3969
  },
@@ -8269,7 +8269,7 @@
  {
   "file": "A05_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.2765957446808511,
   "chars": 12000
  },
@@ -8290,7 +8290,7 @@
  {
   "file": "A05_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.06382978723404255,
   "chars": 809
  },
@@ -8304,7 +8304,7 @@
  {
   "file": "A05_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.18085106382978725,
   "chars": 3969
  },
@@ -8318,7 +8318,7 @@
  {
   "file": "A05_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.2765957446808511,
   "chars": 12000
  },
@@ -8339,7 +8339,7 @@
  {
   "file": "A05_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.09574468085106383,
   "chars": 1304
  },
@@ -8353,7 +8353,7 @@
  {
   "file": "A05_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.22340425531914893,
   "chars": 4203
  },
@@ -8367,7 +8367,7 @@
  {
   "file": "A05_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.32978723404255317,
   "chars": 12000
  },
@@ -8388,7 +8388,7 @@
  {
   "file": "A05_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.09574468085106383,
   "chars": 1304
  },
@@ -8402,7 +8402,7 @@
  {
   "file": "A05_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.22340425531914893,
   "chars": 4203
  },
@@ -8416,7 +8416,7 @@
  {
   "file": "A05_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.32978723404255317,
   "chars": 12000
  },
@@ -8437,7 +8437,7 @@
  {
   "file": "A05_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.02127659574468085,
   "chars": 910
  },
@@ -8451,7 +8451,7 @@
  {
   "file": "A05_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.0851063829787234,
   "chars": 4145
  },
@@ -8465,7 +8465,7 @@
  {
   "file": "A05_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.1702127659574468,
   "chars": 12000
  },
@@ -8486,7 +8486,7 @@
  {
   "file": "A05_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.02127659574468085,
   "chars": 910
  },
@@ -8500,7 +8500,7 @@
  {
   "file": "A05_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.0851063829787234,
   "chars": 4145
  },
@@ -8514,7 +8514,7 @@
  {
   "file": "A05_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.1702127659574468,
   "chars": 12000
  },
@@ -8535,7 +8535,7 @@
  {
   "file": "A05_update.json",
   "op": "update",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.02857142857142857,
   "chars": 974
  },
@@ -8549,7 +8549,7 @@
  {
   "file": "A05_update.json",
   "op": "update",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.08571428571428572,
   "chars": 3989
  },
@@ -8563,7 +8563,7 @@
  {
   "file": "A05_update.json",
   "op": "update",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.1619047619047619,
   "chars": 12000
  },
@@ -8584,7 +8584,7 @@
  {
   "file": "A05_update.json",
   "op": "update",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.02857142857142857,
   "chars": 974
  },
@@ -8598,7 +8598,7 @@
  {
   "file": "A05_update.json",
   "op": "update",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.08571428571428572,
   "chars": 3989
  },
@@ -8612,7 +8612,7 @@
  {
   "file": "A05_update.json",
   "op": "update",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.1619047619047619,
   "chars": 12000
  },
@@ -8633,7 +8633,7 @@
  {
   "file": "A05_update.json",
   "op": "update",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.05714285714285714,
   "chars": 1417
  },
@@ -8647,7 +8647,7 @@
  {
   "file": "A05_update.json",
   "op": "update",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.13333333333333333,
   "chars": 4702
  },
@@ -8661,7 +8661,7 @@
  {
   "file": "A05_update.json",
   "op": "update",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.19047619047619047,
   "chars": 12000
  },
@@ -8682,7 +8682,7 @@
  {
   "file": "A05_update.json",
   "op": "update",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.05714285714285714,
   "chars": 1417
  },
@@ -8696,7 +8696,7 @@
  {
   "file": "A05_update.json",
   "op": "update",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.13333333333333333,
   "chars": 4702
  },
@@ -8710,7 +8710,7 @@
  {
   "file": "A05_update.json",
   "op": "update",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.19047619047619047,
   "chars": 12000
  },
@@ -8731,7 +8731,7 @@
  {
   "file": "A05_update.json",
   "op": "update",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.0380952380952381,
   "chars": 1767
  },
@@ -8745,7 +8745,7 @@
  {
   "file": "A05_update.json",
   "op": "update",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.1523809523809524,
   "chars": 4646
  },
@@ -8759,7 +8759,7 @@
  {
   "file": "A05_update.json",
   "op": "update",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.20952380952380953,
   "chars": 12000
  },
@@ -8780,7 +8780,7 @@
  {
   "file": "A05_update.json",
   "op": "update",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.0380952380952381,
   "chars": 1767
  },
@@ -8794,7 +8794,7 @@
  {
   "file": "A05_update.json",
   "op": "update",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.1523809523809524,
   "chars": 4646
  },
@@ -8808,7 +8808,7 @@
  {
   "file": "A05_update.json",
   "op": "update",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.20952380952380953,
   "chars": 12000
  },
@@ -8829,7 +8829,7 @@
  {
   "file": "A05_update.json",
   "op": "update",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.009523809523809525,
   "chars": 828
  },
@@ -8843,7 +8843,7 @@
  {
   "file": "A05_update.json",
   "op": "update",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.06666666666666667,
   "chars": 3816
  },
@@ -8857,7 +8857,7 @@
  {
   "file": "A05_update.json",
   "op": "update",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.18095238095238095,
   "chars": 11344
  },
@@ -8878,7 +8878,7 @@
  {
   "file": "A05_update.json",
   "op": "update",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.009523809523809525,
   "chars": 828
  },
@@ -8892,7 +8892,7 @@
  {
   "file": "A05_update.json",
   "op": "update",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.06666666666666667,
   "chars": 3816
  },
@@ -8906,7 +8906,7 @@
  {
   "file": "A05_update.json",
   "op": "update",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.18095238095238095,
   "chars": 11344
  },
@@ -8927,7 +8927,7 @@
  {
   "file": "A06_forget.json",
   "op": "forget",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.047058823529411764,
   "chars": 1174
  },
@@ -8941,7 +8941,7 @@
  {
   "file": "A06_forget.json",
   "op": "forget",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.12941176470588237,
   "chars": 4619
  },
@@ -8955,7 +8955,7 @@
  {
   "file": "A06_forget.json",
   "op": "forget",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.16470588235294117,
   "chars": 12000
  },
@@ -8976,7 +8976,7 @@
  {
   "file": "A06_forget.json",
   "op": "forget",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.047058823529411764,
   "chars": 1174
  },
@@ -8990,7 +8990,7 @@
  {
   "file": "A06_forget.json",
   "op": "forget",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.12941176470588237,
   "chars": 4619
  },
@@ -9004,7 +9004,7 @@
  {
   "file": "A06_forget.json",
   "op": "forget",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.16470588235294117,
   "chars": 12000
  },
@@ -9025,7 +9025,7 @@
  {
   "file": "A06_forget.json",
   "op": "forget",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.023529411764705882,
   "chars": 1173
  },
@@ -9039,7 +9039,7 @@
  {
   "file": "A06_forget.json",
   "op": "forget",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.03529411764705882,
   "chars": 4496
  },
@@ -9053,7 +9053,7 @@
  {
   "file": "A06_forget.json",
   "op": "forget",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.12941176470588237,
   "chars": 12000
  },
@@ -9074,7 +9074,7 @@
  {
   "file": "A06_forget.json",
   "op": "forget",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.023529411764705882,
   "chars": 1173
  },
@@ -9088,7 +9088,7 @@
  {
   "file": "A06_forget.json",
   "op": "forget",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.03529411764705882,
   "chars": 4496
  },
@@ -9102,7 +9102,7 @@
  {
   "file": "A06_forget.json",
   "op": "forget",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.12941176470588237,
   "chars": 12000
  },
@@ -9123,7 +9123,7 @@
  {
   "file": "A06_forget.json",
   "op": "forget",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.023529411764705882,
   "chars": 1133
  },
@@ -9137,7 +9137,7 @@
  {
   "file": "A06_forget.json",
   "op": "forget",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.08235294117647059,
   "chars": 4131
  },
@@ -9151,7 +9151,7 @@
  {
   "file": "A06_forget.json",
   "op": "forget",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.15294117647058825,
   "chars": 12000
  },
@@ -9172,7 +9172,7 @@
  {
   "file": "A06_forget.json",
   "op": "forget",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.023529411764705882,
   "chars": 1133
  },
@@ -9186,7 +9186,7 @@
  {
   "file": "A06_forget.json",
   "op": "forget",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.08235294117647059,
   "chars": 4131
  },
@@ -9200,7 +9200,7 @@
  {
   "file": "A06_forget.json",
   "op": "forget",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.15294117647058825,
   "chars": 12000
  },
@@ -9221,7 +9221,7 @@
  {
   "file": "A06_forget.json",
   "op": "forget",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.047058823529411764,
   "chars": 1168
  },
@@ -9235,7 +9235,7 @@
  {
   "file": "A06_forget.json",
   "op": "forget",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.11764705882352941,
   "chars": 4813
  },
@@ -9249,7 +9249,7 @@
  {
   "file": "A06_forget.json",
   "op": "forget",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.15294117647058825,
   "chars": 12000
  },
@@ -9270,7 +9270,7 @@
  {
   "file": "A06_forget.json",
   "op": "forget",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.047058823529411764,
   "chars": 1168
  },
@@ -9284,7 +9284,7 @@
  {
   "file": "A06_forget.json",
   "op": "forget",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.11764705882352941,
   "chars": 4813
  },
@@ -9298,7 +9298,7 @@
  {
   "file": "A06_forget.json",
   "op": "forget",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.15294117647058825,
   "chars": 12000
  },
@@ -9319,7 +9319,7 @@
  {
   "file": "A06_forget.json",
   "op": "forget",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.047058823529411764,
   "chars": 1091
  },
@@ -9333,7 +9333,7 @@
  {
   "file": "A06_forget.json",
   "op": "forget",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.11764705882352941,
   "chars": 3910
  },
@@ -9347,7 +9347,7 @@
  {
   "file": "A06_forget.json",
   "op": "forget",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.2,
   "chars": 12000
  },
@@ -9368,7 +9368,7 @@
  {
   "file": "A06_forget.json",
   "op": "forget",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.047058823529411764,
   "chars": 1091
  },
@@ -9382,7 +9382,7 @@
  {
   "file": "A06_forget.json",
   "op": "forget",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.11764705882352941,
   "chars": 3910
  },
@@ -9396,7 +9396,7 @@
  {
   "file": "A06_forget.json",
   "op": "forget",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.2,
   "chars": 12000
  },
@@ -9417,7 +9417,7 @@
  {
   "file": "A06_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.010309278350515464,
   "chars": 1226
  },
@@ -9431,7 +9431,7 @@
  {
   "file": "A06_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.030927835051546393,
   "chars": 4378
  },
@@ -9445,7 +9445,7 @@
  {
   "file": "A06_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.08247422680412371,
   "chars": 12000
  },
@@ -9466,7 +9466,7 @@
  {
   "file": "A06_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.010309278350515464,
   "chars": 1226
  },
@@ -9480,7 +9480,7 @@
  {
   "file": "A06_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.030927835051546393,
   "chars": 4378
  },
@@ -9494,7 +9494,7 @@
  {
   "file": "A06_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.08247422680412371,
   "chars": 12000
  },
@@ -9515,7 +9515,7 @@
  {
   "file": "A06_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.010309278350515464,
   "chars": 1309
  },
@@ -9529,7 +9529,7 @@
  {
   "file": "A06_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.07216494845360824,
   "chars": 5032
  },
@@ -9543,7 +9543,7 @@
  {
   "file": "A06_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.17525773195876287,
   "chars": 12000
  },
@@ -9564,7 +9564,7 @@
  {
   "file": "A06_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.010309278350515464,
   "chars": 1309
  },
@@ -9578,7 +9578,7 @@
  {
   "file": "A06_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.07216494845360824,
   "chars": 5032
  },
@@ -9592,7 +9592,7 @@
  {
   "file": "A06_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.17525773195876287,
   "chars": 12000
  },
@@ -9613,7 +9613,7 @@
  {
   "file": "A06_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.020618556701030927,
   "chars": 1159
  },
@@ -9627,7 +9627,7 @@
  {
   "file": "A06_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.061855670103092786,
   "chars": 4409
  },
@@ -9641,7 +9641,7 @@
  {
   "file": "A06_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.08247422680412371,
   "chars": 12000
  },
@@ -9662,7 +9662,7 @@
  {
   "file": "A06_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.020618556701030927,
   "chars": 1159
  },
@@ -9676,7 +9676,7 @@
  {
   "file": "A06_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.061855670103092786,
   "chars": 4409
  },
@@ -9690,7 +9690,7 @@
  {
   "file": "A06_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.08247422680412371,
   "chars": 12000
  },
@@ -9711,7 +9711,7 @@
  {
   "file": "A06_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.0,
   "chars": 3166
  },
@@ -9725,7 +9725,7 @@
  {
   "file": "A06_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.020618556701030927,
   "chars": 7867
  },
@@ -9739,7 +9739,7 @@
  {
   "file": "A06_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.041237113402061855,
   "chars": 12000
  },
@@ -9760,7 +9760,7 @@
  {
   "file": "A06_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.0,
   "chars": 3166
  },
@@ -9774,7 +9774,7 @@
  {
   "file": "A06_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.020618556701030927,
   "chars": 7867
  },
@@ -9788,7 +9788,7 @@
  {
   "file": "A06_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.041237113402061855,
   "chars": 12000
  },
@@ -9809,7 +9809,7 @@
  {
   "file": "A06_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.041237113402061855,
   "chars": 993
  },
@@ -9823,7 +9823,7 @@
  {
   "file": "A06_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.13402061855670103,
   "chars": 4391
  },
@@ -9837,7 +9837,7 @@
  {
   "file": "A06_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.20618556701030927,
   "chars": 12000
  },
@@ -9858,7 +9858,7 @@
  {
   "file": "A06_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.041237113402061855,
   "chars": 993
  },
@@ -9872,7 +9872,7 @@
  {
   "file": "A06_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.13402061855670103,
   "chars": 4391
  },
@@ -9886,7 +9886,7 @@
  {
   "file": "A06_reflect.json",
   "op": "reflect",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.20618556701030927,
   "chars": 12000
  },
@@ -9907,7 +9907,7 @@
  {
   "file": "A06_remember.json",
   "op": "remember",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.05319148936170213,
   "chars": 1213
  },
@@ -9921,7 +9921,7 @@
  {
   "file": "A06_remember.json",
   "op": "remember",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.07446808510638298,
   "chars": 5386
  },
@@ -9935,7 +9935,7 @@
  {
   "file": "A06_remember.json",
   "op": "remember",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.09574468085106383,
   "chars": 12000
  },
@@ -9956,7 +9956,7 @@
  {
   "file": "A06_remember.json",
   "op": "remember",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.05319148936170213,
   "chars": 1213
  },
@@ -9970,7 +9970,7 @@
  {
   "file": "A06_remember.json",
   "op": "remember",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.07446808510638298,
   "chars": 5386
  },
@@ -9984,7 +9984,7 @@
  {
   "file": "A06_remember.json",
   "op": "remember",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.09574468085106383,
   "chars": 12000
  },
@@ -10005,7 +10005,7 @@
  {
   "file": "A06_remember.json",
   "op": "remember",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.031914893617021274,
   "chars": 934
  },
@@ -10019,7 +10019,7 @@
  {
   "file": "A06_remember.json",
   "op": "remember",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.10638297872340426,
   "chars": 4555
  },
@@ -10033,7 +10033,7 @@
  {
   "file": "A06_remember.json",
   "op": "remember",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.14893617021276595,
   "chars": 12000
  },
@@ -10054,7 +10054,7 @@
  {
   "file": "A06_remember.json",
   "op": "remember",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.031914893617021274,
   "chars": 934
  },
@@ -10068,7 +10068,7 @@
  {
   "file": "A06_remember.json",
   "op": "remember",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.10638297872340426,
   "chars": 4555
  },
@@ -10082,7 +10082,7 @@
  {
   "file": "A06_remember.json",
   "op": "remember",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.14893617021276595,
   "chars": 12000
  },
@@ -10103,7 +10103,7 @@
  {
   "file": "A06_remember.json",
   "op": "remember",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.05319148936170213,
   "chars": 1095
  },
@@ -10117,7 +10117,7 @@
  {
   "file": "A06_remember.json",
   "op": "remember",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.13829787234042554,
   "chars": 4344
  },
@@ -10131,7 +10131,7 @@
  {
   "file": "A06_remember.json",
   "op": "remember",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.19148936170212766,
   "chars": 12000
  },
@@ -10152,7 +10152,7 @@
  {
   "file": "A06_remember.json",
   "op": "remember",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.05319148936170213,
   "chars": 1095
  },
@@ -10166,7 +10166,7 @@
  {
   "file": "A06_remember.json",
   "op": "remember",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.13829787234042554,
   "chars": 4344
  },
@@ -10180,7 +10180,7 @@
  {
   "file": "A06_remember.json",
   "op": "remember",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.19148936170212766,
   "chars": 12000
  },
@@ -10201,7 +10201,7 @@
  {
   "file": "A06_remember.json",
   "op": "remember",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.031914893617021274,
   "chars": 903
  },
@@ -10215,7 +10215,7 @@
  {
   "file": "A06_remember.json",
   "op": "remember",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.09574468085106383,
   "chars": 4710
  },
@@ -10229,7 +10229,7 @@
  {
   "file": "A06_remember.json",
   "op": "remember",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.18085106382978725,
   "chars": 12000
  },
@@ -10250,7 +10250,7 @@
  {
   "file": "A06_remember.json",
   "op": "remember",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.031914893617021274,
   "chars": 903
  },
@@ -10264,7 +10264,7 @@
  {
   "file": "A06_remember.json",
   "op": "remember",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.09574468085106383,
   "chars": 4710
  },
@@ -10278,7 +10278,7 @@
  {
   "file": "A06_remember.json",
   "op": "remember",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.18085106382978725,
   "chars": 12000
  },
@@ -10299,7 +10299,7 @@
  {
   "file": "A06_remember.json",
   "op": "remember",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.0425531914893617,
   "chars": 1120
  },
@@ -10313,7 +10313,7 @@
  {
   "file": "A06_remember.json",
   "op": "remember",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.09574468085106383,
   "chars": 4182
  },
@@ -10327,7 +10327,7 @@
  {
   "file": "A06_remember.json",
   "op": "remember",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.2127659574468085,
   "chars": 12000
  },
@@ -10348,7 +10348,7 @@
  {
   "file": "A06_remember.json",
   "op": "remember",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.0425531914893617,
   "chars": 1120
  },
@@ -10362,7 +10362,7 @@
  {
   "file": "A06_remember.json",
   "op": "remember",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.09574468085106383,
   "chars": 4182
  },
@@ -10376,7 +10376,7 @@
  {
   "file": "A06_remember.json",
   "op": "remember",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.2127659574468085,
   "chars": 12000
  },
@@ -10397,7 +10397,7 @@
  {
   "file": "A06_remember.json",
   "op": "remember",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.010638297872340425,
   "chars": 2444
  },
@@ -10411,7 +10411,7 @@
  {
   "file": "A06_remember.json",
   "op": "remember",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.02127659574468085,
   "chars": 6947
  },
@@ -10425,7 +10425,7 @@
  {
   "file": "A06_remember.json",
   "op": "remember",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.05319148936170213,
   "chars": 12000
  },
@@ -10446,7 +10446,7 @@
  {
   "file": "A06_remember.json",
   "op": "remember",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.010638297872340425,
   "chars": 2444
  },
@@ -10460,7 +10460,7 @@
  {
   "file": "A06_remember.json",
   "op": "remember",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.02127659574468085,
   "chars": 6947
  },
@@ -10474,7 +10474,7 @@
  {
   "file": "A06_remember.json",
   "op": "remember",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.05319148936170213,
   "chars": 12000
  },
@@ -10495,7 +10495,7 @@
  {
   "file": "A06_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.05063291139240506,
   "chars": 1206
  },
@@ -10509,7 +10509,7 @@
  {
   "file": "A06_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.10126582278481013,
   "chars": 4876
  },
@@ -10523,7 +10523,7 @@
  {
   "file": "A06_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.16455696202531644,
   "chars": 12000
  },
@@ -10544,7 +10544,7 @@
  {
   "file": "A06_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.05063291139240506,
   "chars": 1206
  },
@@ -10558,7 +10558,7 @@
  {
   "file": "A06_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.10126582278481013,
   "chars": 4876
  },
@@ -10572,7 +10572,7 @@
  {
   "file": "A06_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.16455696202531644,
   "chars": 12000
  },
@@ -10593,7 +10593,7 @@
  {
   "file": "A06_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.0,
   "chars": 842
  },
@@ -10607,7 +10607,7 @@
  {
   "file": "A06_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.0379746835443038,
   "chars": 3731
  },
@@ -10621,7 +10621,7 @@
  {
   "file": "A06_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.08860759493670886,
   "chars": 11859
  },
@@ -10642,7 +10642,7 @@
  {
   "file": "A06_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.0,
   "chars": 842
  },
@@ -10656,7 +10656,7 @@
  {
   "file": "A06_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.0379746835443038,
   "chars": 3731
  },
@@ -10670,7 +10670,7 @@
  {
   "file": "A06_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.08860759493670886,
   "chars": 11859
  },
@@ -10691,7 +10691,7 @@
  {
   "file": "A06_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.05063291139240506,
   "chars": 1153
  },
@@ -10705,7 +10705,7 @@
  {
   "file": "A06_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.12658227848101267,
   "chars": 4785
  },
@@ -10719,7 +10719,7 @@
  {
   "file": "A06_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.189873417721519,
   "chars": 12000
  },
@@ -10740,7 +10740,7 @@
  {
   "file": "A06_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.05063291139240506,
   "chars": 1153
  },
@@ -10754,7 +10754,7 @@
  {
   "file": "A06_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.12658227848101267,
   "chars": 4785
  },
@@ -10768,7 +10768,7 @@
  {
   "file": "A06_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.189873417721519,
   "chars": 12000
  },
@@ -10789,7 +10789,7 @@
  {
   "file": "A06_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.0379746835443038,
   "chars": 1196
  },
@@ -10803,7 +10803,7 @@
  {
   "file": "A06_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.10126582278481013,
   "chars": 4195
  },
@@ -10817,7 +10817,7 @@
  {
   "file": "A06_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.17721518987341772,
   "chars": 12000
  },
@@ -10838,7 +10838,7 @@
  {
   "file": "A06_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.0379746835443038,
   "chars": 1196
  },
@@ -10852,7 +10852,7 @@
  {
   "file": "A06_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.10126582278481013,
   "chars": 4195
  },
@@ -10866,7 +10866,7 @@
  {
   "file": "A06_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.17721518987341772,
   "chars": 12000
  },
@@ -10887,7 +10887,7 @@
  {
   "file": "A06_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.0379746835443038,
   "chars": 1119
  },
@@ -10901,7 +10901,7 @@
  {
   "file": "A06_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.0759493670886076,
   "chars": 3824
  },
@@ -10915,7 +10915,7 @@
  {
   "file": "A06_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.17721518987341772,
   "chars": 11645
  },
@@ -10936,7 +10936,7 @@
  {
   "file": "A06_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.0379746835443038,
   "chars": 1119
  },
@@ -10950,7 +10950,7 @@
  {
   "file": "A06_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.0759493670886076,
   "chars": 3824
  },
@@ -10964,7 +10964,7 @@
  {
   "file": "A06_trajectory_ops.json",
   "op": "trajectoryops",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.17721518987341772,
   "chars": 11645
  },
@@ -10985,7 +10985,7 @@
  {
   "file": "A06_update.json",
   "op": "update",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.05154639175257732,
   "chars": 1153
  },
@@ -10999,7 +10999,7 @@
  {
   "file": "A06_update.json",
   "op": "update",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.14432989690721648,
   "chars": 4181
  },
@@ -11013,7 +11013,7 @@
  {
   "file": "A06_update.json",
   "op": "update",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.24742268041237114,
   "chars": 11952
  },
@@ -11034,7 +11034,7 @@
  {
   "file": "A06_update.json",
   "op": "update",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.05154639175257732,
   "chars": 1153
  },
@@ -11048,7 +11048,7 @@
  {
   "file": "A06_update.json",
   "op": "update",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.14432989690721648,
   "chars": 4181
  },
@@ -11062,7 +11062,7 @@
  {
   "file": "A06_update.json",
   "op": "update",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.24742268041237114,
   "chars": 11952
  },
@@ -11083,7 +11083,7 @@
  {
   "file": "A06_update.json",
   "op": "update",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.061855670103092786,
   "chars": 1200
  },
@@ -11097,7 +11097,7 @@
  {
   "file": "A06_update.json",
   "op": "update",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.16494845360824742,
   "chars": 4313
  },
@@ -11111,7 +11111,7 @@
  {
   "file": "A06_update.json",
   "op": "update",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.24742268041237114,
   "chars": 12000
  },
@@ -11132,7 +11132,7 @@
  {
   "file": "A06_update.json",
   "op": "update",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.061855670103092786,
   "chars": 1200
  },
@@ -11146,7 +11146,7 @@
  {
   "file": "A06_update.json",
   "op": "update",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.16494845360824742,
   "chars": 4313
  },
@@ -11160,7 +11160,7 @@
  {
   "file": "A06_update.json",
   "op": "update",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.24742268041237114,
   "chars": 12000
  },
@@ -11181,7 +11181,7 @@
  {
   "file": "A06_update.json",
   "op": "update",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.05154639175257732,
   "chars": 1460
  },
@@ -11195,7 +11195,7 @@
  {
   "file": "A06_update.json",
   "op": "update",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.10309278350515463,
   "chars": 6010
  },
@@ -11209,7 +11209,7 @@
  {
   "file": "A06_update.json",
   "op": "update",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.16494845360824742,
   "chars": 12000
  },
@@ -11230,7 +11230,7 @@
  {
   "file": "A06_update.json",
   "op": "update",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.05154639175257732,
   "chars": 1460
  },
@@ -11244,7 +11244,7 @@
  {
   "file": "A06_update.json",
   "op": "update",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.10309278350515463,
   "chars": 6010
  },
@@ -11258,7 +11258,7 @@
  {
   "file": "A06_update.json",
   "op": "update",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.16494845360824742,
   "chars": 12000
  },
@@ -11279,7 +11279,7 @@
  {
   "file": "A06_update.json",
   "op": "update",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.05154639175257732,
   "chars": 1151
  },
@@ -11293,7 +11293,7 @@
  {
   "file": "A06_update.json",
   "op": "update",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.17525773195876287,
   "chars": 4064
  },
@@ -11307,7 +11307,7 @@
  {
   "file": "A06_update.json",
   "op": "update",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.32989690721649484,
   "chars": 11127
  },
@@ -11328,7 +11328,7 @@
  {
   "file": "A06_update.json",
   "op": "update",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.05154639175257732,
   "chars": 1151
  },
@@ -11342,7 +11342,7 @@
  {
   "file": "A06_update.json",
   "op": "update",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.17525773195876287,
   "chars": 4064
  },
@@ -11356,7 +11356,7 @@
  {
   "file": "A06_update.json",
   "op": "update",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.32989690721649484,
   "chars": 11127
  },
@@ -11377,7 +11377,7 @@
  {
   "file": "A11_update.json",
   "op": "update",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.0,
   "chars": 972
  },
@@ -11391,7 +11391,7 @@
  {
   "file": "A11_update.json",
   "op": "update",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.0,
   "chars": 3995
  },
@@ -11405,7 +11405,7 @@
  {
   "file": "A11_update.json",
   "op": "update",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.12658227848101267,
   "chars": 11896
  },
@@ -11426,7 +11426,7 @@
  {
   "file": "A11_update.json",
   "op": "update",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.0,
   "chars": 972
  },
@@ -11440,7 +11440,7 @@
  {
   "file": "A11_update.json",
   "op": "update",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.0,
   "chars": 3995
  },
@@ -11454,7 +11454,7 @@
  {
   "file": "A11_update.json",
   "op": "update",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.12658227848101267,
   "chars": 11896
  },
@@ -11475,7 +11475,7 @@
  {
   "file": "A11_update.json",
   "op": "update",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.0379746835443038,
   "chars": 1008
  },
@@ -11489,7 +11489,7 @@
  {
   "file": "A11_update.json",
   "op": "update",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.10126582278481013,
   "chars": 4747
  },
@@ -11503,7 +11503,7 @@
  {
   "file": "A11_update.json",
   "op": "update",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.16455696202531644,
   "chars": 12000
  },
@@ -11524,7 +11524,7 @@
  {
   "file": "A11_update.json",
   "op": "update",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.0379746835443038,
   "chars": 1008
  },
@@ -11538,7 +11538,7 @@
  {
   "file": "A11_update.json",
   "op": "update",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.10126582278481013,
   "chars": 4747
  },
@@ -11552,7 +11552,7 @@
  {
   "file": "A11_update.json",
   "op": "update",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.16455696202531644,
   "chars": 12000
  },
@@ -11573,7 +11573,7 @@
  {
   "file": "A11_update.json",
   "op": "update",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.012658227848101266,
   "chars": 1592
  },
@@ -11587,7 +11587,7 @@
  {
   "file": "A11_update.json",
   "op": "update",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.06329113924050633,
   "chars": 5624
  },
@@ -11601,7 +11601,7 @@
  {
   "file": "A11_update.json",
   "op": "update",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.13924050632911392,
   "chars": 12000
  },
@@ -11622,7 +11622,7 @@
  {
   "file": "A11_update.json",
   "op": "update",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.012658227848101266,
   "chars": 1592
  },
@@ -11636,7 +11636,7 @@
  {
   "file": "A11_update.json",
   "op": "update",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.06329113924050633,
   "chars": 5624
  },
@@ -11650,7 +11650,7 @@
  {
   "file": "A11_update.json",
   "op": "update",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.13924050632911392,
   "chars": 12000
  },
@@ -11671,7 +11671,7 @@
  {
   "file": "A11_update.json",
   "op": "update",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.06329113924050633,
   "chars": 973
  },
@@ -11685,7 +11685,7 @@
  {
   "file": "A11_update.json",
   "op": "update",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.10126582278481013,
   "chars": 4362
  },
@@ -11699,7 +11699,7 @@
  {
   "file": "A11_update.json",
   "op": "update",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.22784810126582278,
   "chars": 12000
  },
@@ -11720,7 +11720,7 @@
  {
   "file": "A11_update.json",
   "op": "update",
-  "arm": "mnemo@20",
+  "arm": "inspeximus@20",
   "cov": 0.06329113924050633,
   "chars": 973
  },
@@ -11734,7 +11734,7 @@
  {
   "file": "A11_update.json",
   "op": "update",
-  "arm": "mnemo@60",
+  "arm": "inspeximus@60",
   "cov": 0.10126582278481013,
   "chars": 4362
  },
@@ -11748,7 +11748,7 @@
  {
   "file": "A11_update.json",
   "op": "update",
-  "arm": "mnemo@150",
+  "arm": "inspeximus@150",
   "cov": 0.22784810126582278,
   "chars": 12000
  },

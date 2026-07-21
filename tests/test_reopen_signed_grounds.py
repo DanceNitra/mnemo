@@ -1,18 +1,18 @@
 """Signed-grounds read-path reopen (marintkael round 3, r/RAG 2026-07-16): novelty-of-support is spoofable
 because support strings ride the attacker-owned read path. When `support_authorities` (an allowlist of Ed25519
 public keys held off the content path) is set, a novel support ground corroborates a reopen ONLY if it carries
-a valid signature by an allowlisted authority over Mnemo.support_challenge_for(key, toward) — which binds the
+a valid signature by an allowlisted authority over Inspeximus.support_challenge_for(key, toward) — which binds the
 CURRENT record id + tenant (anti-replay). Independence is then Sybil-resistance RELATIVE TO THE ALLOWLIST:
 self-minted keys/strings count zero. Honest limits (gate-confirmed): distinct keys prove distinctness NOT
 epistemic independence; attests SOURCE not TRUTH; the allowlist administrator is the steward. cryptography-gated."""
 import pytest
-mnemo = pytest.importorskip("mnemo")
+inspeximus = pytest.importorskip("inspeximus")
 crypto = pytest.importorskip("cryptography")
-from mnemo import Mnemo, new_source_keypair, sign_support
+from inspeximus import Inspeximus, new_source_keypair, sign_support
 
 
 def _store(tmp_path, authorities):
-    return Mnemo(str(tmp_path / "m.json"), support_authorities=authorities)
+    return Inspeximus(str(tmp_path / "m.json"), support_authorities=authorities)
 
 
 def _ground(m, sk, pk, key, toward):
@@ -86,7 +86,7 @@ def test_no_replay_across_time_after_value_returns(tmp_path):
 
 def test_empty_allowlist_is_fail_closed(tmp_path):
     """support_authorities=[] is signed mode with no trusted keys: nothing verifies, no fall-through to strings."""
-    m = Mnemo(str(tmp_path / "m.json"), support_authorities=[])
+    m = Inspeximus(str(tmp_path / "m.json"), support_authorities=[])
     assert m.support_authorities == []
     m.remember("x is 1", key="k/x", object="1")
     m.observe("2", key="k/x", object="2", support=["ref:A"])
@@ -96,7 +96,7 @@ def test_empty_allowlist_is_fail_closed(tmp_path):
 
 
 def test_authorities_none_is_legacy_string_mode(tmp_path):
-    m = Mnemo(str(tmp_path / "m.json"))
+    m = Inspeximus(str(tmp_path / "m.json"))
     assert m.support_authorities is None
     m.remember("region is Frankfurt", key="a/region", object="Frankfurt")
     m.observe("Ohio", key="a/region", object="Ohio", support="ground-1")

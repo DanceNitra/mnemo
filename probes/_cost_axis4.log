@@ -3,7 +3,7 @@ Failed to load spaCy lemma model: spaCy is not installed. Install it with: pip i
 fastembed not installed - BM25 keyword search disabled. Install it with: pip install "mem0ai[extras]"
 Failed to load spaCy full model: spaCy is not installed. Install it with: pip install mem0ai[nlp]
 === integrity x cost: retain/recall, n=12 entities (2 retains + 1 recall each) ===
-mnemo : {"retain_ms_median": 0.012, "retain_ms_p95": 0.022, "recall_ms_median": 0.02, "n_retain": 24, "n_recall": 12, "tokens": 0, "llm_calls": 0, "usd_total": 0.0}
+inspeximus : {"retain_ms_median": 0.012, "retain_ms_p95": 0.022, "recall_ms_median": 0.02, "n_retain": 24, "n_recall": 12, "tokens": 0, "llm_calls": 0, "usd_total": 0.0}
   mem0 1/12
   mem0 2/12
   mem0 3/12
@@ -18,4 +18,4 @@ mnemo : {"retain_ms_median": 0.012, "retain_ms_p95": 0.022, "recall_ms_median": 
   mem0 12/12
 mem0  : {"retain_ms_median": 2418.1, "retain_ms_p95": 3638.7, "recall_ms_median": 56.6, "n_retain": 24, "n_recall": 12, "tokens": {"chat_in": 188063, "chat_out": 7591, "emb": 0}, "llm_calls": 60, "usd_total": 0.03276}
 
-HEADLINE: retain median 2418.1ms (mem0) vs 0.012ms (mnemo) = 201508x; mem0 cost $0.03276 for 24 retains ($1.365/1k retains) vs mnemo $0.
+HEADLINE: retain median 2418.1ms (mem0) vs 0.012ms (inspeximus) = 201508x; mem0 cost $0.03276 for 24 retains ($1.365/1k retains) vs inspeximus $0.

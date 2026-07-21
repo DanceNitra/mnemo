@@ -1,5 +1,5 @@
 """
-encryption_at_rest_probe.py — a runnable receipt for mnemo 1.7.0 encryption-at-rest + crypto-shredding. MIT.
+encryption_at_rest_probe.py — a runnable receipt for inspeximus 1.7.0 encryption-at-rest + crypto-shredding. MIT.
 
 Demonstrates, deterministically, exactly what the feature does AND its honest limits — so a reader can verify
 the claim instead of trusting it. Standard primitives only (AES-256-GCM via `cryptography`); we do not roll our
@@ -20,7 +20,7 @@ import sys
 import tempfile
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from mnemo import Mnemo, new_encryption_key  # noqa: E402
+from inspeximus import Inspeximus, new_encryption_key  # noqa: E402
 
 SECRET = "patient SSN 123-45-6789; diagnosis: confidential"
 
@@ -28,14 +28,14 @@ SECRET = "patient SSN 123-45-6789; diagnosis: confidential"
 def main():
     d = tempfile.mkdtemp()
     path = os.path.join(d, "vault.json")
-    key = new_encryption_key()                       # 32-byte AES-256 key; the app holds it, mnemo never stores it
+    key = new_encryption_key()                       # 32-byte AES-256 key; the app holds it, inspeximus never stores it
 
-    m = Mnemo(path=path, encrypt_key=key)
+    m = Inspeximus(path=path, encrypt_key=key)
     m.remember(SECRET, key="record::patient", object=SECRET)
     m.flush()
 
     raw = open(path, "rb").read()
-    print("mnemo 1.7.0 encryption-at-rest — runnable receipt\n")
+    print("inspeximus 1.7.0 encryption-at-rest — runnable receipt\n")
     print(f"  1. confidential at rest : secret in the on-disk bytes? {SECRET.encode() in raw}"
           f"   (header={raw[:5]!r}, {len(raw)} bytes of ciphertext)")
 
@@ -43,7 +43,7 @@ def main():
     bad = bytearray(raw); bad[-1] ^= 0x01
     open(path, "wb").write(bad)
     try:
-        Mnemo(path=path, encrypt_key=key); tamper = "NOT detected (BUG)"
+        Inspeximus(path=path, encrypt_key=key); tamper = "NOT detected (BUG)"
     except Exception:
         tamper = "detected (store refuses to open)"
     open(path, "wb").write(raw)                      # restore
@@ -51,21 +51,21 @@ def main():
 
     # 3. no key -> no data
     try:
-        Mnemo(path=path); nokey = "opened WITHOUT key (BUG)"
+        Inspeximus(path=path); nokey = "opened WITHOUT key (BUG)"
     except Exception:
         nokey = "raises (never silent-empty)"
     try:
-        Mnemo(path=path, encrypt_key=new_encryption_key()); wrong = "opened with WRONG key (BUG)"
+        Inspeximus(path=path, encrypt_key=new_encryption_key()); wrong = "opened with WRONG key (BUG)"
     except Exception:
         wrong = "raises"
     print(f"  3. no key -> no data    : open without key -> {nokey}; wrong key -> {wrong}")
 
     # 4. crypto-shred: destroy the key -> the ciphertext (and any backup of it) is dead
-    m2 = Mnemo(path=path, encrypt_key=key)
+    m2 = Inspeximus(path=path, encrypt_key=key)
     receipt = m2.shred()
     del key                                          # simulate destroying the only key
     try:
-        Mnemo(path=path, encrypt_key=new_encryption_key()); recov = "RECOVERED (BUG)"
+        Inspeximus(path=path, encrypt_key=new_encryption_key()); recov = "RECOVERED (BUG)"
     except Exception:
         recov = "unrecoverable"
     print(f"  4. crypto-shred         : key destroyed -> reopen (no original key) -> {recov}"

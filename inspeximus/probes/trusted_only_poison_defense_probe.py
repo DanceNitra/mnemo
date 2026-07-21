@@ -16,7 +16,7 @@ excluded — deterministically, zero-LLM. Asserts (each able to FAIL):
 """
 import sys
 sys.path.insert(0, ".")
-from inspeximus import Mnemo, new_source_keypair, attest
+from inspeximus import Inspeximus, new_source_keypair, attest
 
 FAILS = []
 def check(n, c):
@@ -30,7 +30,7 @@ TSK, TPK = new_source_keypair()                       # trusted authority
 ASK, APK = new_source_keypair()                       # attacker's self-minted key
 
 def build(trust_on):
-    m = Mnemo(path=None)
+    m = Inspeximus(path=None)
     m.strict_corroboration = True
     if trust_on:
         m.trust_seeds = {"key:" + TPK}
@@ -51,7 +51,7 @@ trusted_top = (m.recall(Q, k=3, trusted_only=True) or [{}])[0].get("text", "")
 check("2 trusted_only returns the TRUE fact vs the adaptive attacker", trusted_top == TRUTH)
 
 # 3. a valid attestation by a NON-trusted key must NOT grant trust (authorship != trust)
-m3 = Mnemo(path=None); m3.strict_corroboration = True; m3.trust_seeds = {"key:" + TPK}
+m3 = Inspeximus(path=None); m3.strict_corroboration = True; m3.trust_seeds = {"key:" + TPK}
 m3.remember(POISON, key="bank_x", attestation=(APK, attest(POISON, ASK)))   # validly signed, wrong signer
 only = m3.recall(Q, k=3, trusted_only=True)
 check("3 non-trusted-key attestation is excluded (trust != authorship)", all(h["text"] != POISON for h in only))

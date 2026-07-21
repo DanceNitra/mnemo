@@ -1,4 +1,4 @@
-"""SOTA lever test: mnemo's keyed supersession already holds latest-value-per-key (exactly the CR task). The
+"""SOTA lever test: inspeximus's keyed supersession already holds latest-value-per-key (exactly the CR task). The
 missing piece is QUERY-SIDE key resolution: map the question to the right key, then return that key's current
 (latest, non-superseded) value deterministically. This bypasses the fuzzy-retrieval ceiling. Measures the
 keyed-lookup ceiling (top-1 and top-3 key match) vs the fuzzy ceiling from _diag_cr.py. Writes _diag_cr2_result.json."""
@@ -52,7 +52,7 @@ def main():
     for ridx in ROWS:
         row = df.iloc[ridx]
         lines = fact_lines(row["context"])
-        # mnemo supersession result: latest value per key (last write wins), + keyed-fact coverage
+        # inspeximus supersession result: latest value per key (last write wins), + keyed-fact coverage
         key2val = {}; keyed = 0
         for ln in lines:
             pf = parse_fact(ln)

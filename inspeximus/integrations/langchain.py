@@ -1,19 +1,19 @@
-"""LangChain integration for mnemo — a supersession-filtered retriever and a chat-message history.
+"""LangChain integration for inspeximus — a supersession-filtered retriever and a chat-message history.
 
 Two opt-in classes (importing this module imports langchain-core; `import inspeximus` stays zero-dependency):
 
-    MnemoRetriever          — a langchain_core BaseRetriever whose results come from inspeximus.recall(), so
+    InspeximusRetriever          — a langchain_core BaseRetriever whose results come from inspeximus.recall(), so
                               SUPERSEDED facts are hidden by default: once a fact is corrected via a keyed
                               write, the retriever never returns the stale value into your chain/prompt.
-    MnemoChatMessageHistory — a BaseChatMessageHistory that persists a conversation in a mnemo store
+    InspeximusChatMessageHistory — a BaseChatMessageHistory that persists a conversation in a inspeximus store
                               (per-session subject) with the same current-truth recall available.
 
-    from inspeximus.integrations.langchain import MnemoRetriever
-    r = MnemoRetriever(path="mem.json", k=5)
+    from inspeximus.integrations.langchain import InspeximusRetriever
+    r = InspeximusRetriever(path="mem.json", k=5)
     r.store.remember("the deploy channel is BLUE-9", key="deploy-channel")   # keyed write -> supersedable
     docs = r.invoke("what is the deploy channel?")     # returns current value, never a superseded one
 
-For semantic recall pass an embedder to the underlying store: MnemoRetriever(embed=my_embed_fn). Without one,
+For semantic recall pass an embedder to the underlying store: InspeximusRetriever(embed=my_embed_fn). Without one,
 recall is lexical (zero-dependency fallback).
 """
 from __future__ import annotations
@@ -24,11 +24,11 @@ from langchain_core.retrievers import BaseRetriever
 from langchain_core.chat_history import BaseChatMessageHistory
 from langchain_core.messages import BaseMessage, message_to_dict, messages_from_dict
 
-from inspeximus import Mnemo
+from inspeximus import Inspeximus
 
 
-class MnemoRetriever(BaseRetriever):
-    """A LangChain retriever backed by mnemo. Its differentiator vs a plain vector retriever: recall() hides
+class InspeximusRetriever(BaseRetriever):
+    """A LangChain retriever backed by inspeximus. Its differentiator vs a plain vector retriever: recall() hides
     superseded values, so a corrected fact is never retrieved back into the prompt (write facts with a
     supersession `key=` for that to engage; plain text is stored append-only)."""
 
@@ -37,7 +37,7 @@ class MnemoRetriever(BaseRetriever):
 
     def __init__(self, path: str | None = None, store: Any = None, k: int = 5,
                  embed=None, extractor=None, **kwargs: Any):
-        super().__init__(k=k, store=store if store is not None else Mnemo(path=path, embed=embed), **kwargs)
+        super().__init__(k=k, store=store if store is not None else Inspeximus(path=path, embed=embed), **kwargs)
         if extractor is not None:
             self.store.extractor = extractor
 
@@ -52,13 +52,13 @@ class MnemoRetriever(BaseRetriever):
         self.store.remember(text, key=key, **kw)
 
 
-class MnemoChatMessageHistory(BaseChatMessageHistory):
-    """A conversation history persisted in a mnemo store, scoped per session_id. Messages are appended;
+class InspeximusChatMessageHistory(BaseChatMessageHistory):
+    """A conversation history persisted in a inspeximus store, scoped per session_id. Messages are appended;
     current-truth recall over the same store is available via `.store.recall(...)`."""
 
     def __init__(self, session_id: str, path: str | None = None, store: Any = None, embed=None):
         self.session_id = session_id
-        self.store = store if store is not None else Mnemo(path=path, embed=embed)
+        self.store = store if store is not None else Inspeximus(path=path, embed=embed)
         self._tag = f"lc-chat:{session_id}"
 
     @property

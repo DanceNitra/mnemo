@@ -1,11 +1,11 @@
-"""mnemo_langgraph_adapter_probe.py — MnemoStore works with the REAL LangGraph BaseStore protocol.
+"""inspeximus_langgraph_adapter_probe.py — InspeximusStore works with the REAL LangGraph BaseStore protocol.
 
 Requires langgraph installed. Verifies faithful put/get/search/delete/list + the honest differentiator:
-mnemo keeps the value HISTORY that the built-in InMemoryStore overwrites and discards.
+inspeximus keeps the value HISTORY that the built-in InMemoryStore overwrites and discards.
 """
 import sys, pathlib, tempfile
-sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / "mnemo_pypi"))
-from mnemo.integrations.langgraph import MnemoStore
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2] / "inspeximus_pypi"))
+from inspeximus.integrations.langgraph import InspeximusStore
 from langgraph.store.memory import InMemoryStore
 
 ns = ("user", "42")
@@ -13,7 +13,7 @@ ns = ("user", "42")
 
 def main():
     ok = {}
-    s = MnemoStore(path=str(pathlib.Path(tempfile.mkdtemp()) / "lg.json"))
+    s = InspeximusStore(path=str(pathlib.Path(tempfile.mkdtemp()) / "lg.json"))
 
     # put + get
     s.put(ns, "timezone", {"tz": "UTC"})
@@ -24,10 +24,10 @@ def main():
     s.put(ns, "timezone", {"tz": "PST"})
     ok["C overwrite -> current value"] = s.get(ns, "timezone").value == {"tz": "PST"}
 
-    # DIFFERENTIATOR: mnemo kept the history InMemoryStore discards
+    # DIFFERENTIATOR: inspeximus kept the history InMemoryStore discards
     im = InMemoryStore(); im.put(ns, "timezone", {"tz": "UTC"}); im.put(ns, "timezone", {"tz": "PST"})
     ok["D InMemoryStore has NO history"] = not hasattr(im, "history")
-    ok["E mnemo history keeps both"] = s.history(ns, "timezone") == [{"tz": "UTC"}, {"tz": "PST"}]
+    ok["E inspeximus history keeps both"] = s.history(ns, "timezone") == [{"tz": "UTC"}, {"tz": "PST"}]
 
     # search within a namespace prefix
     s.put(ns, "theme", {"mode": "dark"})
@@ -45,7 +45,7 @@ def main():
     ok["I delete removes current"] = s.get(ns, "theme") is None
 
     print("=" * 60)
-    print("MnemoStore - LangGraph BaseStore (real langgraph)")
+    print("InspeximusStore - LangGraph BaseStore (real langgraph)")
     print("=" * 60)
     for k, v in ok.items():
         print(f"  [{'PASS' if v else 'FAIL'}] {k}")

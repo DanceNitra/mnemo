@@ -1,13 +1,13 @@
-"""READ-PATH REOPEN probe (marintkael's lead, r/RAG 2026-07-16) — run against the REAL mnemo store.
+"""READ-PATH REOPEN probe (marintkael's lead, r/RAG 2026-07-16) — run against the REAL inspeximus store.
 
 The confident wrong-merge is unattackable at WRITE time ("you cannot out-confidence your own confidence at the
-moment you write"). The missing primitive lives on the READ path: mnemo.observe() — a POST-write review
+moment you write"). The missing primitive lives on the READ path: inspeximus.observe() — a POST-write review
 trigger (the mirror of the Fellegi-Sunter clerical-review band, which holds a POSSIBLE match BEFORE the write).
 When independent evidence CONTRADICTS a high-confidence settled record, corroborate it (>= reopen_corroboration
 independent observations, so a single benign restatement of the old value does NOT reopen) and REOPEN the
 interval for steward review, surfacing the prior value.
 
-Measured here on real Mnemo (keyed supersession, no embedder needed — observe() matches on the object):
+Measured here on real Inspeximus (keyed supersession, no embedder needed — observe() matches on the object):
   (1) CONFIDENT WRONG-MERGE caught LATE, not never: a fuzzy match confidently superseded the true value with
       another entity's value. A baseline has no read path, so it never catches it. observe(true_value) x k
       reopens it once the contradiction corroborates.
@@ -18,7 +18,7 @@ Measured here on real Mnemo (keyed supersession, no embedder needed — observe(
 import os, sys, json, random, tempfile
 from pathlib import Path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))   # use the local edited source, not an installed pkg
-from mnemo import Mnemo
+from inspeximus import Inspeximus
 
 SEEDS = int(os.environ.get("SEEDS", 8))
 E = int(os.environ.get("E", 200))
@@ -27,7 +27,7 @@ OUT = Path(__file__).with_name("reopen_interval_readpath_result.json")
 
 def run(seed):
     random.seed(seed)
-    m = Mnemo(os.path.join(tempfile.mkdtemp(), "m.json"))
+    m = Inspeximus(os.path.join(tempfile.mkdtemp(), "m.json"))
     K = m.reopen_corroboration
     true = {}
     wrong, reverts, flood = [], [], []
@@ -77,11 +77,11 @@ def main():
     def mean(k): return round(sum(r[k] for r in rows) / len(rows), 3)
     agg = {k: mean(k) for k in ("wm_caught_base", "wm_caught_reopen", "revert_keyed_base",
                                 "revert_keyed_reopen", "false_reopen_rate")}
-    print("=== read-path reopen on the REAL mnemo store (means over seeds) ===")
+    print("=== read-path reopen on the REAL inspeximus store (means over seeds) ===")
     print(f"  confident wrong-merge CAUGHT:   baseline {agg['wm_caught_base']:.0%}  ->  observe() {agg['wm_caught_reopen']:.0%}")
     print(f"  value-obscuring revert KEYED:   baseline {agg['revert_keyed_base']:.0%}  ->  observe() {agg['revert_keyed_reopen']:.0%}")
     print(f"  false-reopen on a single benign restatement (cost): {agg['false_reopen_rate']:.1%}")
-    OUT.write_text(json.dumps({"ok": True, "store": "real mnemo", "E": E, "agg": agg, "rows": rows}, indent=1),
+    OUT.write_text(json.dumps({"ok": True, "store": "real inspeximus", "E": E, "agg": agg, "rows": rows}, indent=1),
                    encoding="utf-8")
 
 

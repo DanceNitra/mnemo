@@ -1,5 +1,5 @@
 """Org-wide erasure receipt (the real moat / PRO direction) — DeletionManifest cascades a right-to-erasure
-across EVERY registered store (mnemo + the app's vector store + logs + backups), verifies each reports the
+across EVERY registered store (inspeximus + the app's vector store + logs + backups), verifies each reports the
 subject unrecoverable, and emits ONE signed, tamper-evident manifest. The point a within-one-library scrub
 cannot make: if a store DID NOT comply, the receipt NAMES it (residual_targets) instead of hiding it.
 
@@ -8,14 +8,14 @@ receipt names the leaker (does NOT falsely certify); (C) tamper an entry -> veri
 """
 import sys, pathlib, tempfile, os
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
-from mnemo import Mnemo, new_receipt_keypair
-from mnemo.deletion_manifest import DeletionManifest, ErasureTarget
+from inspeximus import Inspeximus, new_receipt_keypair
+from inspeximus.deletion_manifest import DeletionManifest, ErasureTarget
 
 SEC = "Alice-SSN-441-90-2277"
 
 
-class MnemoTarget(ErasureTarget):
-    name = "mnemo-store"
+class InspeximusTarget(ErasureTarget):
+    name = "inspeximus-store"
     def __init__(self, m): self.m = m
     def erase(self, subject):
         r = self.m.forget_subject(subject, request_id="dsr"); self.m._save(force=True)
@@ -46,12 +46,12 @@ def run():
 
     def build(backup_compliant):
         d = os.path.join(tempfile.mkdtemp(), "m.json")
-        m = Mnemo(path=d); m.remember(SEC, key="alice::ssn", source={"doc": "alice"}, pii=True); m._save(force=True)
+        m = Inspeximus(path=d); m.remember(SEC, key="alice::ssn", source={"doc": "alice"}, pii=True); m._save(force=True)
         vec = DictStore("app-vector-index"); vec.add("v1", "profile: " + SEC)
         log = DictStore("retrieval-log"); log.add("l1", "query hit -> " + SEC)
         bak = DictStore("nightly-backup", compliant=backup_compliant); bak.add("b1", "snapshot " + SEC)
         man = DeletionManifest(sign_sk_hex=sk, pubkey_hex=pub)
-        man.register(MnemoTarget(m)).register(vec).register(log).register(bak)
+        man.register(InspeximusTarget(m)).register(vec).register(log).register(bak)
         return man
 
     # A) full cascade — every store complies

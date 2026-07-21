@@ -2,7 +2,7 @@
 arXiv:2601.07004 shows Letta/Zep/mem0 deletion leaves data recoverable from the raw store).
 
 We do NOT trust the API's "is it gone?" — we read the RAW store on disk after erasure and try to recover the
-forgotten content AND its embedding vector. mnemo must leave ZERO recoverable trace.
+forgotten content AND its embedding vector. inspeximus must leave ZERO recoverable trace.
 
 Three settings:
   A. plaintext store, persist_vectors=True  -> forget_subject must remove text AND the persisted vec.
@@ -11,7 +11,7 @@ Three settings:
 """
 import sys, pathlib, tempfile, os, json
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
-from mnemo import Mnemo, new_encryption_key
+from inspeximus import Inspeximus, new_encryption_key
 
 SECRET = "SSN-441-90-2277 (Alice Meyer medical record)"
 
@@ -39,7 +39,7 @@ def run():
 
     # A. plaintext + persisted vectors: forget must scrub text AND vec from the raw file
     tmpA = os.path.join(tempfile.mkdtemp(), "a.json")
-    mA = Mnemo(path=tmpA, embed=fake_embed, persist_vectors=True)
+    mA = Inspeximus(path=tmpA, embed=fake_embed, persist_vectors=True)
     rid = mA.remember(SECRET, key="alice::ssn", object="441-90-2277", pii=True)
     mA.remember("the deploy channel is BLUE-9", key="deploy")  # bystander, must survive
     mA._save(force=True)
@@ -54,7 +54,7 @@ def run():
 
     # B. plaintext + RAM-only vectors (default): forget must scrub text; vec never on disk anyway
     tmpB = os.path.join(tempfile.mkdtemp(), "b.json")
-    mB = Mnemo(path=tmpB)
+    mB = Inspeximus(path=tmpB)
     mB.remember(SECRET, key="alice::ssn", pii=True)
     mB.remember("keep me", key="k2")
     mB._save(force=True)
@@ -67,7 +67,7 @@ def run():
     # C. encrypted-at-rest + crypto-shred: after shred() the raw bytes are undecryptable
     tmpC = os.path.join(tempfile.mkdtemp(), "c.json")
     key = new_encryption_key()
-    mC = Mnemo(path=tmpC, encrypt_key=key)
+    mC = Inspeximus(path=tmpC, encrypt_key=key)
     mC.remember(SECRET, key="alice::ssn", pii=True)
     mC._save(force=True)
     rawC = raw_bytes(tmpC)
@@ -88,7 +88,7 @@ def run():
                                                         and len(getattr(mC, "items", [])) == 0)
         wrong = new_encryption_key()
         try:
-            m2 = Mnemo(path=tmpC, encrypt_key=wrong)   # adversary with the file but not the real key
+            m2 = Inspeximus(path=tmpC, encrypt_key=wrong)   # adversary with the file but not the real key
             recovered = any(SECRET in (r.get("text") or "") for r in getattr(m2, "items", []))
             ok["C3 file undecryptable without the key"] = not recovered
         except Exception:

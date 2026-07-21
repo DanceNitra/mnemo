@@ -3,7 +3,7 @@ decomposed by phase so the EXTRACTION BOUNDARY is explicit.
 
 Vectorize's manifesto elevated cost-per-operation to a first-class axis. A fair cost comparison of memory
 systems has a trap: some systems (mem0, Zep, Letta) run an LLM at add() to EXTRACT structured facts from raw
-text; others (mnemo) take an already-structured (key, value) write and do the extraction UPSTREAM in the
+text; others (inspeximus) take an already-structured (key, value) write and do the extraction UPSTREAM in the
 caller. Comparing "cost per add" without naming where extraction is paid rewards the system that skips it and
 hides the cost in the caller. So this tool reports, per phase:
 
@@ -17,7 +17,7 @@ Metric is LLM-CALLS and TOKENS per phase (the backend-independent, un-gameable q
 does NOT headline dollars (a repricing across tokenizers is a modeled estimate) or latency (a local op vs a
 network round-trip is not a like-for-like number) — report those only with their assumptions, downstream.
 
-Add a system by writing a CostAdapter (below). Runnable on any OpenAI-compatible backend; mnemo runs free/local.
+Add a system by writing a CostAdapter (below). Runnable on any OpenAI-compatible backend; inspeximus runs free/local.
 """
 import os, sys, json, argparse
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
@@ -57,12 +57,12 @@ class CostAdapter:
     def recall(self, query): ...        # retrieve
 
 
-class MnemoAdapter(CostAdapter):
-    name = "mnemo"
-    extract_site = "upstream/caller"    # mnemo takes an already-structured (key, value) write; extraction is the caller's
+class InspeximusAdapter(CostAdapter):
+    name = "inspeximus"
+    extract_site = "upstream/caller"    # inspeximus takes an already-structured (key, value) write; extraction is the caller's
     def __init__(self):
-        from mnemo import Mnemo
-        self._M = Mnemo
+        from inspeximus import Inspeximus
+        self._M = Inspeximus
     def reset(self, case):
         self.m = self._M(path=None)
     def extract(self, text):
@@ -99,7 +99,7 @@ class Mem0Adapter(CostAdapter):
         return self.mem.search(query, filters={"user_id": self._uid}, top_k=5)
 
 
-ADAPTERS = {"mnemo": MnemoAdapter, "mem0": Mem0Adapter}
+ADAPTERS = {"inspeximus": InspeximusAdapter, "mem0": Mem0Adapter}
 FIXTURE = [("cache region", "osaka"), ("primary shard", "delta7"), ("build target", "arm64"),
            ("default currency", "forint"), ("route profile", "coastal"), ("api tier", "bronze"),
            ("index locale", "tallinn"), ("worker pool", "amber"), ("log sink", "vault3"), ("retry policy", "linear")]
@@ -123,7 +123,7 @@ def measure(ad, n):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--systems", default="mnemo")
+    ap.add_argument("--systems", default="inspeximus")
     ap.add_argument("--n", type=int, default=10)
     a = ap.parse_args()
     if os.path.exists(r"C:/Users/Danculus/agora/server/.env"):

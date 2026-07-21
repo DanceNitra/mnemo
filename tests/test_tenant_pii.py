@@ -1,14 +1,14 @@
 """Tenant isolation + PII layer (1.6.0). Zero-dependency; run with `python -m pytest tests/test_tenant_pii.py`."""
 import time
 
-from mnemo import Mnemo, detect_pii, redact_pii
+from inspeximus import Inspeximus, detect_pii, redact_pii
 
 
 # ── hard tenant isolation ────────────────────────────────────────────────────
 
 def test_recall_never_crosses_tenants():
-    # one physical store, two tenant views sharing it (Mnemo.for_tenant)
-    store = Mnemo()
+    # one physical store, two tenant views sharing it (Inspeximus.for_tenant)
+    store = Inspeximus()
     a = store.for_tenant("acme")
     b = store.for_tenant("globex")
     a.remember("acme deploy key is ACME-SECRET-123", key="deploy::key", object="ACME-SECRET-123")
@@ -24,17 +24,17 @@ def test_recall_never_crosses_tenants():
 
 
 def test_bound_constructor_own_file_isolation():
-    # the simple model: Mnemo(tenant=...) with its own file is trivially isolated
+    # the simple model: Inspeximus(tenant=...) with its own file is trivially isolated
     import tempfile, os
     d = tempfile.mkdtemp()
-    a = Mnemo(path=os.path.join(d, "acme.json"), tenant="acme")
+    a = Inspeximus(path=os.path.join(d, "acme.json"), tenant="acme")
     a.remember("acme only")
     got = a.recall("acme", k=5)
     assert len(got) == 1 and got[0].get("text") == "acme only"
 
 
 def test_same_key_does_not_supersede_across_tenants():
-    store = Mnemo()
+    store = Inspeximus()
     a = store.for_tenant("t1")
     b = store.for_tenant("t2")
     a.remember("plan is pro", key="billing::plan", object="pro")
@@ -50,7 +50,7 @@ def test_same_key_does_not_supersede_across_tenants():
 
 
 def test_unbound_store_is_admin_view():
-    store = Mnemo()
+    store = Inspeximus()
     store.for_tenant("t1").remember("t1 fact alpha")
     store.for_tenant("t2").remember("t2 fact beta")
     seen = store.recall("fact", k=10)                         # unbound parent sees everything
@@ -59,7 +59,7 @@ def test_unbound_store_is_admin_view():
 
 
 def test_forget_subject_is_tenant_scoped():
-    store = Mnemo()
+    store = Inspeximus()
     a = store.for_tenant("t1")
     b = store.for_tenant("t2")
     a.remember("shared-subject data A", source={"doc": "user-42"})
@@ -71,7 +71,7 @@ def test_forget_subject_is_tenant_scoped():
 
 def test_consolidation_does_not_cross_tenants():
     # The dream pass (consolidate) links/dedups/supersedes; on a tenant view it must not touch other tenants.
-    store = Mnemo()
+    store = Inspeximus()
     a = store.for_tenant("t1")
     b = store.for_tenant("t2")
     phrase = "restart the api gateway nightly at midnight utc per the runbook"
@@ -90,7 +90,7 @@ def test_consolidation_does_not_cross_tenants():
 
 def test_unbound_consolidate_links_across_when_no_tenants():
     # severe-test control: without tenants, the SAME corpus DOES link (proves the guard above prevents a real leak)
-    m = Mnemo()
+    m = Inspeximus()
     phrase = "restart the api gateway nightly at midnight utc per the runbook"
     m.remember("alpha: " + phrase)
     m.remember("beta: " + phrase)
@@ -100,7 +100,7 @@ def test_unbound_consolidate_links_across_when_no_tenants():
 
 def test_legacy_unbound_is_byte_identical():
     # No tenant anywhere -> no `tenant` key stamped, legacy supersession intact.
-    m = Mnemo()
+    m = Inspeximus()
     m.remember("timeout setting is short", key="cfg::timeout", object="short")
     m.remember("timeout setting is long", key="cfg::timeout", object="long")
     got = m.recall("timeout setting", k=10)
@@ -131,26 +131,26 @@ def test_redact_pii_masks_and_counts():
 
 
 def test_remember_tags_pii_when_detect_on():
-    m = Mnemo(pii_detect=True)
+    m = Inspeximus(pii_detect=True)
     mid = m.remember("customer email is carol@corp.com")
     rec = [r for r in m.items if r["id"] == mid][0]
     assert rec.get("pii") == ["email"]
 
 
 def test_remember_pii_override():
-    m = Mnemo()
+    m = Inspeximus()
     mid = m.remember("no obvious pii here", pii=["custom_id"])
     rec = [r for r in m.items if r["id"] == mid][0]
     assert rec.get("pii") == ["custom_id"]
     # pii=False suppresses even with detect on
-    m2 = Mnemo(pii_detect=True)
+    m2 = Inspeximus(pii_detect=True)
     mid2 = m2.remember("email a@b.com", pii=False)
     rec2 = [r for r in m2.items if r["id"] == mid2][0]
     assert "pii" not in rec2
 
 
 def test_recall_redact_pii_masks_return_not_store():
-    m = Mnemo(pii_detect=True)
+    m = Inspeximus(pii_detect=True)
     m.remember("the account owner is dave@bank.com")
     got = m.recall("account owner", k=5, redact_pii=True)
     assert got and "dave@bank.com" not in got[0]["text"] and "[EMAIL]" in got[0]["text"]
@@ -160,7 +160,7 @@ def test_recall_redact_pii_masks_return_not_store():
 
 
 def test_pii_report_and_forget_pii():
-    m = Mnemo(pii_detect=True)
+    m = Inspeximus(pii_detect=True)
     m.remember("email one: a@x.com")
     m.remember("email two: b@y.com")
     m.remember("no pii in this one at all")
@@ -174,7 +174,7 @@ def test_pii_report_and_forget_pii():
 
 
 def test_forget_pii_is_tenant_scoped():
-    store = Mnemo(pii_detect=True)
+    store = Inspeximus(pii_detect=True)
     a = store.for_tenant("t1")
     b = store.for_tenant("t2")
     a.remember("t1 email a@x.com")
@@ -187,7 +187,7 @@ def test_forget_pii_is_tenant_scoped():
 
 
 def test_tenant_view_pii_report_isolated():
-    store = Mnemo(pii_detect=True)
+    store = Inspeximus(pii_detect=True)
     store.for_tenant("t1").remember("t1 a@x.com")
     store.for_tenant("t2").remember("t2 b@y.com and c@z.com")
     assert store.for_tenant("t1").pii_report()["records_with_pii"] == 1

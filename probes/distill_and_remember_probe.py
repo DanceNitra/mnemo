@@ -1,11 +1,11 @@
 """distill_and_remember_probe.py — the OPTIONAL LLM capture half (deterministic orchestration).
 
-mnemo core stays zero-dep/zero-LLM: the caller injects a `distiller(prompt, text)` (any LLM / subagent) that runs
-Mnemo.DISTILL_PROMPT and returns JSON; mnemo parses it and stores each item DETERMINISTICALLY — decisions via
+inspeximus core stays zero-dep/zero-LLM: the caller injects a `distiller(prompt, text)` (any LLM / subagent) that runs
+Inspeximus.DISTILL_PROMPT and returns JSON; inspeximus parses it and stores each item DETERMINISTICALLY — decisions via
 remember_decision (topic-keyed supersession + revert), facts via remember. This probe uses a MOCK distiller (no
 LLM) to lock the orchestration + fail-open behavior; a live subagent distiller is tested separately.
 Asserts:
-  1. mnemo passes its DISTILL_PROMPT to the distiller.
+  1. inspeximus passes its DISTILL_PROMPT to the distiller.
   2. decisions + facts from the returned JSON are stored (decision -> remember_decision, fact -> semantic).
   3. malformed items (empty text, non-dict) are skipped, not crashed.
   4. a distilled decision's topic gives keyed supersession (new decision retires old; one active per topic).
@@ -13,14 +13,14 @@ Asserts:
 """
 import sys, json
 sys.path.insert(0, ".")
-from mnemo import Mnemo
+from inspeximus import Inspeximus
 
 FAILS = []
 def check(n, c):
     print(f"  [{'OK ' if c else 'XXX'}] {n}")
     if not c: FAILS.append(n)
 
-m = Mnemo(path=None)
+m = Inspeximus(path=None)
 TRANSCRIPT = ("We debated the next release. Decision: ship 1.16 with distill_and_remember. "
               "Also noted: nomic-embed-text needs search_document/search_query prefixes. "
               "Then some off-topic chit-chat about lunch.")
@@ -34,7 +34,7 @@ def mock(prompt, text):
         "not-a-dict -> skip",
     ]})
 r = m.distill_and_remember(TRANSCRIPT, mock)
-check("1 mnemo passed its DISTILL_PROMPT", "distill" in seen_prompt.get("p", "").lower())
+check("1 inspeximus passed its DISTILL_PROMPT", "distill" in seen_prompt.get("p", "").lower())
 check("2 decision + fact stored (2 captured)", r["captured"] == 2 and r["decisions"] == 1 and r["facts"] == 1)
 check("2b decision recallable", "1.16" in (m.recall("what to ship", k=1) or [{}])[0].get("text", ""))
 check("2c fact recallable", "nomic" in (m.recall("nomic prefixes", k=1) or [{}])[0].get("text", ""))
@@ -46,7 +46,7 @@ def hallu(prompt, text):
         {"kind": "decision", "text": "we chose Postgres over SQLite", "topic": "vendor::db", "because": "invented", "support": "we all agreed Postgres is the winner"},  # support NOT in transcript
         {"kind": "decision", "text": "ship 1.16 with distill_and_remember", "topic": "release::1.16b", "support": "ship 1.16 with distill_and_remember"},                     # support IS in transcript
     ]})
-mg = Mnemo(path=None)
+mg = Inspeximus(path=None)
 rg = mg.distill_and_remember(TRANSCRIPT, hallu)
 check("G1 hallucinated item (support not in source) DROPPED", rg["dropped"] == 1 and rg["captured"] == 1)
 check("G2 supported item survives the gate", rg["decisions"] == 1)

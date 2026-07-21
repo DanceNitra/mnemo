@@ -1,13 +1,13 @@
-"""Does MnemoStore actually behave like a LangGraph BaseStore? Checked against LangGraph's own store.
+"""Does InspeximusStore actually behave like a LangGraph BaseStore? Checked against LangGraph's own store.
 
 Claiming "drop-in BaseStore" is only meaningful if a caller cannot tell the difference. So every
 operation script below runs TWICE — once against `langgraph.store.memory.InMemoryStore` (the reference
-implementation) and once against `MnemoStore` — and the observable results must match. Where they must
-NOT match is stated explicitly: mnemo keeps queryable history that the reference discards, and its
+implementation) and once against `InspeximusStore` — and the observable results must match. Where they must
+NOT match is stated explicitly: inspeximus keeps queryable history that the reference discards, and its
 delete removes the value from the bytes on disk.
 
     python store_audit.py                 # working tree
-    STORE_FALSIFY=1 python store_audit.py # breaks MnemoStore on purpose; parity checks MUST fail
+    STORE_FALSIFY=1 python store_audit.py # breaks InspeximusStore on purpose; parity checks MUST fail
 
 Three scripts x three repeats. Any mismatch fails the claim.
 """
@@ -26,8 +26,8 @@ sys.path.insert(0, str(HERE))
 
 def _stores(tmp):
     from langgraph.store.memory import InMemoryStore
-    from mnemo.integrations.langgraph import MnemoStore
-    return InMemoryStore(), MnemoStore(path=str(tmp / "store.jsonl"))
+    from inspeximus.integrations.langgraph import InspeximusStore
+    return InMemoryStore(), InspeximusStore(path=str(tmp / "store.jsonl"))
 
 
 # Each script is a list of (label, callable(store) -> comparable result).
@@ -112,7 +112,7 @@ def run_script(name, build, run_idx):
         if not same:
             mismatches.append((label, r_ref, r_ours))
 
-    # mnemo-specific extras the reference cannot do — these are DIFFERENCES BY DESIGN, checked separately
+    # inspeximus-specific extras the reference cannot do — these are DIFFERENCES BY DESIGN, checked separately
     extras = {}
     if os.environ.get("STORE_FALSIFY") != "1":
         try:
@@ -143,7 +143,7 @@ def main():
     a = ap.parse_args()
     import langgraph
     print("=" * 92)
-    print(f"MnemoStore vs langgraph {getattr(langgraph, '__version__', '?')} InMemoryStore "
+    print(f"InspeximusStore vs langgraph {getattr(langgraph, '__version__', '?')} InMemoryStore "
           f"— {len(SCRIPTS)} scripts x {a.repeats} repeats")
     if os.environ.get("STORE_FALSIFY") == "1":
         print("FALSIFY MODE: writes are swallowed; parity checks MUST fail")
@@ -177,7 +177,7 @@ def main():
         print(f"  [{'PASS' if same_state else 'FAIL'}] identical results across {a.repeats} runs")
 
     print("\n" + "=" * 92)
-    print("MnemoStore IS a drop-in BaseStore" if not fails else f"NOT drop-in — {fails} failing groups")
+    print("InspeximusStore IS a drop-in BaseStore" if not fails else f"NOT drop-in — {fails} failing groups")
     print("=" * 92)
     return 1 if fails else 0
 

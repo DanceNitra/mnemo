@@ -11,7 +11,7 @@ attests it unaltered. The self-correcting memory layer for AI agents.*
 back — deterministically, with no LLM on the write path. Extracted from an autonomous research OS that has run
 it daily over 10,000 notes.*
 
-`pip install inspeximus` → `import inspeximus` · [PyPI](https://pypi.org/project/inspeximus/) · [Hugging Face](https://huggingface.co/Danchi17/mnemo) · [DOI](https://doi.org/10.5281/zenodo.21128549) · [Homepage](https://dancenitra.github.io/inspeximus/) · MIT · v1.25.0
+`pip install inspeximus` → `import inspeximus` · [PyPI](https://pypi.org/project/inspeximus/) · [Hugging Face](https://huggingface.co/Danchi17/inspeximus) · [DOI](https://doi.org/10.5281/zenodo.21128549) · [Homepage](https://dancenitra.github.io/inspeximus/) · MIT · v1.25.0
 
 [![audit](https://github.com/DanceNitra/inspeximus/actions/workflows/audit.yml/badge.svg)](https://github.com/DanceNitra/inspeximus/actions/workflows/audit.yml)
 [![Star on GitHub](https://img.shields.io/github/stars/DanceNitra/inspeximus?style=social)](https://github.com/DanceNitra/inspeximus)
@@ -34,7 +34,7 @@ Built by **[Rastislav Drahoš](https://github.com/DanceNitra)** — extracted fr
 ```
 
 That registers this repository as a plugin marketplace and installs the MCP server, which then starts
-with `uvx --from "inspeximus[mcp]" inspeximus-mcp` and keeps its store in `.mnemo/memory.json` inside the
+with `uvx --from "inspeximus[mcp]" inspeximus-mcp` and keeps its store in `.inspeximus/memory.json` inside the
 project. Nothing to configure by hand, and nothing to install globally.
 
 Prefer the manual route? `pip install "inspeximus[mcp]"` and point your client at `inspeximus-mcp` — the
@@ -54,7 +54,7 @@ systems are listed separately and marked untestable here; verifying those means 
 so they are never counted as passing.
 
 ```
-auditing : agora_mnemo-1.24.1-py3-none-any.whl
+auditing : inspeximus-1.24.1-py3-none-any.whl
 13 passed · 0 FAILED · 0 skipped · 5 not testable here
 ```
 
@@ -165,9 +165,9 @@ pip install inspeximus          # zero required dependencies
 ```
 
 ```python
-from inspeximus import Mnemo
+from inspeximus import Inspeximus
 
-m = Mnemo("memory.json")                      # persists to JSON; drop the path for pure in-memory
+m = Inspeximus("memory.json")                      # persists to JSON; drop the path for pure in-memory
 m.remember("The API rate limit is 1000 req/min", key="api::rate_limit")
 m.recall("what is the rate limit")            # -> ["The API rate limit is 1000 req/min"]
 
@@ -180,7 +180,7 @@ m.history("api::rate_limit")                  # full audit trail, oldest to newe
 
 New in **1.11.0**: ready-made write-path extractors (`regex_extractor`, deterministic; `make_llm_extractor`,
 opt-in) that can derive a key from text without an explicit one, and a first-class **LangChain**
-integration (`from inspeximus.integrations.langchain import MnemoRetriever` — a retriever that never hands a
+integration (`from inspeximus.integrations.langchain import InspeximusRetriever` — a retriever that never hands a
 superseded fact back to your chain). `pip install "inspeximus[langchain]"`.
 
 **Honest scope of `regex_extractor` (measured 2026-07-20, corrected from an earlier overclaim).** It keys
@@ -200,7 +200,7 @@ found in the same measurement.)
 Using **Claude Code**? One command registers inspeximus as your agent's memory ([uv](https://docs.astral.sh/uv/) fetches it, nothing else to install):
 
 ```bash
-claude mcp add inspeximus -e MNEMO_PATH=~/.mnemo_memory.json -- uvx --from "inspeximus[mcp]" inspeximus-mcp
+claude mcp add inspeximus -e INSPEXIMUS_PATH=~/.inspeximus_memory.json -- uvx --from "inspeximus[mcp]" inspeximus-mcp
 ```
 
 **Claude Desktop / Cursor / any MCP client** — add to your MCP config (`claude_desktop_config.json`, `.cursor/mcp.json`, …):
@@ -211,7 +211,7 @@ claude mcp add inspeximus -e MNEMO_PATH=~/.mnemo_memory.json -- uvx --from "insp
     "inspeximus": {
       "command": "uvx",
       "args": ["--from", "inspeximus[mcp]", "inspeximus-mcp"],
-      "env": { "MNEMO_PATH": "~/.mnemo_memory.json" }
+      "env": { "INSPEXIMUS_PATH": "~/.inspeximus_memory.json" }
     }
   }
 }
@@ -250,7 +250,7 @@ steward review on a *corroborated* contradiction (a lone restatement stays an ec
 The MCP `remember` exposes `key` (deterministic supersession) plus `object` / `reaffirm`, and the server
 runs with **`echo_guard` ON by default** (0.6.11) so a corrected fact stays corrected even if the old value
 is re-stated later — the failure mode a plain keyed/add-based store shows on RAMR's ECHO-RESISTANCE
-(keyed-without-guard 0.00, a real add-based system 0.57, guard 1.00). Set `MNEMO_ECHO_GUARD=0` to disable.
+(keyed-without-guard 0.00, a real add-based system 0.57, guard 1.00). Set `INSPEXIMUS_ECHO_GUARD=0` to disable.
 Install and run the server straight from PyPI (the `[mcp]` extra pulls the MCP SDK; the core library stays
 dependency-free):
 
@@ -268,7 +268,7 @@ Register it with any MCP client — Claude Code (`.mcp.json`), Claude Desktop
     "inspeximus": {
       "command": "uvx",
       "args": ["--from", "inspeximus[mcp]", "inspeximus-mcp"],
-      "env": { "MNEMO_PATH": "./mnemo_memory.json" }
+      "env": { "INSPEXIMUS_PATH": "./inspeximus_memory.json" }
     }
   }
 }
@@ -281,28 +281,28 @@ Or, after `pip install "inspeximus[mcp]"`, with the console script directly:
   "mcpServers": {
     "inspeximus": {
       "command": "inspeximus-mcp",
-      "env": { "MNEMO_PATH": "./mnemo_memory.json" }
+      "env": { "INSPEXIMUS_PATH": "./inspeximus_memory.json" }
     }
   }
 }
 ```
 
 For **semantic** recall, point it at any OpenAI-compatible embeddings endpoint via
-`MNEMO_EMBED_URL` / `MNEMO_EMBED_MODEL` / `MNEMO_EMBED_KEY`; with none set it uses the lexical
+`INSPEXIMUS_EMBED_URL` / `INSPEXIMUS_EMBED_MODEL` / `INSPEXIMUS_EMBED_KEY`; with none set it uses the lexical
 fallback. The agent then calls `recall(query)` before reasoning and `remember(fact)` as it learns —
-its memory is value-ranked and append-only, not a recency buffer. If `MNEMO_EMBED_MODEL` contains
+its memory is value-ranked and append-only, not a recency buffer. If `INSPEXIMUS_EMBED_MODEL` contains
 `nomic` (nomic-embed-text is asymmetric — see its model card; like E5's `passage:`/`query:`), inspeximus auto-applies its
 required task prefixes — `search_document: ` for stored text, `search_query: ` for the query (opt out with
-`MNEMO_NOMIC_PREFIX=0`). Omitting them was simply using the model wrong; with prefixes on, our own
+`INSPEXIMUS_NOMIC_PREFIX=0`). Omitting them was simply using the model wrong; with prefixes on, our own
 reinforcement-controlled re-measure lands recall_any@1 at 0.397 on one LoCoMo config (n=1536, deterministic
 retrieval-recall — an upper bound, not end-to-end QA; a self-comparison, not a cross-system claim; the earlier
-0.19→0.29 delta was contaminated by a since-fixed recall-reinforcement confound — see the 1.15.0 CHANGELOG correction). In the library, pass a separate `Mnemo(embed=…, embed_query=…)` for any
-asymmetric embedder. If you use `persist_vectors=True`, also pass `Mnemo(embed_id="…")` (a recipe fingerprint): when
+0.19→0.29 delta was contaminated by a since-fixed recall-reinforcement confound — see the 1.15.0 CHANGELOG correction). In the library, pass a separate `Inspeximus(embed=…, embed_query=…)` for any
+asymmetric embedder. If you use `persist_vectors=True`, also pass `Inspeximus(embed_id="…")` (a recipe fingerprint): when
 it changes, inspeximus re-embeds the persisted vectors once so a new-space query can't silently mis-match old vectors.
 
 **Compact recall + progressive disclosure (1.14.0).** Over MCP, `recall` returns a compact projection — `{id,
 text, score, value, tags}` — dropping internal bookkeeping fields the model doesn't reason over, and `k` is
-hard-capped (`MNEMO_MAX_K`, default 50), so a recall drops cheaply into the prompt. **Full text is kept by
+hard-capped (`INSPEXIMUS_MAX_K`, default 50), so a recall drops cheaply into the prompt. **Full text is kept by
 default**; snippet truncation is **opt-in** (`snippet_chars>0`) — off by default on purpose, since truncating a
 hit could cut off a corrected value past the boundary and defeat the echo-guard. Pull detail on demand: `get(id)`
 returns one full record, `neighbors(id, k)` a bounded local expansion (excludes self). `recall(full=True)` returns
@@ -454,7 +454,7 @@ An optional layer on top of the store — dialectic, contradiction
 surfacing, question generation: **[docs/SECOND_BRAIN.md](docs/SECOND_BRAIN.md)**.
 ## Status
 
-`v0.2` — the core, honest and runnable, **now with two MCP servers** (`mnemo_mcp` for memory,
+`v0.2` — the core, honest and runnable, **now with two MCP servers** (`mcp` for memory,
 `second_brain_mcp` for the thinking layer over your notes) **and a deterministic supersession key**
 (`remember(..., key=...)`) that closes the embedding *supersession blind spot*. Roadmap: pluggable
 vector stores, a hosted tier. Open-core; the core stays free.

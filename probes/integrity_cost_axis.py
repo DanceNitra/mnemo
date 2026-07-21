@@ -1,12 +1,12 @@
 """INTEGRITY x COST probe — the axis Vectorize's manifesto demands ("a system that scores 90% but costs $10/user/day
-is not better than 82% at $0.10"), measured for the retain/recall path of mnemo vs mem0 (native config).
+is not better than 82% at $0.10"), measured for the retain/recall path of inspeximus vs mem0 (native config).
 
-The structural asymmetry under test: mnemo's write path is zero-LLM (local, deterministic supersession); mem0's
-add() runs an LLM extraction (gpt-4o-mini) + an embedding call per memory. HYPOTHESIS: mnemo is orders of
+The structural asymmetry under test: inspeximus's write path is zero-LLM (local, deterministic supersession); mem0's
+add() runs an LLM extraction (gpt-4o-mini) + an embedding call per memory. HYPOTHESIS: inspeximus is orders of
 magnitude cheaper and faster on retain at comparable (for the integrity cells, better) correctness.
 
 Measured, not asserted: wall-clock latency per op (retain / recall) and EXACT token usage (the OpenAI client is
-monkeypatched to accumulate response.usage — mem0 discards it, we do not). mnemo runs with its local embedder
+monkeypatched to accumulate response.usage — mem0 discards it, we do not). inspeximus runs with its local embedder
 disabled (pure lexical) = its true zero-dependency floor; cost 0 tokens by construction, which we still verify.
 Same fixture as the integrity bench (entity/value corrections). Prices: gpt-4o-mini $0.15/M in, $0.60/M out;
 text-embedding-3-small $0.02/M (2026-07 public pricing).
@@ -60,10 +60,10 @@ def usd():
     return TOK["chat_in"] * PRICE["chat_in"] + TOK["chat_out"] * PRICE["chat_out"] + TOK["emb"] * PRICE["emb"]
 
 
-def run_mnemo():
-    from mnemo import Mnemo
+def run_inspeximus():
+    from inspeximus import Inspeximus
     ret_lat, rec_lat = [], []
-    m = Mnemo(path=None)                      # zero-dependency floor: no embedder, lexical recall
+    m = Inspeximus(path=None)                      # zero-dependency floor: no embedder, lexical recall
     for (e, A, B) in ENTS:
         t0 = time.perf_counter(); m.remember(f"the {e} is {A}", key=e, object=A); ret_lat.append(time.perf_counter() - t0)
         t0 = time.perf_counter(); m.remember(f"correction: the {e} is now {B}", key=e, object=B); ret_lat.append(time.perf_counter() - t0)
@@ -78,7 +78,7 @@ def run_mnemo():
 def run_mem0():
     """mem0's native PIPELINE (LLM extraction + embedding per add), served per the owner's standing rule on
     Ollama Cloud (OpenAI quota must never block a competitor measurement). The structural cost story — N
-    network LLM+embedding calls per add vs mnemo's zero — is backend-independent; token counts are measured
+    network LLM+embedding calls per add vs inspeximus's zero — is backend-independent; token counts are measured
     and PRICED at gpt-4o-mini public rates (labeled estimate); latency is 'as measured on this backend'."""
     from mem0 import Memory
     key = os.environ.get("AGORA_API_KEY", "")
@@ -122,16 +122,16 @@ def run_mem0():
 
 def main():
     print(f"=== integrity x cost: retain/recall, n={N} entities (2 retains + 1 recall each) ===")
-    mn = run_mnemo()
-    print("mnemo :", json.dumps(mn))
+    mn = run_inspeximus()
+    print("inspeximus :", json.dumps(mn))
     m0 = run_mem0()
     print("mem0  :", json.dumps(m0))
     ops = mn["n_retain"]
     per_1k = round(m0["usd_total"] / ops * 1000, 4)
     speed = round(m0["retain_ms_median"] / max(mn["retain_ms_median"], 1e-6))
-    print(f"\nHEADLINE: retain median {m0['retain_ms_median']}ms (mem0) vs {mn['retain_ms_median']}ms (mnemo) "
-          f"= {speed}x; mem0 cost ${m0['usd_total']} for {ops} retains (${per_1k}/1k retains) vs mnemo $0.")
-    OUT.write_text(json.dumps({"ok": True, "n_entities": N, "mnemo": mn, "mem0": m0,
+    print(f"\nHEADLINE: retain median {m0['retain_ms_median']}ms (mem0) vs {mn['retain_ms_median']}ms (inspeximus) "
+          f"= {speed}x; mem0 cost ${m0['usd_total']} for {ops} retains (${per_1k}/1k retains) vs inspeximus $0.")
+    OUT.write_text(json.dumps({"ok": True, "n_entities": N, "inspeximus": mn, "mem0": m0,
                                "headline": {"retain_speedup_x": speed, "mem0_usd_per_1k_retains": per_1k}},
                               indent=1), encoding="utf-8")
 

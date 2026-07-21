@@ -15,7 +15,7 @@ finding is that it can't be done from text alone without an explicit revert chan
     4. ask   "what is the current {entity}?"  ->  A = revert honored, B = revert ignored, other = confused
 
 Systems (native config, no tuning in our favor):
-  - mnemo   : route() the revert (its intent router + ledger revert), then recall. Local, no LLM.
+  - inspeximus   : route() the revert (its intent router + ledger revert), then recall. Local, no LLM.
   - mem0    : Memory() default (OpenAI gpt-4o-mini extractor + text-embedding-3-small); add() all three,
               then search() and let the SAME judge read the retrieved memories for the current value.
   - graphiti: (added in a follow-up cell; neo4j is up) — same protocol.
@@ -23,12 +23,12 @@ Systems (native config, no tuning in our favor):
 Metric = revert-success rate (fraction where the current answer == A). A shared OpenAI judge reads each
 system's returned context and extracts the current value, so the answer step is identical across systems
 (the judge never sees the ground truth). n kept small (OpenAI cost, owner-approved for competitor native
-config). Deterministic fixture. RUN: python mnemo/probes/integrity_bench_revert.py [--n 20]
+config). Deterministic fixture. RUN: python inspeximus/probes/integrity_bench_revert.py [--n 20]
 """
 import os, sys, json, re, time, urllib.request, argparse
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-from mnemo import Mnemo
+from inspeximus import Inspeximus
 
 env = {}
 for line in open("server/.env", encoding="utf-8", errors="replace"):
@@ -109,18 +109,18 @@ def judge_current(entity, context_text, A, B):
 
 
 # ── adapters: common interface (reset, add, revert, context_for_judge) ───────
-def run_mnemo(cases):
+def run_inspeximus(cases):
     res = []
     for (e, A, B, rev) in cases:
-        m = Mnemo(path=None); m.echo_guard = True
+        m = Inspeximus(path=None); m.echo_guard = True
         m.remember(f"the {e} is {A}", key=e, object=A)
         m.remember(f"correction: the {e} is now {B}", key=e, object=B)
         m.route(rev, policy="safe")                      # its revert router (no LLM); safe policy
         hits = m.recall(e, k=6)
         ctx = "\n".join(h["text"] for h in hits)
-        # SYMMETRIC INSTRUMENT (fairness fix 2026-07-11): read mnemo's current value through the SAME LLM
+        # SYMMETRIC INSTRUMENT (fairness fix 2026-07-11): read inspeximus's current value through the SAME LLM
         # judge on its native recall surface, exactly as mem0/graphiti are read. The earlier version scored
-        # mnemo mechanically from its own ledger while competitors went through the judge — an asymmetric
+        # inspeximus mechanically from its own ledger while competitors went through the judge — an asymmetric
         # instrument that confounded the comparison (caught by the pre-publication stress-claim audit).
         res.append(judge_current(e, ctx or "(no memories)", A, B))
     return res
@@ -207,8 +207,8 @@ def score(name, verdicts, cases):
 
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument("--n", type=int, default=20)
-    ap.add_argument("--systems", default="mnemo,mem0",
-                    help="comma list: mnemo (local/free), mem0 (OpenAI $), graphiti (OpenAI $ + neo4j). "
+    ap.add_argument("--systems", default="inspeximus,mem0",
+                    help="comma list: inspeximus (local/free), mem0 (OpenAI $), graphiti (OpenAI $ + neo4j). "
                          "mem0/graphiti cost OpenAI calls — opt in explicitly.")
     a = ap.parse_args()
     want = [s.strip() for s in a.systems.split(",") if s.strip()]
@@ -218,9 +218,9 @@ def main():
         cases.append((e, A, B, REVERTS[i % len(REVERTS)].format(e=e)))
     print(f"cross-system integrity benchmark — value-obscuring revert · n={len(cases)} · systems={want}\n")
     out = {}
-    if "mnemo" in want:
-        print("mnemo (local, route/revert)...")
-        out["mnemo"] = score("mnemo", run_mnemo(cases), cases); print(json.dumps(out["mnemo"]))
+    if "inspeximus" in want:
+        print("inspeximus (local, route/revert)...")
+        out["inspeximus"] = score("inspeximus", run_inspeximus(cases), cases); print(json.dumps(out["inspeximus"]))
     if "mem0" in want:
         print("\nmem0 (native, OpenAI gpt-4o-mini)...")
         out["mem0"] = score("mem0", run_mem0(cases), cases); print(json.dumps(out["mem0"]))
