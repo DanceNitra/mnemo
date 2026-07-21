@@ -185,7 +185,9 @@ jobs:
           exit 1
       - name: is this version already listed?
         id: state
-        run: python packages/_registry_state.py
+        run: |
+          curl -s "https://registry.modelcontextprotocol.io/v0.1/servers?search=inspeximus" -o reg.json || true
+          python packages/_registry_state.py reg.json
       - run: ./mcp-publisher login github-oidc
         if: steps.state.outputs.already != 'true'
       - name: publish (skipped when the registry already has this exact version)
