@@ -1,0 +1,35 @@
+{
+  "name": "mnemo",
+  "owner": {
+    "name": "Rastislav Drahos",
+    "url": "https://github.com/DanceNitra"
+  },
+  "metadata": {
+    "description": "Self-correcting memory for coding agents — corrections stick, deletions are provable, and nothing calls a model on the write path.",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "mnemo",
+      "source": "./",
+      "description": "Persistent memory for Claude Code that corrects itself: write a new value for a fact and the old one is retired, revert() puts it back, and forget leaves a signed, content-free receipt. Deterministic and zero-dependency — no LLM call when storing, so the same input always produces the same store.",
+      "version": "1.24.4",
+      "author": {
+        "name": "Rastislav Drahos",
+        "url": "https://github.com/DanceNitra"
+      },
+      "homepage": "https://github.com/DanceNitra/mnemo",
+      "repository": "https://github.com/DanceNitra/mnemo",
+      "license": "MIT",
+      "keywords": [
+        "memory",
+        "mcp",
+        "agent-memory",
+        "supersession",
+        "erasure",
+        "provenance",
+        "deterministic"
+      ]
+    }
+  ]
+}

@@ -25,6 +25,21 @@ Built by **[Rastislav Drahoš](https://github.com/DanceNitra)** — extracted fr
 
 ---
 
+## Install into Claude Code in one line
+
+```
+/plugin marketplace add DanceNitra/mnemo
+/plugin install mnemo@mnemo
+```
+
+That registers this repository as a plugin marketplace and installs the MCP server, which then starts
+with `uvx --from "agora-mnemo[mcp]" mnemo-mcp` and keeps its store in `.mnemo/memory.json` inside the
+project. Nothing to configure by hand, and nothing to install globally.
+
+Prefer the manual route? `pip install "agora-mnemo[mcp]"` and point your client at `mnemo-mcp` — the
+extra matters, because the core library is deliberately zero-dependency and the MCP server is the one
+piece that needs a dependency.
+
 ## Every claim below is checked by a script you can run
 
 ```bash

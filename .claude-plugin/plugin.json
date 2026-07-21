@@ -1,0 +1,33 @@
+{
+  "name": "mnemo",
+  "version": "1.24.4",
+  "description": "Self-correcting memory for Claude Code. Facts you correct stay corrected, deletions leave a signed receipt, and storing something never calls a model.",
+  "author": {
+    "name": "Rastislav Drahos",
+    "url": "https://github.com/DanceNitra"
+  },
+  "homepage": "https://github.com/DanceNitra/mnemo",
+  "repository": "https://github.com/DanceNitra/mnemo",
+  "license": "MIT",
+  "keywords": [
+    "memory",
+    "mcp",
+    "agent-memory",
+    "supersession",
+    "erasure",
+    "provenance"
+  ],
+  "mcpServers": {
+    "mnemo": {
+      "command": "uvx",
+      "args": [
+        "--from",
+        "agora-mnemo[mcp]",
+        "mnemo-mcp"
+      ],
+      "env": {
+        "MNEMO_PATH": "${CLAUDE_PROJECT_DIR}/.mnemo/memory.json"
+      }
+    }
+  }
+}
