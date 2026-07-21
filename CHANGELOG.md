@@ -3,6 +3,22 @@
 All notable changes to inspeximus (`inspeximus`). Format loosely follows Keep a Changelog; versioning is semver
 (MAJOR = stable/breaking, MINOR = features, PATCH = fixes).
 
+## 1.28.1 - receipts signed with `receipt_key` alone could never be verified
+
+Passing `receipt_key` without `receipt_pubkey` signed every write receipt with `"pubkey": None`, so
+`verify_writes()` could not check the signature and reported **"invalid signature" on records the store had
+just written itself**. The data was fine; the integrity report was crying tampering at its own output. For a
+layer whose whole job is to be believed, a false alarm is worse than no alarm — it teaches the reader to
+ignore the one signal that matters.
+
+The public half is now derived from the private key when it is not supplied, and a malformed key is rejected
+at construction instead of raising from `bytes.fromhex` thousands of writes later, inside `remember()`.
+
+Found by using the library the way a new user would, while checking a claim before putting it in a pull
+request. Every existing receipts test passed *both* halves — the documented happy path — which is exactly
+why it survived. Three regression tests now cover the key-only path, the malformed key, and the control that
+tamper detection still fires on a real out-of-band edit.
+
 ## 1.28.0 - the ADK memory service ingests idempotently, and supports incremental writes
 
 Google ADK ships no conformance suite for `BaseMemoryService`, so `InspeximusMemoryService` was called a

@@ -412,7 +412,7 @@ def verify_erasure_certificate(cert: dict, store_path: str | None = None,
     return {"valid": valid, "checks": checks, "problems": problems, "count": cert.get("count")}
 
 
-__version__ = "1.28.0"
+__version__ = "1.28.1"
 
 # Internal sentinel: marks a reaffirm write already authorized by submit_revert() (which verified the
 # signed INTENT). Object identity — no text/content path can ever produce it.
@@ -819,6 +819,21 @@ class Inspeximus:
         # OPT-IN write receipts (default OFF -> zero behavior change; no sidecar created)
         self.receipts_enabled = bool(receipts or receipt_key)
         self._receipt_sk = receipt_key
+        # The public half is DERIVED when it is not supplied. Without this, passing receipt_key alone signed
+        # every receipt with `"pubkey": None`, so verify_writes() could never check the signature and reported
+        # "invalid signature" on records the store had just written itself -- a false tampering alarm, which
+        # for an integrity layer is worse than no signal at all. A bad key is also rejected here rather than
+        # thousands of writes later, deep inside remember().
+        if receipt_key and not receipt_pubkey:
+            if not _HAVE_ED:
+                raise RuntimeError("signing write receipts needs the `cryptography` package "
+                                   "(pip install cryptography)")
+            try:
+                receipt_pubkey = _Ed25519SK.from_private_bytes(bytes.fromhex(receipt_key)).public_key(
+                    ).public_bytes(_ser.Encoding.Raw, _ser.PublicFormat.Raw).hex()
+            except Exception as e:
+                raise ValueError("receipt_key must be a 32-byte Ed25519 private key as hex "
+                                 "(use new_receipt_keypair()); got an unusable value") from e
         self.receipt_pubkey = receipt_pubkey
         self._receipts: list[dict] = []
         self._receipts_path = (self.path.parent / (self.path.name + ".receipts.json")) if self.path else None

@@ -1,5 +1,6 @@
 """Governance + tamper-evidence: CT-style anchor, authenticated-principal erasure, decision basis."""
 import sys, os, copy
+import pytest
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from inspeximus import (Inspeximus, new_receipt_keypair, new_source_keypair, sign_erasure, erasure_challenge)
 from inspeximus.core import _sha256_hex, _canon, _GENESIS
@@ -71,3 +72,35 @@ def test_governance_report_carries_anchor():
     rep = m.governance_report(expected_pubkey=pk)
     assert rep["proof"]["verified"]
     assert rep["proof"]["anchor"]["sth_hash"] and "writes_tip" in rep["proof"]["anchor"]
+
+
+def test_receipt_pubkey_is_derived_when_only_the_private_key_is_given(tmp_path):
+    """Every other test in this file passes BOTH halves, which is why this went unnoticed.
+
+    Passing `receipt_key` alone used to sign each receipt with `"pubkey": None`, so verify_writes()
+    could not check the signature and reported "invalid signature" on records the store had just
+    written itself. A false tampering alarm is worse than no alarm: it trains the reader to ignore it.
+    """
+    sk, pk = new_receipt_keypair()
+    m = Inspeximus(path=str(tmp_path / "a.json"), receipts=True, receipt_key=sk)
+    assert m.receipt_pubkey == pk
+    m.remember("the sky is blue")
+    assert m.verify_writes() == (True, [])
+
+
+def test_a_malformed_receipt_key_is_rejected_at_construction(tmp_path):
+    """It used to surface as a ValueError from bytes.fromhex deep inside remember()."""
+    with pytest.raises(ValueError, match="Ed25519 private key"):
+        Inspeximus(path=str(tmp_path / "b.json"), receipts=True, receipt_key="not-a-key")
+
+
+def test_tamper_detection_still_fires_after_the_derivation_fix(tmp_path):
+    """The control for the fix: deriving the key must not turn verification into a rubber stamp."""
+    sk, _ = new_receipt_keypair()
+    p = tmp_path / "c.json"
+    m = Inspeximus(path=str(p), receipts=True, receipt_key=sk)
+    m.remember("the invoice is 100 EUR")
+    m._save(force=True)
+    p.write_text(p.read_text(encoding="utf-8").replace("100 EUR", "900 EUR"), encoding="utf-8")
+    ok, problems = Inspeximus(path=str(p), receipts=True, receipt_key=sk).verify_writes()
+    assert ok is False and problems
