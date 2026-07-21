@@ -1,18 +1,18 @@
 <!-- moved out of README.md to keep the landing page readable; content unchanged -->
 
-## Use it from the shell: the `mnemo` CLI (1.12.4)
+## Use it from the shell: the `inspeximus` CLI (1.12.4)
 
-`pip install agora-mnemo` also gives you a `mnemo` command — script the memory layer from the terminal, bash,
+`pip install inspeximus` also gives you a `inspeximus` command — script the memory layer from the terminal, bash,
 or cron, with no Python and no MCP server:
 
 ```bash
-mnemo remember "the deploy channel is BLUE-9" --key deploy-channel
-mnemo remember "the deploy channel is RED-2"  --key deploy-channel   # supersedes BLUE-9
-mnemo recall  "what is the deploy channel?"                          # -> RED-2 (current-truth)
-mnemo revert  deploy-channel                                         # roll back to BLUE-9
-mnemo list -n 10           # recent active memories
-mnemo forget --key deploy-channel        # or --id <id> / --contains <substr>
-mnemo stats               # store summary   ·   add --json to any command for scripting
+inspeximus remember "the deploy channel is BLUE-9" --key deploy-channel
+inspeximus remember "the deploy channel is RED-2"  --key deploy-channel   # supersedes BLUE-9
+inspeximus recall  "what is the deploy channel?"                          # -> RED-2 (current-truth)
+inspeximus revert  deploy-channel                                         # roll back to BLUE-9
+inspeximus list -n 10           # recent active memories
+inspeximus forget --key deploy-channel        # or --id <id> / --contains <substr>
+inspeximus stats               # store summary   ·   add --json to any command for scripting
 ```
 
 It shares one store with the MCP server (`--path`, else `$MNEMO_PATH`, else `./mnemo_memory.json`). Recall is
@@ -21,13 +21,13 @@ endpoint (e.g. local Ollama) for semantic recall. Zero dependencies.
 
 ## Claude Code: deterministic auto-capture memory (1.10.0)
 
-One command turns mnemo into persistent memory for Claude Code, the same auto-capture the popular coding-memory
+One command turns inspeximus into persistent memory for Claude Code, the same auto-capture the popular coding-memory
 plugins do, but with **no LLM on the write path**, so a corrected fact supersedes the stale one and cannot come
 back:
 
 ```bash
-pip install agora-mnemo
-python -m mnemo.claude_code --install     # writes the hooks into ./.claude/settings.json
+pip install inspeximus
+python -m inspeximus.claude_code --install     # writes the hooks into ./.claude/settings.json
 ```
 
 That is it. `PostToolUse` captures your edits and commands into a deterministic, keyed store; `UserPromptSubmit`
@@ -35,30 +35,30 @@ injects the current-state memory before Claude answers; `SessionStart` shows wha
 store is a local JSON file at `.mnemo/coding_memory.json` you can read, grep, or delete.
 
 Why it differs from the LLM-summarizing coding memories: you change an API signature, rename a symbol, move a
-file, and mnemo keeps only the current state (keyed by file). Next session Claude recalls the new signature,
+file, and inspeximus keeps only the current state (keyed by file). Next session Claude recalls the new signature,
 never the old one, and a stale line reappearing in a diff or paste cannot resurrect it (`echo_guard`). Same
 convenience, but corrections stick, capture is reproducible, and a secret can be provably erased. Remove with
-`python -m mnemo.claude_code --uninstall`.
+`python -m inspeximus.claude_code --uninstall`.
 
 ## Correction is a first-class operation (measured across systems)
 
 Any memory layer can store a fact and retrieve it. The harder, less-benchmarked property is **integrity**:
 when a fact is corrected, can the store *undo* the correction on command, and does restating a retired value
-*resurrect* it? mnemo treats correction as a first-class channel — `revert(key)`, `revert_now` /
+*resurrect* it? inspeximus treats correction as a first-class channel — `revert(key)`, `revert_now` /
 `revert_intent`, `retract_lineage`, `echo_guard`, and the `route()` intent tagger — and we measured it against
 mem0 and Graphiti in their **native configs** with a shared, **ground-truth-blind** judge (harness +
 methodology: [`probes/INTEGRITY_BENCHMARK.md`](probes/INTEGRITY_BENCHMARK.md)):
 
 | value-obscuring revert · undo a correction from an unmarked "go back" (n=20) | success | 95% CI |
 |---|---|---|
-| **mnemo** (route/revert) | **0.75** | [0.53, 0.89] |
+| **inspeximus** (route/revert) | **0.75** | [0.53, 0.89] |
 | mem0 2.0.11 (native, gpt-4o-mini) | 0.20 | [0.08, 0.42] |
 | Graphiti (native, live neo4j) | 0.00 | [0.00, 0.16] |
 
-Only mnemo exposes a channel to undo a correction on command; mnemo's and mem0's CIs do not overlap, so the
+Only inspeximus exposes a channel to undo a correction on command; inspeximus's and mem0's CIs do not overlap, so the
 capability gap survives at n=20. We lead with the cell we *don't* win: **echo-resurrection is a tie** — all
 three defend against a restated stale value. This is a narrow, adversarial, command-driven cut, not a general
-"mnemo is better" claim; run it yourself or add your system.
+"inspeximus is better" claim; run it yourself or add your system.
 
 **Run the receipts yourself** — all harnesses are public, point-at-your-own-store, and live in one place:
 [`ramr`](https://github.com/DanceNitra/ramr) (RAMR — Retrieval-Augmented Memory Reliability, Zenodo-DOI'd).
@@ -106,7 +106,7 @@ not certify independence. Runnable: [`examples/05_review_trigger.py`](examples/0
 
 ## Governance, erasure & audit
 
-mnemo ships tamper-evident governance primitives — built by auditing mnemo against a governance-evidence
+inspeximus ships tamper-evident governance primitives — built by auditing inspeximus against a governance-evidence
 rubric, finding gaps, and closing them in the open. These are engineering, not novelty: each applies a
 well-known primitive, credited below.
 
@@ -120,13 +120,13 @@ well-known primitive, credited below.
   over the request, via `sign_erasure()`) and records the **decision basis** — both inside the tamper-evident
   hash. An auditor verifies *who* authorized the deletion and *on what basis*, not a free-text id.
 - **Cross-store erasure, first-class (1.8.0)** — a copy the app embedded into its *own* vector index survives
-  every memory store's native delete (8/8 in our measured cell, mnemo included). The fix:
+  every memory store's native delete (8/8 in our measured cell, inspeximus included). The fix:
   `register_erasure_target(target)` your app-side stores (vector index, caches, logs — the two-method
   `ErasureTarget` protocol), and `forget_subject()` cascades the erasure through every one and returns a
-  hash-chained **manifest** — honest by construction: `complete` only if *every* store (mnemo self-checked
+  hash-chained **manifest** — honest by construction: `complete` only if *every* store (inspeximus self-checked
   first) verified the value no longer recoverable, leaking stores NAMED. Measured: unwired 8/8 leak → wired
   0/8 with verifying chains; a broken wiring cannot produce a clean receipt (0/8 falsely complete).
-  `DeletionManifest` (`mnemo.deletion_manifest`) remains usable standalone.
+  `DeletionManifest` (`inspeximus.deletion_manifest`) remains usable standalone.
 - **Identity-confidence gate on supersession (1.9.0)** — a keyed correction supersedes on `(entity, field)`,
   which is only right if the identity is right. When identity is resolved fuzzily, `remember(..., identity_confidence=c)`
   gates the write: `c` below `fork_below` (0.7) forks a **candidate** instead of overwriting the authoritative
@@ -134,7 +134,7 @@ well-known primitive, credited below.
   noisy identity resolution an ungated auto-commit corrupts the ledger 13.5% of the time; the gate cuts it to 1.0%
   (93%) at the cost of a review queue. *Not a new idea, credited: record linkage's clerical-review zone (Fellegi &
   Sunter 1969) and MDM match-merge stewardship, ported to an agent-memory write path where nobody gates it.*
-- **`ErasureAuditor`** (`mnemo.erasure_auditor`) — after your app runs its deletion, adversarially re-attempts
+- **`ErasureAuditor`** (`inspeximus.erasure_auditor`) — after your app runs its deletion, adversarially re-attempts
   **recovery** of the subject's values from each store (verbatim scan for text/caches; **NN-inversion** for a
   vector index whose embeddings may survive). Answers "is the content still *reconstructible*?" — the check DSAR
   tooling skips — not just "was the row deleted?". *A retained embedding reconstructs the content: Morris et al.,
@@ -149,13 +149,13 @@ a lower bound on embedding inversion. When a store leaks, the fix is hard-delete
 
 ```bash
 # single file, zero dependencies
-curl -O https://raw.githubusercontent.com/DanceNitra/mnemo/main/mnemo/mnemo.py
+curl -O https://raw.githubusercontent.com/DanceNitra/inspeximus/main/inspeximus/inspeximus.py
 ```
 
 ## Use
 
 ```python
-from mnemo import Mnemo
+from inspeximus import Mnemo
 
 m = Mnemo("memory.json")                       # persists to JSON; or Mnemo("memory.json", embed=my_model)
 
@@ -167,7 +167,7 @@ m.contradictions()                             # flag incompatible memories for 
 m.value_by_cohort()                            # value reported per tag/time-block, not per memory
 ```
 
-Bring any text→vector function as `embed=` for semantic recall; with none, `mnemo` falls back to a
+Bring any text→vector function as `embed=` for semantic recall; with none, `inspeximus` falls back to a
 forgiving lexical match so it **runs anywhere, today**. Once the store grows past the threshold, recall
 **fuses lexical (BM25) + semantic with Reciprocal Rank Fusion**. On high-lexical-overlap agent memory
 (e.g. LoCoMo) the fused hybrid *measurably* beats either channel alone (recall@20 **+0.06** over the best
@@ -179,7 +179,7 @@ single channel, 9/10 conversations, conversation-level bootstrap CI excludes 0; 
 ### Poison-resistant recall: `recall(..., influence_only=True)` (0.4.0)
 
 Retrieval-time / embedding-geometry defenses do **not** stop memory poisoning in general. We red-teamed
-`mnemo` with a real AgentPoison-style single-instance attack (Chen et al., NeurIPS 2024; PoisonedRAG, Zou
+`inspeximus` with a real AgentPoison-style single-instance attack (Chen et al., NeurIPS 2024; PoisonedRAG, Zou
 et al., USENIX Security 2025): a **plain-English trigger sentence** in one poisoned memory hijacks raw
 top-1 retrieval **88–100%**, it is **scale-invariant** (60→10 000 memories), it **evades a perplexity
 filter** (natural triggers have natural perplexity), and coherence/outlier retrieval defenses **don't
@@ -233,12 +233,12 @@ becomes the attack surface.
 **Provenance that rides through transformation: `remember(..., derived_from=[ids])` (0.4.6).** All of the above —
 `slash`, a per-source influence budget, any source-level accountability — is silently un-countable the moment a
 memory is *transformed*: an app-side **summary** of five source-memories is a fresh record with no source, so
-`slash(source)` can't reach it and a cumulative cap can't attribute its slices. `mnemo`'s own consolidation never
+`slash(source)` can't reach it and a cumulative cap can't attribute its slices. `inspeximus`'s own consolidation never
 loses provenance (it links, never merges text), but LLM summarization/rewrite does. `remember(text,
 derived_from=[parent_ids])` closes that hole: the new record **inherits the union of its parents' canonical
 sources** as a `taint` (transitively — a summary-of-a-summary still carries the origin), and `slash(scope='source')`
 matches on *own source OR inherited taint*, so forfeiting a source also burns every derived summary it fed. The
-honest boundary: the app has to *declare* the derivation at the transformation step — `mnemo` can carry the taint
+honest boundary: the app has to *declare* the derivation at the transformation step — `inspeximus` can carry the taint
 through, but it can't recover provenance an opaque summary threw away. This is the substrate everything else is
 deterrence math on top of. Receipt: [`probes/triad_attacker_split.py`](probes/triad_attacker_split.py).
 
@@ -333,7 +333,7 @@ requires "≥2 distinct sources". By default a source is a canonical **string** 
 sybil variants (`Wikipedia`/`wikipedia.org`/a URL → one), but an attacker who owns the labeling channel can still
 supply two *unrelated* source strings it controls and manufacture "independent" corroboration. Set
 `m.strict_corroboration = True` and a corroborating link counts only if it carries a **verified key**: a source
-signs the claims it authored (`sig = mnemo.attest(text, source_sk, source_doc)`; write with
+signs the claims it authored (`sig = inspeximus.attest(text, source_sk, source_doc)`; write with
 `remember(..., attestation=(source_pubkey, sig))`), the signature is verified over the *same claim + canonical
 source* at write time (a forged or replayed attestation is **rejected**, not silently dropped), and the record
 carries `attested_key`. Independence is then measured by distinct **Ed25519 public keys an attacker cannot
@@ -434,7 +434,7 @@ returns `False` for any slash'd record on **every** path (credit, graduation, an
 alike). Measured: one slash revokes 5/5 provenance-reached descendants (incl. a depth-2 rollup and the
 link-corroborated one), restore recovers 5/5; the only survivor is a lineage-stripped orphan (preserve
 `derived_from` through summarization — a usage requirement, not a store bug). Runnable receipt:
-[`mnemo/probes/retraction_propagation.py`](https://github.com/DanceNitra/agora/blob/main/mnemo/probes/retraction_propagation.py).
+[`inspeximus/probes/retraction_propagation.py`](https://github.com/DanceNitra/agora/blob/main/inspeximus/probes/retraction_propagation.py).
 Credit: jacksonxly (the invariant) + marintkael (authenticated-but-false). Reversible; default behavior unchanged.
 
 ### Convergence-backed status: `convergence_report()` + `recall(with_status=)` (0.6.1)
@@ -504,7 +504,7 @@ boosts each record by `1 + trust*(coverage)*exp(-distance/half)` over the target
 normalised, coverage-weighted, NaN/bool-guarded). Soft (never hard-deletes; missing dims → neutral), composes
 with text sim and `prefer`, `near=None` = byte-identical legacy. MEASURED on a real TAT 5-D state trace:
 regime-relevance precision@5 **0.984 (near) vs 0.758 (plain text)**. It re-ranks the recall pool — not a
-vector index. Receipt: `mnemo/probes/continuous_chunk_recall_probe.py`.
+vector index. Receipt: `inspeximus/probes/continuous_chunk_recall_probe.py`.
 
 ### Make the not-asserting visible: `recall(with_warrant=True)` + `spend_irreversible(provenance_lo=...)` (0.6.6)
 A silent low score for "no independent channel" decays into *"unverified but present"* — a downstream consumer
@@ -515,7 +515,7 @@ it, `spend_irreversible(ids, amount, budget, provenance_lo=0.15)` caps a source 
 contributing record** at the small `provenance_lo` instead of the full budget — a low-provenance memory
 recalled into an irreversible action binds that action's budget **against itself**, scoping the hard floor to
 the consequential slice rather than the whole store. Both opt-in (`with_warrant=False` / `provenance_lo=None` =
-legacy). Receipt: `mnemo/probes/legible_warrant_scoped_budget_probe.py`.
+legacy). Receipt: `inspeximus/probes/legible_warrant_scoped_budget_probe.py`.
 
 ### Require earned outcome for the irreversible tail: `spend_irreversible(require_earned=True)` (0.6.7)
 By default `spend_irreversible(provenance_lo=...)` grants the full irreversible budget to any *corroborated*
@@ -525,16 +525,16 @@ attacker sets, so a forged-source sybil poison can earn the full budget for an i
 `good>=bad`, set by `credit()` on real downstream success) — the one signal a sybil cannot mint (a forged or
 attested ≥2-witness sybil clears corroboration but not this). Cost: any not-yet-earned legitimate source is
 throttled to `provenance_lo` too, so it is opt-in for high-stakes deployments; default `False` is a
-byte-identical legacy path. Receipt: `mnemo/probes/spend_irreversible_require_earned_probe.py`.
+byte-identical legacy path. Receipt: `inspeximus/probes/spend_irreversible_require_earned_probe.py`.
 
 ### Near-tie recency reorder for corrected facts: `recall(tie_recent=eps)` (0.6.8)
 When a fact is later **corrected in free text**, SRO supersession never triggers and the stale value can
 outrank the fresh one: measured on MemBench (ACL 2025 Findings) knowledge-update questions, the **stale value
-wins rank-1 in 32.7%** of cases — identically for raw cosine and mnemo's semantic recall (receipt:
-`mnemo/probes/membench_recall_probe_v2.py`). `tie_recent=eps` re-orders candidates whose relevance is within
+wins rank-1 in 32.7%** of cases — identically for raw cosine and inspeximus's semantic recall (receipt:
+`inspeximus/probes/membench_recall_probe_v2.py`). `tie_recent=eps` re-orders candidates whose relevance is within
 `eps` of the strongest candidate **newest-first** (by `valid_from`, falling back to `ts`); everything below the
 band keeps its score order. Measured sweep (222 questions incl. 3 non-update control splits, receipt:
-`mnemo/probes/membench_recency_tiebreak_probe.py`): `tie_recent=0.05` on centered cosine cuts stale-beats-fresh
+`inspeximus/probes/membench_recency_tiebreak_probe.py`): `tie_recent=0.05` on centered cosine cuts stale-beats-fresh
 **0.327 → 0.109 (3×) at ~zero hit@1/5 cost on the control splits**; a *linear* position bonus was measured
 useless (no movement before it damages controls) — the band reorder is the shape that works. Honest scope: the
 benchmark's corrections always come after the original mention (by construction; the control-split cost is the
@@ -546,11 +546,11 @@ Opt-in; default `None` = byte-identical legacy recall.
 A fact is corrected (old value → superseded); later the OLD value is **re-stated** — a benign restatement or
 an attacker re-injection. On a plain recency / bi-temporal / last-writer-wins store the restatement carries a
 newer timestamp and **resurrects the stale value**. Measured on a MemBench echo fixture
-(`mnemo/probes/echo_attack_probe_v2.py`, retrieval-level stale-answer-rate, 43 corrected-fact cases; echoes
+(`inspeximus/probes/echo_attack_probe_v2.py`, retrieval-level stale-answer-rate, 43 corrected-fact cases; echoes
 paraphrased cross-family with deepseek/kimi/glm): recency, a mem0-v1-faithful ADD/UPDATE/DELETE policy, and a
 **bi-temporal Graphiti-faithful** policy all go **0.21 → 1.00** under both verbatim *and* paraphrased echo; a
 verbatim-hash policy (MemStrata-style) holds against verbatim (0.21) but is **destroyed by paraphrase (1.00)**.
-mnemo's own keyed supersession is vulnerable too (end-to-end `echo_guard_e2e_probe.py`: **1.00** under both).
+inspeximus's own keyed supersession is vulnerable too (end-to-end `echo_guard_e2e_probe.py`: **1.00** under both).
 
 Set `echo_guard=True` and pass the asserted value as `remember(text, key=..., object=...)`: a keyed write
 whose `object` matches a value **already superseded** for that key is a restatement-of-superseded — retired
@@ -568,11 +568,11 @@ un-supersede on its own). Opt-in; `echo_guard=False` (default) = byte-identical 
 ### Close the retrieval loop: `propagate_outcome()` (0.6.10)
 The un-self-gradable earned-outcome signal (`credit()`) is what the influence gate and `echo_guard` ride on
 — but on a live store we measured retrieval→earned **conversion at only ~28%** (16–62% across 8 agents;
-`mnemo/probes/retrieval_exposure_coverage_probe.py`). That gap is an **attribution** problem, not a ceiling:
+`inspeximus/probes/retrieval_exposure_coverage_probe.py`). That gap is an **attribution** problem, not a ceiling:
 the app hand-credits only some acted-on recalls, so most retrieved-and-used memory never earns its signal.
 `propagate_outcome(outcome)` auto-credits the **decision-driving** subset of the last recall when the action
 is scored, so coverage rises toward the app's scored-action rate without hand-threading ids into `credit()`.
-Measured (`mnemo/probes/outcome_propagation_probe.py`): conversion lifts from manual-attribution-limited to
+Measured (`inspeximus/probes/outcome_propagation_probe.py`): conversion lifts from manual-attribution-limited to
 the scored-action rate, and a **non-driver poison in the recall set earns 0%** under the default
 `driving_only` mode (vs **50%** if you credit the whole set with `driving_only=False`) — so closing the loop
 does **not** open a recall-set-attribution poison surface. Load-bearing limit: `driving_only=True, ids=None`
@@ -587,7 +587,7 @@ editing a row. It's the control-plane un-do for a keyed value, exposed as an MCP
 **object-less clobber guard**: on a key managed with explicit `object=` values (a value ledger), a keyed
 write carrying *no* object can no longer displace a real value — a hole our own pilot found, where a
 value-free reversion utterance ("go back to the old one") superseded the real value with junk text
-(`mnemo/probes/revert_by_reference_probe.py`, resistance **0.00 → 1.00**). Discrimination gap 1.0 vs a
+(`inspeximus/probes/revert_by_reference_probe.py`, resistance **0.00 → 1.00**). Discrimination gap 1.0 vs a
 content-only store. Changing a ledgered value now requires an explicit object, `reaffirm=True`, or `revert()`.
 
 ### Lineage-aware correction: `retract_lineage(subject)` (0.7.16)
@@ -599,7 +599,7 @@ from default recall, but **retained** (recallable with `include_superseded`, fla
 you can re-derive against the corrected root instead of hard-deleting the payload (as `forget_subject` would).
 This is classic retract-and-retain from Truth-Maintenance (Doyle 1979) and bitemporal invalidation, recently
 ported to LLM-agent memory ([TOKI](https://arxiv.org/abs/2606.06240), [MemLineage](https://arxiv.org/abs/2605.14421));
-mnemo's only twist is that it rides the same `derived_from` taint as `forget_subject`, so it needs no separate
+inspeximus's only twist is that it rides the same `derived_from` taint as `forget_subject`, so it needs no separate
 graph. It can only cascade on links that were actually recorded.
 
 ### Regenerate the demoted payload: `rederive(subject)` (0.7.17)
@@ -616,7 +616,7 @@ the complete correction lifecycle.
 ### Erasure-with-proof, in one call: `governance_report()` (0.7.18)
 A right-to-erasure request (GDPR Art.17) is one place agent memory gets legally sharp: you must delete a
 subject's data *and* keep an auditable record of the act (Art.30), without the deletion looking like tampering.
-mnemo already has the parts — `forget_subject(subject, request_id=...)` hard-deletes the subject **plus its
+inspeximus already has the parts — `forget_subject(subject, request_id=...)` hard-deletes the subject **plus its
 `derived_from` lineage** (a summary built from that subject's data goes too) and writes a hash-chained,
 optionally Ed25519-signed deletion tombstone; `verify_writes()` then proves both the write-receipt chain and
 the tombstone chain are intact, so a real erasure reads as *accounted-for* while a silent out-of-band delete
@@ -630,7 +630,7 @@ m.governance_report(expected_pubkey=pk)
 ```
 
 **Honest scope (stated in-band, because overclaiming here is the failure mode):** erasure is within *this*
-mnemo store only — not your vector store, prompt logs, or backups — and the tombstone proves the *act* of
+inspeximus store only — not your vector store, prompt logs, or backups — and the tombstone proves the *act* of
 deletion, never the content (a hash of PII is still PII). The signature is load-bearing only against a party
 who does **not** hold `receipt_key`; anchor the chain head externally for operator-adversarial audit. It is a
 tamper-evident **integrity primitive, not a compliance certification**. Prior art: crypto-shredding, Cassandra
@@ -644,21 +644,21 @@ trusting you**:
 ```python
 cert = m.erasure_certificate(request_id="dsr-2026-07-12-0001")   # operator issues it
 
-from mnemo import verify_erasure_certificate                     # auditor verifies, standalone
+from inspeximus import verify_erasure_certificate                     # auditor verifies, standalone
 verify_erasure_certificate(cert, store_path="mem.json", expected_pubkey=pk)
 # -> {"valid": True, "checks": {chain_intact, signatures_valid, anchor_matches_tip, store_absent}, ...}
 ```
 
 The verifier re-derives the tombstone hash-chain, checks every Ed25519 signature (pinnable to `expected_pubkey`),
-confirms the anchor commits to the chain tip, and — reading **mnemo's store records** — confirms every erased id
+confirms the anchor commits to the chain tip, and — reading **inspeximus's store records** — confirms every erased id
 is genuinely absent (the value is gone from the store, not merely soft-deleted or kept in a history table).
 Tampering a tombstone, faking an "erased" id that is still present, or pinning the wrong key each flips the
-verdict to `valid: False`. Honest scope (`governance_report()`'s): this proves erasure from THIS mnemo store's
-records — NOT secure at-rest erasure against raw-disk/backup forensics (a plaintext store of any library, mnemo
+verdict to `valid: False`. Honest scope (`governance_report()`'s): this proves erasure from THIS inspeximus store's
+records — NOT secure at-rest erasure against raw-disk/backup forensics (a plaintext store of any library, inspeximus
 included, leaves bytes in free space/backups), and NOT the app's own vector store/logs. For secure at-rest
 erasure use an encrypted store + `shred()` (NIST SP 800-88 crypto-erasure: destroy the key, ciphertext and
 every backup die); for cross-store erasure register `ErasureTarget`s so `forget_subject` cascades. Receipts:
-`mnemo/probes/erasure_certificate_probe.py`, `erasure_raw_store_probe.py`.
+`inspeximus/probes/erasure_certificate_probe.py`, `erasure_raw_store_probe.py`.
 
 ### Hydration witness + index coherence: "this answer reflects store state as of revision X" (1.21.0)
 A governed store can still serve a stale answer if the **derived index** (embeddings, caches) lags the store —
@@ -678,14 +678,14 @@ index inputs** — it cannot attest external caches or copies it never saw.
 
 ### Org-wide erasure receipt: one signed manifest across every store you REGISTER
 A right-to-erasure demand isn't satisfied by one library scrubbing its own file — the subject's data is also in
-your vector index, your retrieval logs, your caches, your backups. `DeletionManifest` (`mnemo.deletion_manifest`)
+your vector index, your retrieval logs, your caches, your backups. `DeletionManifest` (`inspeximus.deletion_manifest`)
 cascades the erasure across **every store you register** and emits ONE signed, tamper-evident manifest. Honest
 scope: the manifest is an auditable trail over the stores it was shown — it names the registered stores that
 complied (and the non-compliant ones), but it cannot attest a copy nobody registered (an unknown cache, a backup,
 a teammate's already-hydrated context):
 
 ```python
-from mnemo.deletion_manifest import DeletionManifest
+from inspeximus.deletion_manifest import DeletionManifest
 man = (DeletionManifest(sign_sk_hex=sk, pubkey_hex=pub)
        .register(MnemoTarget(m)).register(vector_index).register(retrieval_log).register(backup))
 cert = man.execute("alice", values=[the_pii], request_id="dsr-2026-...")
@@ -700,7 +700,7 @@ so a broken wiring produces an INCOMPLETE receipt, never a clean lie. Honest sco
 registered targets (not unregistered stores), and "complete" is verified-non-recoverable at check time, not proof
 of physical destruction — and it does not defend against reconstructing the subject from RETAINED embeddings
 (embedding inversion, Morris et al., EMNLP 2023) unless the embeddings are a registered target too. Receipt:
-`mnemo/probes/org_wide_erasure_probe.py` (10/10, incl. a non-compliant backup correctly named + a tamper caught).
+`inspeximus/probes/org_wide_erasure_probe.py` (10/10, incl. a non-compliant backup correctly named + a tamper caught).
 
 ### Point-in-time / bi-temporal reads: `as_of()` + `history()` (0.6.14)
 Every keyed write already carries a `[valid_from, invalidated_at)` interval, so the timeline is
@@ -715,7 +715,7 @@ Append-only is unbounded; production memory isn't. `Mnemo(capacity=N)` hard-evic
 records past `N` via the verified value-protected + recency-aged rule (`protect_frac` of the cap is
 recency-immune so a rare-but-critical memory survives a flood; the rest fill by decay-weighted value so a
 stale high-value memory can't crowd out a fresh one). Superseded history isn't counted or evicted (it's cheap
-and preserves `as_of`). Default `None` = unbounded legacy, byte-identical. (`mnemo/probes/` Lab 29992a.)
+and preserves `as_of`). Default `None` = unbounded legacy, byte-identical. (`inspeximus/probes/` Lab 29992a.)
 
 ### Defer the expensive reorg to idle: `sleep()` (0.6.16)
 Consolidation (cluster merge, keep-budget, capacity) is O(n); doing it on the write path taxes every
@@ -729,7 +729,7 @@ Corroboration by "≥2 distinct sources" (or, with `strict_corroboration`, ≥2 
 Cheng–Friedman 2005 prove only *asymmetric*, flow-based trust is Sybilproof). `trust_seeds` adds that anchor:
 a corroborating witness counts only if its source is in the trust closure grown from app-seeded roots via
 vouch edges (TrustRank/Advogato; Gyöngyi et al. 2004), up to `trust_hops`. Un-vouched self-minted sources
-contribute **zero** trusted witnesses (`mnemo/probes/seed_anchored_trust_probe.py`, 4/4). Default empty set =
+contribute **zero** trusted witnesses (`inspeximus/probes/seed_anchored_trust_probe.py`, 4/4). Default empty set =
 byte-identical legacy. Honest limit: it relocates the residual to "earn *one* seed endorsement" and assumes
 sound seeds + attribution — the earned-outcome path (`credit()`) stays the orthogonal unforgeable channel.
 
@@ -739,7 +739,7 @@ A store's history says *what* was retired but not *why*. Every supersession path
 `objectless_guard` / `state_toggle` / `toggle_corroborated` / `toggle_persistence` / `keep_budget`);
 `history()` exposes it per row and `supersession_report()` aggregates counts per policy — the write-time
 judge log most memory systems omit (cf. TOKI, arXiv:2606.06240). Additive metadata only; no resolution
-decision changes (`mnemo/probes/supersession_policy_stamp_probe.py`, 10/10).
+decision changes (`inspeximus/probes/supersession_policy_stamp_probe.py`, 10/10).
 
 ### Right-to-erasure that keeps the audit trail honest: `forget_subject()` + deletion tombstones (0.6.19+)
 `forget()` genuinely removes content — but a hard delete makes `verify_writes()` report the now-missing
@@ -752,9 +752,9 @@ random surrogate id + a timestamp + your opaque `request_id` and **nothing conte
 is still PII), so `verify_writes()` now reports the erasure as *accounted-for* (chain intact, provably
 erased) while a record missing *without* a tombstone still flags as tampering — and a forged tombstone is
 caught by the same check. `erasure_report()` is the content-free proof-of-deletion trail.
-**Honest scope:** this erases + proves-the-act **within this mnemo store only** (not your vector store, prompt
+**Honest scope:** this erases + proves-the-act **within this inspeximus store only** (not your vector store, prompt
 logs, or backups); it is an integrity primitive, **not** a compliance certification, and the signature is
 load-bearing only against a party who does not hold `receipt_key`. Prior art: crypto-shredding; Cassandra /
 event-sourcing tombstones; GDPR Art. 30 erasure logs; Crosby-Wallach / Certificate-Transparency
-tamper-evident logs. Receipt: `mnemo/probes/forget_subject_tombstone_probe.py` (8/8).
+tamper-evident logs. Receipt: `inspeximus/probes/forget_subject_tombstone_probe.py` (8/8).
 

@@ -155,9 +155,9 @@ def _maybe_nudge(cwd):
         # ASCII-only on purpose: hook stdout can be a non-UTF-8 console (e.g. Windows cp1250), where an
         # emoji would garble or drop the line. The word "star" carries it; the README badge carries the glyph.
         print(
-            f"\n[mnemo] A small ask: mnemo has quietly remembered {st['writes']} things for you here so far.\n"
+            f"\n[inspeximus] A small ask: inspeximus has quietly remembered {st['writes']} things for you here so far.\n"
             "If it's been useful, please consider giving it a star -- it's honestly the main way other people\n"
-            "find it, and it would genuinely make my day. Thank you so much! https://github.com/DanceNitra/mnemo\n"
+            "find it, and it would genuinely make my day. Thank you so much! https://github.com/DanceNitra/inspeximus\n"
             "(you'll only ever see this once; silence it anytime with MNEMO_NO_NUDGE=1)")
         st["shown"] = True
         json.dump(st, open(_nudge_path(cwd), "w", encoding="utf-8"))
@@ -216,7 +216,7 @@ def recall(ev):
         out.append("recent mechanics (files/commands):")
         out += [f"  - {mm['text']}" for mm in mechanics]
     if out:
-        print("[mnemo] relevant project memory (deterministic, corrections already applied):\n" + "\n".join(out))
+        print("[inspeximus] relevant project memory (deterministic, corrections already applied):\n" + "\n".join(out))
     _maybe_nudge(cwd)   # visible slot: UserPromptSubmit stdout is shown to the user
 
 
@@ -227,7 +227,7 @@ def session_start(ev):
              and it.get("status") != "superseded"][:8]
     if files:
         lines = "\n".join(f"- {it['text']}" for it in files)
-        print(f"[mnemo] this project's current known files (latest state only):\n{lines}")
+        print(f"[inspeximus] this project's current known files (latest state only):\n{lines}")
     # once-a-day, opt-out "newer version exists" courtesy (stdout is injected as context here)
     try:
         from inspeximus import __version__
@@ -239,7 +239,12 @@ def session_start(ev):
         pass
 
 
-_HOOK = {"hooks": [{"type": "command", "command": "python -m mnemo.claude_code"}]}
+_HOOK = {"hooks": [{"type": "command", "command": "python -m inspeximus.claude_code"}]}
+
+# Hooks written before the 1.25.0 rename invoke `python -m mnemo.claude_code`, which still works
+# through the compatibility alias. Both spellings must be RECOGNISED, or install() would add a second
+# hook next to the old one and uninstall() would leave it behind.
+_HOOK_MARKERS = ("inspeximus.claude_code", "mnemo.claude_code")
 
 
 def install(cwd=None):
@@ -257,12 +262,12 @@ def install(cwd=None):
     hooks = cfg.setdefault("hooks", {})
     for evt in ("PostToolUse", "UserPromptSubmit", "SessionStart"):
         existing = json.dumps(hooks.get(evt, []))
-        if "mnemo.claude_code" not in existing:
+        if not any(mark in existing for mark in _HOOK_MARKERS):
             hooks.setdefault(evt, []).append(dict(_HOOK))
     json.dump(cfg, open(p, "w", encoding="utf-8"), indent=2)
-    print(f"mnemo: installed Claude Code hooks into {p}")
+    print(f"inspeximus: installed Claude Code hooks into {p}")
     print("Restart Claude Code in this project. Memory lands in ./.mnemo/coding_memory.json (deterministic, "
-          "no LLM, provably erasable). Run `python -m mnemo.claude_code --uninstall` to remove.")
+          "no LLM, provably erasable). Run `python -m inspeximus.claude_code --uninstall` to remove.")
 
 
 def uninstall(cwd=None):
@@ -271,9 +276,10 @@ def uninstall(cwd=None):
         return
     cfg = json.load(open(p, encoding="utf-8"))
     for evt, arr in list(cfg.get("hooks", {}).items()):
-        cfg["hooks"][evt] = [h for h in arr if "mnemo.claude_code" not in json.dumps(h)]
+        cfg["hooks"][evt] = [h for h in arr
+                             if not any(mark in json.dumps(h) for mark in _HOOK_MARKERS)]
     json.dump(cfg, open(p, "w", encoding="utf-8"), indent=2)
-    print(f"mnemo: removed Claude Code hooks from {p}")
+    print(f"inspeximus: removed Claude Code hooks from {p}")
 
 
 def main():

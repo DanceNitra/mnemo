@@ -17,7 +17,7 @@ inside this server — it scores, links, and slices your notes, then hands the m
 claims below are about what an *agent* did with the tools, not about the tool "thinking" on its own.
 No autonomous oracle.
 
-**Runs today, zero config.** It indexes your notes into an in-process `mnemo` store at startup; with
+**Runs today, zero config.** It indexes your notes into an in-process `inspeximus` store at startup; with
 no embedder it uses the lexical-overlap fallback. An embedder (`MNEMO_EMBED_URL/MODEL/KEY`) is optional
 and matters **at scale**: at several-thousand-note scale, lexical recall@5 decays from 0.94 (small store) to
 **0.25** at full corpus while semantic **holds ~0.65** — ≈2.6× (Agora Lab `b4c260`); on paraphrase
@@ -56,7 +56,7 @@ The same session in text:
 That `bridge_candidates` hit is the point: a connection across two folders that *you never linked* —
 the agent now writes the mapping (or rejects it). The tool found the material; the agent does the thinking.
 
-Register it with an MCP client (point `args` at the file's absolute path so `mnemo.py`, which sits
+Register it with an MCP client (point `args` at the file's absolute path so `inspeximus.py`, which sits
 beside it, is found):
 
 ```json

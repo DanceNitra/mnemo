@@ -76,9 +76,9 @@ def check_for_update(current_version, cache_dir=None, timeout=1.5):
 
         if latest and _is_newer(latest, current_version):
             return (
-                f"[mnemo] A new version is available: {latest} (you have {current_version}).\n"
+                f"[inspeximus] A new version is available: {latest} (you have {current_version}).\n"
                 "        Update:  pip install -U agora-mnemo   |   "
-                "changelog: https://github.com/DanceNitra/mnemo/blob/main/CHANGELOG.md\n"
+                "changelog: https://github.com/DanceNitra/inspeximus/blob/main/CHANGELOG.md\n"
                 "        (silence this with MNEMO_NO_UPDATE_CHECK=1)")
     except Exception:
         return None

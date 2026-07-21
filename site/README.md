@@ -1,6 +1,6 @@
-# mnemo — launch site
+# inspeximus — launch site
 
-A single-page marketing site for [mnemo](https://github.com/DanceNitra/mnemo): a zero-dependency memory
+A single-page marketing site for [inspeximus](https://github.com/DanceNitra/inspeximus): a zero-dependency memory
 layer and MCP server for AI agents. Dark, precise, with a scroll-driven 3D "memory ledger" narrative.
 
 ## Stack
@@ -37,4 +37,4 @@ The build uses `base: './'`, so `dist/` can be served from any path. Either:
 
 ## Copy
 All product claims are real (measured integrity numbers, tool names, DOIs). Do not invent figures — see the
-mnemo repo `SECURITY.md`, `CHANGELOG.md`, and the open benchmark harness for provenance.
+inspeximus repo `SECURITY.md`, `CHANGELOG.md`, and the open benchmark harness for provenance.

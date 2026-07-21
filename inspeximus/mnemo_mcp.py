@@ -36,7 +36,7 @@ from inspeximus import Mnemo  # noqa: E402
 try:
     from mcp.server.fastmcp import FastMCP
 except Exception as e:  # pragma: no cover
-    sys.stderr.write("mnemo MCP server needs the MCP SDK: pip install \"mcp[cli]\"\n")
+    sys.stderr.write("inspeximus MCP server needs the MCP SDK: pip install \"mcp[cli]\"\n")
     raise
 
 

@@ -1,7 +1,25 @@
 # Changelog
 
-All notable changes to mnemo (`agora-mnemo`). Format loosely follows Keep a Changelog; versioning is semver
+All notable changes to inspeximus (`inspeximus`). Format loosely follows Keep a Changelog; versioning is semver
 (MAJOR = stable/breaking, MINOR = features, PATCH = fixes).
+
+## 1.25.0 — renamed to inspeximus
+
+The package is now **`inspeximus`** (`pip install inspeximus`, `import inspeximus`). The name is the
+medieval charter that recites an earlier charter verbatim and attests it unaltered — the same act this
+library performs on a corrected fact.
+
+- `pip install agora-mnemo` -> `pip install inspeximus`; console scripts `inspeximus` and
+  `inspeximus-mcp`.
+- **`import mnemo` keeps working** and resolves to the *identical* objects, not copies, so
+  `isinstance` checks, monkeypatching and module state behave the same across both namespaces. The
+  alias is deprecated and will be removed in 2.0.
+- Old console scripts `mnemo` / `mnemo-mcp` remain as deprecated aliases.
+- **Unchanged on purpose:** the default store file (`mnemo_memory.json`), the `MNEMO_PATH` environment
+  variable, the plugin's `.mnemo/memory.json` project store, and the public class names
+  (`MnemoStore`, `MnemoSaver`, ...). Renaming any of them would orphan existing stores or break
+  callers for no benefit; they can follow in 2.0.
+- Repository and homepage moved to `DanceNitra/inspeximus`; GitHub redirects the old paths.
 
 ## 1.24.4
 
@@ -223,7 +241,7 @@ edges, and `route()`'s delete id-selection matched the wrong tenant. All five ar
 recomputed every pairwise cosine uncached: ~p³/6 similarity calls. Fine at the default p=50, ~1.3M at k=50,
 ~1e9 for a caller passing `rerank_pool=2000` — an effective hang. Now bounded to `k` and memoized.
 
-**`reembed()` + `mnemo reembed`.** The explicit counterpart to 1.18.0's bounded embed-recipe guard: when a
+**`reembed()` + `inspeximus reembed`.** The explicit counterpart to 1.18.0's bounded embed-recipe guard: when a
 recipe change finds more than `MNEMO_REALIGN_MAX` stale vectors the guard drops them (lexical fallback) rather
 than making every open pay a network call per record. This is how you deliberately rebuild that space —
 foreground, with a count, `--batch`-able — instead of implicitly on a load path. `route()`'s NOOP now also
@@ -236,7 +254,7 @@ stored recipe differing from the current `embed_id`, the realignment (a) re-embe
 the vector-bearing ones, and (b) recorded the new recipe only inside `_save()` — so any caller that never saves (a
 read-only `recall()`, a session digest, a short-lived hook process) redid the entire realignment on every open.
 Together that turned a one-time migration into a permanent per-open network storm: a 1214-record store issued 1214
-embedding calls *per open*, forever — which froze a Claude Code session through the `mnemo.claude_code` hooks
+embedding calls *per open*, forever — which froze a Claude Code session through the `inspeximus.claude_code` hooks
 (~44 min per hook; the hook blocks prompt submission). The guard now realigns only vector-bearing records, persists
 the realignment exactly once (vectors and sidecar together — never the sidecar alone, which would label old vectors
 with a new recipe), and is bounded by `MNEMO_REALIGN_MAX` (default 256): past the cap it drops the stale vectors
@@ -244,11 +262,11 @@ with a new recipe), and is bounded by `MNEMO_REALIGN_MAX` (default 256): past th
 path. Measured on the affected store: 44 min -> 17 s once, then 2.6 s per open. Probe
 `embed_recipe_migration_guard_probe.py` gains regressions 5/5b/6/6b/6c/7/7b.
 
-**Fix: `mnemo.claude_code._make_embedder` returned a bare `None` when unconfigured** while its caller unpacked three
+**Fix: `inspeximus.claude_code._make_embedder` returned a bare `None` when unconfigured** while its caller unpacked three
 values — a `TypeError` that the hook's fail-open swallowed, so in any project without `.mnemo/config.json` the
 plugin silently captured nothing at all.
 
-**Deterministic knowledge graph (`graph()` + `subgraph()`).** Every keyed `(subject::relation, object)` memory is an edge subject-[relation]->object; `graph()` exports nodes+edges and `subgraph(entity, hops)` does multi-hop traversal — the graph-memory view mem0/Zep/cognee ship, but DERIVED deterministically from mnemo's supersession triples (no LLM entity-extraction, no graph DB). Superseded facts drop out (graph = current truth). Probe `graph_layer_probe.py` (5 checks incl. supersession-drop + 2-hop).
+**Deterministic knowledge graph (`graph()` + `subgraph()`).** Every keyed `(subject::relation, object)` memory is an edge subject-[relation]->object; `graph()` exports nodes+edges and `subgraph(entity, hops)` does multi-hop traversal — the graph-memory view mem0/Zep/cognee ship, but DERIVED deterministically from inspeximus's supersession triples (no LLM entity-extraction, no graph DB). Superseded facts drop out (graph = current truth). Probe `graph_layer_probe.py` (5 checks incl. supersession-drop + 2-hop).
 
 ## 1.17.0
 
@@ -277,23 +295,23 @@ isolation + soft `scope`); exposed on the MCP `remember`/`recall` tools too. Pro
 
 **LangGraph checkpointer (`MnemoSaver`).** The thread-state half of LangGraph memory (MnemoStore was the long-term
 half): a `BaseCheckpointSaver` so a graph can persist + resume, same contract as SqliteSaver/PostgresSaver but in a
-single zero-dependency mnemo file (no DB, no server). Checkpoints + pending writes serialized via LangGraph's own
-serde, tagged so they never pollute recall. Sync + async; `mnemo.integrations.langgraph.MnemoSaver`.
+single zero-dependency inspeximus file (no DB, no server). Checkpoints + pending writes serialized via LangGraph's own
+serde, tagged so they never pollute recall. Sync + async; `inspeximus.integrations.langgraph.MnemoSaver`.
 
-**Offline memory browser (`mnemo.browser` + `mnemo browse`).** Renders the store to a SINGLE self-contained HTML
+**Offline memory browser (`inspeximus.browser` + `inspeximus browse`).** Renders the store to a SINGLE self-contained HTML
 file (all data inlined, vanilla JS, inline CSS — no server, no build, works offline) with client-side search +
 filters and a summary header (counts, cohorts, contradictions); shows active vs superseded so you can SEE
-corrections. Read-only by design. The console every competitor ships and mnemo lacked.
+corrections. Read-only by design. The console every competitor ships and inspeximus lacked.
 
 **Rich MCP server — resources + prompts + governance/integrity tools.** The MCP server was tools-only (19/60
 methods). Now exposes the 3 MCP primitives: +8 governance/integrity tools (forget_subject, governance_report,
 verify_writes, pii_report, forget_pii, influence_gate_report, why_recalled, supersession_report), 3 resources
-(`mnemo://digest`, `://contradictions`, `://governance`) + a `mnemo://memory/{id}` template, and 3 prompts
+(`inspeximus://digest`, `://contradictions`, `://governance`) + a `inspeximus://memory/{id}` template, and 3 prompts
 (recall_before_answer, consolidate_session, review_contradictions); `recall` now takes `mmr` + `trusted_only`.
 27 tools total.
 
 **Fatter CLI (6 → 13 commands)** + **`default_distiller`.** New: `browse`, `decision`, `contradictions`,
-`governance`, `consolidate`, `why`, `distill`. `mnemo.default_distiller()` is a zero-dep urllib chat caller (any
+`governance`, `consolidate`, `why`, `distill`. `inspeximus.default_distiller()` is a zero-dep urllib chat caller (any
 OpenAI-compatible endpoint via `MNEMO_LLM_URL`) so `distill_and_remember` works out of the box — opt-in (the core
 stays zero-LLM), raises a clear error if no endpoint is set.
 
@@ -310,7 +328,7 @@ duplicates so the test can fail).
 
 **Asymmetric query embedder (`embed_query`) — a recall correctness fix for nomic-embed-text.** nomic-embed-text is
 trained to prefix stored text with `search_document: ` and queries with `search_query: ` (Nomic's model card;
-asymmetric prefixing is standard retrieval practice, cf. E5's `passage:`/`query:`). mnemo was omitting the prefixes,
+asymmetric prefixing is standard retrieval practice, cf. E5's `passage:`/`query:`). inspeximus was omitting the prefixes,
 which is simply using the model wrong. `Mnemo(embed=…, embed_query=…)` now lets the recall QUERY be embedded
 differently from stored TEXT (defaults to `embed`, so existing setups are byte-identical); the MCP server
 auto-applies the nomic prefixes when `MNEMO_EMBED_MODEL` contains `nomic` (opt out with `MNEMO_NOMIC_PREFIX=0`).
@@ -324,11 +342,11 @@ retrieval upper bound, not end-to-end QA, and multi-hop full-recall barely moves
 > ranking order-dependent (later queries see values shifted by earlier hits) — a confound that depresses benchmark
 > recall_any by up to ~0.10 at low k. With reinforcement disabled (a new `recall(reinforce=False)` kwarg returns a
 > non-mutating read — no value bump, decay-clock reset, or graduation; default `reinforce=True` is unchanged),
-> re-measured on the same LoCoMo config against our OWN plain-cosine baseline over the same nomic embeddings, mnemo is
+> re-measured on the same LoCoMo config against our OWN plain-cosine baseline over the same nomic embeddings, inspeximus is
 > **indistinguishable from that cosine baseline within measurement noise** (recall_any@1 0.397 vs 0.390; single run,
 > n≈1536, no confidence interval — read as "no measurable gap", not a proven win).
 > *Re-verified 2026-07-19 with a paired bootstrap (n=1536, 5000 resamples, fixed seed, Bonferroni across the 5 k's
-> tested): @1 remains statistically indistinguishable (Δ +0.007, 99% CI [−0.009, +0.024]); at k=3 and k=5 mnemo's
+> tested): @1 remains statistically indistinguishable (Δ +0.007, 99% CI [−0.009, +0.024]); at k=3 and k=5 inspeximus's
 > native ranking is a small but Bonferroni-surviving WIN over raw cosine (Δ +0.023, 99% CI [+0.005, +0.044] and
 > Δ +0.032, 99% CI [+0.014, +0.051]); @10/@25 positive but not significant after correction. Same scope as above:
 > one dataset, one embedder, retrieval upper bound, self-built baseline — no cross-system claim.* So the integrity core adds no
@@ -344,18 +362,18 @@ default stores are unaffected). Probes: `probes/embed_query_asymmetric_probe.py`
 
 ## 1.14.0
 
-**Compact MCP recall + progressive disclosure (standard context-economy practice, applied to mnemo).** A memory
+**Compact MCP recall + progressive disclosure (standard context-economy practice, applied to inspeximus).** A memory
 server that returns every internal field burns the agent's context on data it never reads. Over MCP, `recall` now
 returns a **compact projection** — `{id, text, score, value, tags}` — dropping internal bookkeeping (links,
 provenance, ISO stamps, relevance/reliability breakdown); `k` is hard-capped (`MNEMO_MAX_K`, default 50). **Full
 text is kept by default** — snippet truncation is **opt-in** (`snippet_chars>0`), deliberately NOT the default,
-because truncating a hit could cut off a corrected value that sits past the boundary and silently defeat mnemo's
+because truncating a hit could cut off a corrected value that sits past the boundary and silently defeat inspeximus's
 own supersession/echo-guard. Two companion tools do progressive disclosure: `get(id)` returns one full record,
 `neighbors(id, k)` a bounded local expansion (excludes self). `token_report(query, k)` is a **deterministic,
 no-LLM** payload-size estimate (~chars/4) comparing the compact projection to the FULL records for the **same k
 hits** — the honest apples-to-apples baseline, explicitly **not** a whole-store comparison and **not** a measured
 token/cost saving. None of these are novel (progressive disclosure / small-to-big retrieval are standard MCP/RAG
-practice); mnemo already never emitted embedding vectors in recall. Core library and on-disk format unchanged;
+practice); inspeximus already never emitted embedding vectors in recall. Core library and on-disk format unchanged;
 `recall(full=True)` returns complete records. Receipt: `probes/mnemo_mcp_token_pack_probe.py` (7/7), suite 148/148.
 Eighteen MCP tools total.
 
@@ -367,7 +385,7 @@ key, and a CT-style anchor into ONE portable, content-free JSON document. A thir
 function `verify_erasure_certificate(cert, store_path=...)` — WITHOUT the private key and WITHOUT trusting the
 operator — and gets a machine-checkable verdict: the tombstone chain re-derives, every Ed25519 signature
 verifies (pinnable to an expected pubkey), the anchor commits to the chain tip, AND every erased id is genuinely
-ABSENT from mnemo's store records (the value is deleted, not soft-deleted or kept in a history table by design
+ABSENT from inspeximus's store records (the value is deleted, not soft-deleted or kept in a history table by design
 as most libraries do). Tampering a tombstone, faking an "erased" id that is still present, or pinning the wrong
 key all flip the verdict to INVALID. This is the erasure primitive built for a right-to-erasure demand (GDPR
 Art.17) with an Art.30-style auditable record — a governance capability most agent-memory libraries do not
@@ -376,31 +394,31 @@ witness the anchor externally for an operator-adversarial audit) — it is NOT s
 raw-disk/backup forensics (a plaintext store of any library leaves bytes in free space/backups → use an
 encrypted store + `shred()`, NIST SP 800-88 crypto-erasure) and NOT the app's own vector store/logs (register
 `ErasureTarget`s for cross-store cascade). Receipts:
-`mnemo/probes/erasure_certificate_probe.py` (9/9) + `mnemo/probes/erasure_raw_store_probe.py` (12/12).
+`inspeximus/probes/erasure_certificate_probe.py` (9/9) + `inspeximus/probes/erasure_raw_store_probe.py` (12/12).
 
 ## 1.12.4
 
-**`mnemo` shell CLI.** A new console command to script the memory layer from the terminal — no Python and no
-MCP server needed: `mnemo remember "..." --key k`, `mnemo recall "..."` (current-truth, superseded values
-hidden), `mnemo revert <key>`, `mnemo forget --key/--id/--contains`, `mnemo list`, `mnemo stats`. Shares the
-store with `mnemo-mcp` (`--path` / `$MNEMO_PATH` / `./mnemo_memory.json`); `--json` for scripting; lexical by
-default, semantic when `$MNEMO_EMBED_URL` is set. Zero dependencies. Receipt: `mnemo/probes/mnemo_cli_probe.py`
+**`inspeximus` shell CLI.** A new console command to script the memory layer from the terminal — no Python and no
+MCP server needed: `inspeximus remember "..." --key k`, `inspeximus recall "..."` (current-truth, superseded values
+hidden), `inspeximus revert <key>`, `inspeximus forget --key/--id/--contains`, `inspeximus list`, `inspeximus stats`. Shares the
+store with `inspeximus-mcp` (`--path` / `$MNEMO_PATH` / `./mnemo_memory.json`); `--json` for scripting; lexical by
+default, semantic when `$MNEMO_EMBED_URL` is set. Zero dependencies. Receipt: `inspeximus/probes/mnemo_cli_probe.py`
 (6/6).
 
 ## 1.12.3
 
 **Optional reranker hook: `recall(rerank=callable, rerank_pool=N)`.** A retrieve-then-rerank extension point:
 `rerank(query, records) -> list[float]` (one relevance score per record, higher=better) reorders the top
-candidates before truncation to `k`. Model-agnostic (mnemo imports no model) and moat-safe: no model runs
+candidates before truncation to `k`. Model-agnostic (inspeximus imports no model) and moat-safe: no model runs
 unless the caller supplies one, the WRITE path is untouched, default `None` = zero behavior change, and it
 fails open (a broken or wrong-length reranker keeps the pre-rerank order). Honest scope: the lift is only as
 good as the reranker — a model-READER reranker is the measured multi-hop lever (LoCoMo ~0.30->~0.48), whereas a
 generic query-relevance cross-encoder does NOT help multi-hop (measured: it hurts, because 2nd-hop evidence
-isn't directly query-relevant). Receipt: `mnemo/probes/mnemo_rerank_hook_probe.py` (5/5).
+isn't directly query-relevant). Receipt: `inspeximus/probes/mnemo_rerank_hook_probe.py` (5/5).
 
 ## 1.12.2
 
-**Opt-out "a newer version is available" check.** When mnemo runs (Claude Code `SessionStart`, or the MCP
+**Opt-out "a newer version is available" check.** When inspeximus runs (Claude Code `SessionStart`, or the MCP
 server starting), it checks PyPI at most once per 24h and prints a single ASCII line if the installed version
 is behind — the standard pip/npm/gh courtesy, so users who installed weeks ago learn about new integrity
 features instead of silently staying on an old release. Fail-open (offline = silent), never blocks, and the
@@ -408,7 +426,7 @@ MCP server routes it to stderr so the stdio JSON-RPC channel is untouched. Silen
 
 ## 1.12.1
 
-**Claude Code plugin: a one-time, opt-out star nudge.** After mnemo has actually been useful — 25 captured
+**Claude Code plugin: a one-time, opt-out star nudge.** After inspeximus has actually been useful — 25 captured
 writes in a project — the plugin prints a single, warm request to star the repo on the next prompt, then never
 again. ASCII-only (safe on non-UTF-8 consoles), never blocks, and silenced anytime with `MNEMO_NO_NUDGE=1`.
 Tied to a moment of demonstrated value, not to install time (which wheels can't run anyway).
@@ -417,13 +435,13 @@ Tied to a moment of demonstrated value, not to install time (which wheels can't 
 
 Additive only, no breaking changes.
 
-**CrewAI integration.** `mnemo.integrations.crewai` ships `MnemoStorage`, a drop-in CrewAI `Storage`
+**CrewAI integration.** `inspeximus.integrations.crewai` ships `MnemoStorage`, a drop-in CrewAI `Storage`
 (`save`/`search`/`reset`) you hand to `ExternalMemory` (or any custom-storage slot). `search()` retrieves
-through mnemo's supersession-filtered `recall()`, so a corrected fact never returns into the crew's context.
+through inspeximus's supersession-filtered `recall()`, so a corrected fact never returns into the crew's context.
 Duck-typed — CrewAI is matched structurally and never imported, so the zero-dependency core is untouched.
-Opt-in extra: `pip install "agora-mnemo[crewai]"`. Receipt: `mnemo/probes/mnemo_crewai_adapter_probe.py` (6/6).
+Opt-in extra: `pip install "inspeximus[crewai]"`. Receipt: `inspeximus/probes/mnemo_crewai_adapter_probe.py` (6/6).
 
-**Claude Code plugin: optional semantic recall.** The auto-capture plugin (`mnemo.claude_code`) now supports
+**Claude Code plugin: optional semantic recall.** The auto-capture plugin (`inspeximus.claude_code`) now supports
 SEMANTIC recall against any OpenAI-compatible `/embeddings` endpoint (e.g. local Ollama), configured by env
 (`MNEMO_EMBED_URL` / `MNEMO_EMBED_MODEL`) or a per-project `.mnemo/config.json`. Default stays deterministic
 LEXICAL (runs anywhere, no service). Writes remain verbatim, keyed and no-LLM; the embedder only builds a
@@ -447,19 +465,19 @@ core) and `make_llm_extractor(call_fn)` (opt-in; puts an LLM on the write path i
 unstructured text). Set `m.extractor = regex_extractor` and supersession/echo_guard/revert engage over free text
 without the caller passing an explicit `key`. Both fail-open (a returned `None` falls back to a plain append).
 
-**LangChain integration.** `mnemo.integrations.langchain` ships `MnemoRetriever` (a `BaseRetriever` whose
+**LangChain integration.** `inspeximus.integrations.langchain` ships `MnemoRetriever` (a `BaseRetriever` whose
 results are supersession-filtered — a corrected fact is never retrieved back into the prompt) and
-`MnemoChatMessageHistory`. Opt-in extra: `pip install "agora-mnemo[langchain]"`.
+`MnemoChatMessageHistory`. Opt-in extra: `pip install "inspeximus[langchain]"`.
 
-**Tuned recall recipe + a measured LOCOMO number.** `mnemo/examples/recall_recipe_locomo.py` shows the built-in
+**Tuned recall recipe + a measured LOCOMO number.** `inspeximus/examples/recall_recipe_locomo.py` shows the built-in
 levers (an embedder → lexical+semantic hybrid RRF; a soft speaker/entity prefilter via `recall(prefer=...)`) that
-put mnemo in the top tier on retrieval. Measured on the full LOCOMO benchmark (n=1536), LLM-free and reproducible:
-retrieval-recall@25 = 0.783 (any evidence turn) / 0.648 (all). Run `mnemo/probes/retrieval_recall_locomo.py`.
+put inspeximus in the top tier on retrieval. Measured on the full LOCOMO benchmark (n=1536), LLM-free and reproducible:
+retrieval-recall@25 = 0.783 (any evidence turn) / 0.648 (all). Run `inspeximus/probes/retrieval_recall_locomo.py`.
 
 ## 1.10.0
 
 Claude Code integration: deterministic, no-LLM auto-capture of coding-agent memory. `python -m
-mnemo.claude_code --install` writes lifecycle hooks (`PostToolUse` / `UserPromptSubmit` / `SessionStart`) into
+inspeximus.claude_code --install` writes lifecycle hooks (`PostToolUse` / `UserPromptSubmit` / `SessionStart`) into
 `.claude/settings.json`. `PostToolUse` captures Edit/Write/MultiEdit/Bash events into a deterministic keyed
 store (`file:<path>`), so a corrected fact supersedes the stale one and `echo_guard` blocks its resurrection;
 `UserPromptSubmit` injects the current-state memory; `SessionStart` digests the project's known files. No LLM on
@@ -500,7 +518,7 @@ the port into an agent-memory write path plus the measured prevention vs an unga
 
 Cross-store erasure becomes a first-class operation. Motivated by a measured gap (audit report, July 2026):
 a copy the application embedded into its OWN vector index survives every memory store's native delete (8/8 in
-our cell, mnemo included) — the store alone cannot fix that, because it cannot see infrastructure it was never
+our cell, inspeximus included) — the store alone cannot fix that, because it cannot see infrastructure it was never
 told about. 1.8.0 wires the fan-out into the erasure path:
 
 - **`register_erasure_target(target)`** — register app-side stores (the app's vector index, embedding/response
@@ -509,7 +527,7 @@ told about. 1.8.0 wires the fan-out into the erasure path:
   process start.
 - **`forget_subject(...)` cascades**: with targets registered it erases the store (as before), then every
   registered target, re-checks residual recoverability per target, and returns a hash-chained **`manifest`**
-  in its result — honest by construction: `complete` is True only if EVERY store (mnemo itself included, as the
+  in its result — honest by construction: `complete` is True only if EVERY store (inspeximus itself included, as the
   first self-checked target) verified the value no longer recoverable, and leaking stores are NAMED in
   `residual_targets`. Check values are captured automatically from the erased records (or pass `values=[...]`).
 - Measured (deterministic cell, n=8): unwired external index leaks 8/8 after a store-native delete; wired it
@@ -527,7 +545,7 @@ provenance + erasure + **confidentiality**). Standard primitives only; we do not
 - **`Mnemo(path=..., encrypt_key=...)`** (raw 32-byte key from `new_encryption_key()`) or **`encrypt_passphrase=...`**
   (scrypt-stretched) encrypts the store at rest with **AES-256-GCM** (AEAD: confidentiality + tamper-detection),
   a fresh random 96-bit nonce per save, file layout `MAGIC(5)+salt(16)+nonce(12)+ciphertext` with the header
-  authenticated as AAD. Opt-in, default OFF → byte-identical plaintext-JSON legacy. mnemo never persists the
+  authenticated as AAD. Opt-in, default OFF → byte-identical plaintext-JSON legacy. inspeximus never persists the
   key. A wrong key / tampered file **fails loud** (never a silent empty store). Needs the `cryptography` package.
 - **`shred()`** — crypto-shredding: destroy the in-memory key so the on-disk ciphertext (and every at-rest
   backup of it) becomes permanently unrecoverable (NIST SP 800-88 key-destruction "Purge"), clearing plaintext
@@ -584,7 +602,7 @@ Provable forget + bitemporal audit — the governance/temporal pillar.
 Soft-delete residual probes for the `ErasureAuditor` — from an r/RAG thread: a store reports a delete as DONE
 (HTTP 200) while the data physically survives until a background compaction/vacuum/GC that may never trigger, so
 "the API returned 200" and "it's gone" are two different things. Each probe calls only the client you pass —
-mnemo keeps ZERO external dependencies (no qdrant/psycopg/boto3 import).
+inspeximus keeps ZERO external dependencies (no qdrant/psycopg/boto3 import).
 
 - **`QdrantSoftDeleteProbe`** — deleted points sit in the bitmask until a segment crosses the optimizer's
   `deleted_threshold` (default 0.2, 1000-vector min); flags residue with compaction pending.
@@ -625,10 +643,10 @@ Universal-executor gate — OPT-IN; default (`tool=None`) is byte-identical to 1
   containment, so an *uncontained* universal executor is denied outright (the caller must sandbox it,
   `contained=True`, or route the effect through a specific signature-decidable tool). `contained=True` falls
   through to the normal per-source budget check.
-  Motivation is measured (mnemo lab, ToolEmu 330 tools, 2 labelers): tool reversibility is ~93% decidable from
+  Motivation is measured (inspeximus lab, ToolEmu 330 tools, 2 labelers): tool reversibility is ~93% decidable from
   the signature (Cohen's κ=0.82); the ~7% undecidable residual is exactly the universal-executor class, whose
   realized harm-reach is environment-conditional (isolated executor ~0% external, networked ~0.66). Honest
-  bound: the detector is a heuristic and `contained` is a caller assertion mnemo cannot verify — it forces the
+  bound: the detector is a heuristic and `contained` is a caller assertion inspeximus cannot verify — it forces the
   declaration, it does not enforce the sandbox. Credits the reversibility×scope grid of arXiv:2607.07474.
 
 ## 1.1.0
@@ -647,13 +665,13 @@ default behaviour is byte-identical to 1.0.0 (verified by tests).
 ## 1.0.0
 
 First stable release. The library matured over the 0.4–0.7 line into a real, shipped product; 1.0.0 marks a
-**stable public API** (`mnemo.__all__`), a **runnable test suite** (`tests/`, CI on every push), a documented
+**stable public API** (`inspeximus.__all__`), a **runnable test suite** (`tests/`, CI on every push), a documented
 changelog, and the governance/erasure tooling consolidated. No functional change from 0.7.22 — this release is
 about production-readiness and API stability, not new features.
 
-- **Public API frozen** in `mnemo.__all__`: `Mnemo`, `new_receipt_keypair`, `new_source_keypair`, `sign_revert`,
+- **Public API frozen** in `inspeximus.__all__`: `Mnemo`, `new_receipt_keypair`, `new_source_keypair`, `sign_revert`,
   `sign_erasure`, `erasure_challenge`, `attest`. Governance/erasure tools live in submodules
-  `mnemo.deletion_manifest` and `mnemo.erasure_auditor`.
+  `inspeximus.deletion_manifest` and `inspeximus.erasure_auditor`.
 - **Tests + CI** added (`tests/test_core.py`, `test_governance.py`, `test_erasure.py`) — core recall/supersession
   /revert/echo-guard/forget, tamper-evidence, the CT-anchor, authenticated-principal erasure, the deletion
   manifest, and the erasure auditor, all cloud-free and deterministic.

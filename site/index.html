@@ -3,39 +3,39 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>mnemo — Agent memory that keeps a corrected fact corrected</title>
+    <title>inspeximus — Agent memory that keeps a corrected fact corrected</title>
     <meta
       name="description"
-      content="The self-correcting memory layer for AI agents: when a fact is corrected, mnemo serves the new value and resists the old one resurfacing. Zero-dependency, with an MCP server — measured, not assumed."
+      content="The self-correcting memory layer for AI agents: when a fact is corrected, inspeximus serves the new value and resists the old one resurfacing. Zero-dependency, with an MCP server — measured, not assumed."
     />
     <meta name="theme-color" content="#0a0a0b" />
-    <link rel="canonical" href="https://dancenitra.github.io/mnemo/" />
-    <meta property="og:title" content="mnemo — Agent memory that keeps a corrected fact corrected" />
+    <link rel="canonical" href="https://dancenitra.github.io/inspeximus/" />
+    <meta property="og:title" content="inspeximus — Agent memory that keeps a corrected fact corrected" />
     <meta property="og:description" content="The self-correcting memory layer for AI agents. Correction and erasure as a first-class channel — measured, not assumed." />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://dancenitra.github.io/mnemo/" />
-    <meta property="og:image" content="https://dancenitra.github.io/mnemo/og.png" />
+    <meta property="og:url" content="https://dancenitra.github.io/inspeximus/" />
+    <meta property="og:image" content="https://dancenitra.github.io/inspeximus/og.png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="mnemo — Agent memory that keeps a corrected fact corrected" />
+    <meta name="twitter:title" content="inspeximus — Agent memory that keeps a corrected fact corrected" />
     <meta name="twitter:description" content="Zero-dependency agent memory + MCP server. Value-ranked recall, correction &amp; erasure channel — measured, not assumed." />
-    <meta name="twitter:image" content="https://dancenitra.github.io/mnemo/og.png" />
+    <meta name="twitter:image" content="https://dancenitra.github.io/inspeximus/og.png" />
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@graph": [
         {
           "@type": "SoftwareApplication",
-          "name": "mnemo",
+          "name": "inspeximus",
           "applicationCategory": "DeveloperApplication",
           "operatingSystem": "Windows, macOS, Linux",
           "softwareVersion": "1.9.9",
           "description": "The self-correcting memory layer for AI agents: zero-dependency, with an MCP server. Value-ranked recall, consolidation, and a first-class correction and erasure channel.",
           "license": "https://opensource.org/licenses/MIT",
-          "url": "https://dancenitra.github.io/mnemo/",
-          "downloadUrl": "https://pypi.org/project/agora-mnemo/",
-          "codeRepository": "https://github.com/DanceNitra/mnemo",
+          "url": "https://dancenitra.github.io/inspeximus/",
+          "downloadUrl": "https://pypi.org/project/inspeximus/",
+          "codeRepository": "https://github.com/DanceNitra/inspeximus",
           "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
           "author": { "@type": "Organization", "name": "Agora", "url": "https://dancenitra.github.io/agora/" }
         },
@@ -69,13 +69,13 @@
 
     <!-- Nav -->
     <header class="nav" id="nav">
-      <a class="nav__brand" href="#top" aria-label="mnemo home">
+      <a class="nav__brand" href="#top" aria-label="inspeximus home">
         <svg class="nav__logo" viewBox="0 0 28 28" width="26" height="26" aria-hidden="true">
           <rect x="4" y="18.4" width="12" height="3" rx="1.5" fill="currentColor" opacity=".34" />
           <rect x="4" y="12.9" width="15.5" height="3" rx="1.5" fill="currentColor" opacity=".62" />
           <rect x="4" y="7" width="20" height="3.4" rx="1.7" fill="var(--signal)" />
         </svg>
-        <span class="nav__word">mnemo<span class="dot">.</span></span>
+        <span class="nav__word">inspeximus<span class="dot">.</span></span>
       </a>
       <nav class="nav__links" aria-label="Primary">
         <a href="#story">Story</a>
@@ -84,7 +84,7 @@
         <a href="#mcp">MCP</a>
         <a href="#governance">Governance</a>
       </nav>
-      <a class="btn btn--ghost magnetic" href="https://github.com/DanceNitra/mnemo" target="_blank" rel="noopener">
+      <a class="btn btn--ghost magnetic" href="https://github.com/DanceNitra/inspeximus" target="_blank" rel="noopener">
         <span>Star on GitHub</span>
       </a>
     </header>
@@ -112,11 +112,11 @@
               measured, not assumed.
             </p>
             <div class="hero__cta">
-              <a class="btn btn--primary magnetic" href="https://github.com/DanceNitra/mnemo" target="_blank" rel="noopener">
+              <a class="btn btn--primary magnetic" href="https://github.com/DanceNitra/inspeximus" target="_blank" rel="noopener">
                 Star on GitHub
               </a>
-              <button class="copy-field magnetic" data-copy='pip install "agora-mnemo[mcp]"' type="button">
-                <code>pip install "agora-mnemo[mcp]"</code>
+              <button class="copy-field magnetic" data-copy='pip install "inspeximus[mcp]"' type="button">
+                <code>pip install "inspeximus[mcp]"</code>
                 <span class="copy-field__icon" aria-hidden="true">copy</span>
               </button>
             </div>
@@ -183,10 +183,10 @@
           <p class="eyebrow">the correction channel</p>
           <h2 class="section__title">Store a fact. Correct it. It stays corrected.</h2>
         </div>
-        <div class="terminal reveal" id="terminal" aria-label="mnemo session replay">
+        <div class="terminal reveal" id="terminal" aria-label="inspeximus session replay">
           <div class="terminal__bar">
             <span class="terminal__dot"></span><span class="terminal__dot"></span><span class="terminal__dot"></span>
-            <span class="terminal__name">mnemo — correction that sticks</span>
+            <span class="terminal__name">inspeximus — correction that sticks</span>
           </div>
           <pre class="terminal__body" id="term-body"></pre>
         </div>
@@ -204,7 +204,7 @@
         </div>
         <div class="bench reveal" id="bench">
           <div class="bench__row" data-value="0.75" data-lo="0.53" data-hi="0.89" data-self="1">
-            <div class="bench__label">mnemo <span>1.5</span></div>
+            <div class="bench__label">inspeximus <span>1.5</span></div>
             <div class="bench__track"><div class="bench__fill"></div><div class="bench__ci"></div></div>
             <div class="bench__num">0.75</div>
           </div>
@@ -222,7 +222,7 @@
         <p class="bench__caveat reveal">
           Honest scope: this is a narrow adversarial cut, not a general memory-quality score. On the separate
           echo-resurrection cell all three systems tie. Run it yourself —
-          <a href="https://github.com/DanceNitra/mnemo" target="_blank" rel="noopener">the harness is open</a>.
+          <a href="https://github.com/DanceNitra/inspeximus" target="_blank" rel="noopener">the harness is open</a>.
         </p>
       </section>
 
@@ -272,29 +272,29 @@
           <div class="mcp__copy reveal">
             <p class="eyebrow">model context protocol</p>
             <h2 class="section__title">15 tools any MCP host can call</h2>
-            <p class="section__lede">Point Claude, Cursor, or any MCP agent at mnemo and it gets a real memory with a correction channel — no glue code.</p>
+            <p class="section__lede">Point Claude, Cursor, or any MCP agent at inspeximus and it gets a real memory with a correction channel — no glue code.</p>
             <div class="code-block scanlines">
               <div class="code-block__bar"><span>Claude Code — one command</span>
-                <button class="copy-mini magnetic" data-copy='claude mcp add mnemo -e MNEMO_PATH=~/.mnemo_memory.json -- uvx --from "agora-mnemo[mcp]" mnemo-mcp' type="button">copy</button>
+                <button class="copy-mini magnetic" data-copy='claude mcp add inspeximus -e MNEMO_PATH=~/.mnemo_memory.json -- uvx --from "inspeximus[mcp]" inspeximus-mcp' type="button">copy</button>
               </div>
-<pre>claude mcp add mnemo <span class="k">-e</span> MNEMO_PATH=~/.mnemo_memory.json <span class="k">--</span> uvx --from <span class="s">"agora-mnemo[mcp]"</span> mnemo-mcp</pre>
+<pre>claude mcp add inspeximus <span class="k">-e</span> MNEMO_PATH=~/.mnemo_memory.json <span class="k">--</span> uvx --from <span class="s">"inspeximus[mcp]"</span> inspeximus-mcp</pre>
           </div>
             <div class="code-block scanlines">
               <div class="code-block__bar"><span>claude_desktop_config.json</span>
                 <button class="copy-mini magnetic" data-copy='{
   "mcpServers": {
-    "mnemo": {
+    "inspeximus": {
       "command": "uvx",
-      "args": ["--from", "agora-mnemo[mcp]", "mnemo-mcp"]
+      "args": ["--from", "inspeximus[mcp]", "inspeximus-mcp"]
     }
   }
 }' type="button">copy</button>
               </div>
 <pre>{
   <span class="k">"mcpServers"</span>: {
-    <span class="k">"mnemo"</span>: {
+    <span class="k">"inspeximus"</span>: {
       <span class="k">"command"</span>: <span class="s">"uvx"</span>,
-      <span class="k">"args"</span>: [<span class="s">"--from"</span>, <span class="s">"agora-mnemo[mcp]"</span>, <span class="s">"mnemo-mcp"</span>]
+      <span class="k">"args"</span>: [<span class="s">"--from"</span>, <span class="s">"inspeximus[mcp]"</span>, <span class="s">"inspeximus-mcp"</span>]
     }
   }
 }</pre>
@@ -334,9 +334,9 @@
           </article>
         </div>
         <p class="bench__caveat reveal">
-          Honest scope: mnemo has no RCE or ReDoS surface (JSON-only, no pickle/eval/subprocess) and uses
+          Honest scope: inspeximus has no RCE or ReDoS surface (JSON-only, no pickle/eval/subprocess) and uses
           constant-time HMAC, with two documented residuals in
-          <a href="https://github.com/DanceNitra/mnemo/blob/main/SECURITY.md" target="_blank" rel="noopener">SECURITY.md</a>.
+          <a href="https://github.com/DanceNitra/inspeximus/blob/main/SECURITY.md" target="_blank" rel="noopener">SECURITY.md</a>.
         </p>
       </section>
 
@@ -344,14 +344,14 @@
       <footer class="footer">
         <div class="footer__brand">
           <svg viewBox="0 0 28 28" width="24" height="24" aria-hidden="true"><rect x="4" y="18.4" width="12" height="3" rx="1.5" fill="currentColor" opacity=".34"/><rect x="4" y="12.9" width="15.5" height="3" rx="1.5" fill="currentColor" opacity=".62"/><rect x="4" y="7" width="20" height="3.4" rx="1.7" fill="var(--signal)"/></svg>
-          <span class="nav__word">mnemo<span class="dot">.</span></span>
+          <span class="nav__word">inspeximus<span class="dot">.</span></span>
         </div>
         <nav class="footer__links" aria-label="Footer">
-          <a href="https://github.com/DanceNitra/mnemo" target="_blank" rel="noopener">GitHub</a>
-          <a href="https://pypi.org/project/agora-mnemo/" target="_blank" rel="noopener">PyPI</a>
+          <a href="https://github.com/DanceNitra/inspeximus" target="_blank" rel="noopener">GitHub</a>
+          <a href="https://pypi.org/project/inspeximus/" target="_blank" rel="noopener">PyPI</a>
           <a href="https://doi.org/10.5281/zenodo.21128549" target="_blank" rel="noopener">Zenodo DOI</a>
-          <a href="https://github.com/DanceNitra/mnemo#readme" target="_blank" rel="noopener">Docs</a>
-          <a href="https://github.com/DanceNitra/mnemo/blob/main/CHANGELOG.md" target="_blank" rel="noopener">Changelog</a>
+          <a href="https://github.com/DanceNitra/inspeximus#readme" target="_blank" rel="noopener">Docs</a>
+          <a href="https://github.com/DanceNitra/inspeximus/blob/main/CHANGELOG.md" target="_blank" rel="noopener">Changelog</a>
         </nav>
         <p class="footer__note">MIT · part of <a href="https://dancenitra.github.io/agora/" target="_blank" rel="noopener">Agora</a></p>
       </footer>

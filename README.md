@@ -1,21 +1,22 @@
 <div align="center">
 
-<img src="https://raw.githubusercontent.com/DanceNitra/mnemo/main/assets_readme/hero_banner.png" alt="mnemo — a glowing digital memory layer resting on a robust machined-steel base" width="800">
+<img src="https://raw.githubusercontent.com/DanceNitra/inspeximus/main/assets_readme/hero_banner.png" alt="inspeximus — a glowing digital memory layer resting on a robust machined-steel base" width="800">
 
-# agora-mnemo
+# inspeximus
 
-*Mnemosyne — the self-correcting memory layer for AI agents.*
+*"We have inspected" — the medieval charter that recites an earlier one word for word and
+attests it unaltered. The self-correcting memory layer for AI agents.*
 
-*Correct a fact once and it stays corrected: mnemo serves the new value and refuses to let the old one creep
+*Correct a fact once and it stays corrected: inspeximus serves the new value and refuses to let the old one creep
 back — deterministically, with no LLM on the write path. Extracted from an autonomous research OS that has run
 it daily over 10,000 notes.*
 
-`pip install agora-mnemo` → `import mnemo` · [PyPI](https://pypi.org/project/agora-mnemo/) · [Hugging Face](https://huggingface.co/Danchi17/mnemo) · [DOI](https://doi.org/10.5281/zenodo.21128549) · [Homepage](https://dancenitra.github.io/mnemo/) · MIT · v1.24.4
+`pip install inspeximus` → `import inspeximus` · [PyPI](https://pypi.org/project/inspeximus/) · [Hugging Face](https://huggingface.co/Danchi17/mnemo) · [DOI](https://doi.org/10.5281/zenodo.21128549) · [Homepage](https://dancenitra.github.io/inspeximus/) · MIT · v1.25.0
 
-[![audit](https://github.com/DanceNitra/mnemo/actions/workflows/audit.yml/badge.svg)](https://github.com/DanceNitra/mnemo/actions/workflows/audit.yml)
-[![Star on GitHub](https://img.shields.io/github/stars/DanceNitra/mnemo?style=social)](https://github.com/DanceNitra/mnemo)
+[![audit](https://github.com/DanceNitra/inspeximus/actions/workflows/audit.yml/badge.svg)](https://github.com/DanceNitra/inspeximus/actions/workflows/audit.yml)
+[![Star on GitHub](https://img.shields.io/github/stars/DanceNitra/inspeximus?style=social)](https://github.com/DanceNitra/inspeximus)
 
-*If mnemo's saved you some time, a ⭐ would mean a lot — it's how other people find it. Thank you!*
+*If inspeximus's saved you some time, a ⭐ would mean a lot — it's how other people find it. Thank you!*
 
 <img src="assets_readme/correction_demo.svg" alt="A fact is corrected; later the old value is restated, yet recall still serves the correction — the restatement lands retired via echo_guard" width="720">
 
@@ -28,15 +29,15 @@ Built by **[Rastislav Drahoš](https://github.com/DanceNitra)** — extracted fr
 ## Install into Claude Code in one line
 
 ```
-/plugin marketplace add DanceNitra/mnemo
-/plugin install mnemo@mnemo
+/plugin marketplace add DanceNitra/inspeximus
+/plugin install inspeximus@inspeximus
 ```
 
 That registers this repository as a plugin marketplace and installs the MCP server, which then starts
-with `uvx --from "agora-mnemo[mcp]" mnemo-mcp` and keeps its store in `.mnemo/memory.json` inside the
+with `uvx --from "inspeximus[mcp]" inspeximus-mcp` and keeps its store in `.mnemo/memory.json` inside the
 project. Nothing to configure by hand, and nothing to install globally.
 
-Prefer the manual route? `pip install "agora-mnemo[mcp]"` and point your client at `mnemo-mcp` — the
+Prefer the manual route? `pip install "inspeximus[mcp]"` and point your client at `inspeximus-mcp` — the
 extra matters, because the core library is deliberately zero-dependency and the MCP server is the one
 piece that needs a dependency.
 
@@ -86,20 +87,20 @@ proves the *act* of deletion, never the content; and an operator holding the rec
 receipts, so anchor the chain head externally if your adversary is the operator. Those limits are in the
 docstrings too, and they are the reason the word "certified" does not appear anywhere else on this page.
 
-## Why mnemo — the one thing no other agent memory does
+## Why inspeximus — the one thing no other agent memory does
 
 Every mainstream agent-memory library puts an **LLM on the write path**: it calls a model to extract, summarize,
 or build a graph *every time you store something*. mem0 runs LLM fact-extraction on `add()` by default; Zep/Graphiti
 runs LLM entity/edge extraction on every `add_episode()`. That one choice is why their stored state is
 **non-deterministic**, costs a model call per write, and can silently drop a fact.
 
-**mnemo has no LLM on the write path.** Storing a fact is a deterministic, zero-cost operation — and *that* is
+**inspeximus has no LLM on the write path.** Storing a fact is a deterministic, zero-cost operation — and *that* is
 what makes three things possible the mainstream libraries don't offer:
 
 > **What that costs, measured on someone else's benchmark.** On the [MemOps](https://github.com/MemTensor/MemOps)
 > long-context scenarios (24 scenarios, ~50 sessions each), ingesting one scenario through mem0's default
-> pipeline took **519–917 s of LLM extraction** (median 606 s, n=24); mnemo's write path made **zero model calls**. Read the rest
-> before quoting that: on the same run, answer accuracy was **statistically indistinguishable** — mnemo 0.593,
+> pipeline took **519–917 s of LLM extraction** (median 606 s, n=24); inspeximus's write path made **zero model calls**. Read the rest
+> before quoting that: on the same run, answer accuracy was **statistically indistinguishable** — inspeximus 0.593,
 > a naive keep-all store 0.592, mem0 0.544, with every bootstrap CI crossing zero. So the honest claim is *same
 > answers, no write-time model cost*, not *better answers*. About 2% of mem0's extraction calls failed to parse
 > and those memories are missing from its store, which handicaps it slightly. MemOps is published by MemTensor,
@@ -114,7 +115,7 @@ what makes three things possible the mainstream libraries don't offer:
   we checked — mem0, Zep/Graphiti, Letta, Cognee, Memobase, MemoryScope, LangMem, txtai — **none exposes a
   revert-to-predecessor command** (mem0's `history()` is a read-only log; Graphiti invalidates but never
   un-invalidates; Letta has no undo).
-- **Deletes the value, not just the pointer.** `forget_subject` removes the value from mnemo's records (subject
+- **Deletes the value, not just the pointer.** `forget_subject` removes the value from inspeximus's records (subject
   + its `derived_from` lineage) and leaves a **content-free**, tamper-evident signed receipt — so what remains is
   a proof-of-deletion, not the data. Since **1.24.0 every deletion path leaves that receipt**, including plain
   `forget(ids=…, where=…)`; before that only `forget_subject` and `forget_pii` did, so a record removed with
@@ -123,18 +124,18 @@ what makes three things possible the mainstream libraries don't offer:
   `forget()` to bind the reason into the receipt's committed hash. Most agent-memory libraries instead *retain the deleted value* by design:
   mem0 keeps it in its SQLite history table (a full `reset()` purges it); Graphiti stamps the old edge
   `invalid_at` and keeps it. For **secure erasure at rest** (against raw-disk/backup forensics — which a plaintext
-  store of ANY library, mnemo included, does not give you) use an encrypted store + `shred()` (NIST SP 800-88
+  store of ANY library, inspeximus included, does not give you) use an encrypted store + `shred()` (NIST SP 800-88
   crypto-erasure: destroy the key and every at-rest copy dies).
 
 | | LLM on write | corrections stick | revert to predecessor | deleted value retained? |
 |---|---|---|---|---|
-| **mnemo** | **no — deterministic** | ✅ supersession + echo_guard | ✅ `revert(key)` | ✅ no — value scrubbed, content-free receipt (+ `shred()` for at-rest) |
+| **inspeximus** | **no — deterministic** | ✅ supersession + echo_guard | ✅ `revert(key)` | ✅ no — value scrubbed, content-free receipt (+ `shred()` for at-rest) |
 | mem0 | yes (by default) | LLM decides ADD/UPDATE | ✗ history is read-only | ✗ kept in the history table by design |
 | Zep / Graphiti | yes | temporal invalidation | ✗ no un-invalidate | ✗ invalidated edge retained |
 | Letta / MemGPT | yes | LLM rewrites the block | ✗ no undo | ✗ |
 
 *(Every competitor cell was checked against that project's current source/docs — see [the integrity
-benchmark](mnemo/probes/INTEGRITY_BENCHMARK.md), which also names each system that shares an individual property.
+benchmark](inspeximus/probes/INTEGRITY_BENCHMARK.md), which also names each system that shares an individual property.
 Cryptographic deletion receipts do exist in purpose-built provenance systems like Engram and Heartwood; the claim
 here is scoped to mainstream agent-memory libraries.)*
 
@@ -143,28 +144,28 @@ its extraction design. That is the moat.
 
 ## And it doesn't cost you recall
 
-Integrity would be hollow if mnemo retrieved worse. It doesn't. On the standard **LOCOMO** benchmark (full set,
+Integrity would be hollow if inspeximus retrieved worse. It doesn't. On the standard **LOCOMO** benchmark (full set,
 n=1536), with the built-in tuned recipe (a semantic embedder + hybrid recall + a soft speaker prefilter),
-mnemo's **retrieval-recall@25 is 0.78** (a supporting turn is retrieved) / **0.65** (all supporting turns) —
+inspeximus's **retrieval-recall@25 is 0.78** (a supporting turn is retrieved) / **0.65** (all supporting turns) —
 top-tier, and measured the honest way: **LLM-free and reproducible**, with no LLM judge to inflate it. Run it:
-`python mnemo/probes/retrieval_recall_locomo.py`.
+`python inspeximus/probes/retrieval_recall_locomo.py`.
 
 *(We deliberately don't headline an LLM-judged end-to-end QA score. Those are judge-dependent and not comparable
 across harnesses — mem0 reports 66.9% and Zep 71.2% under their own judges — so a cross-system "we win" claim
 would need running them through this harness, which we haven't done. What we publish is our own reproducible
 number.)*
 
-**Every number in this README traces to a runnable probe in [`mnemo/probes/`](mnemo/probes/). Nothing is
+**Every number in this README traces to a runnable probe in [`inspeximus/probes/`](inspeximus/probes/). Nothing is
 asserted that you can't reproduce.**
 
 ## Quickstart (2 minutes)
 
 ```bash
-pip install agora-mnemo          # zero required dependencies
+pip install inspeximus          # zero required dependencies
 ```
 
 ```python
-from mnemo import Mnemo
+from inspeximus import Mnemo
 
 m = Mnemo("memory.json")                      # persists to JSON; drop the path for pure in-memory
 m.remember("The API rate limit is 1000 req/min", key="api::rate_limit")
@@ -179,8 +180,8 @@ m.history("api::rate_limit")                  # full audit trail, oldest to newe
 
 New in **1.11.0**: ready-made write-path extractors (`regex_extractor`, deterministic; `make_llm_extractor`,
 opt-in) that can derive a key from text without an explicit one, and a first-class **LangChain**
-integration (`from mnemo.integrations.langchain import MnemoRetriever` — a retriever that never hands a
-superseded fact back to your chain). `pip install "agora-mnemo[langchain]"`.
+integration (`from inspeximus.integrations.langchain import MnemoRetriever` — a retriever that never hands a
+superseded fact back to your chain). `pip install "inspeximus[langchain]"`.
 
 **Honest scope of `regex_extractor` (measured 2026-07-20, corrected from an earlier overclaim).** It keys
 clean declarative statements — "My ZIP code is 94107", "Alice's email is …", "The API rate limit is 500 rps".
@@ -188,7 +189,7 @@ It does **not** reliably key natural conversational prose: measured on an extern
 MemOps dataset, arXiv 2607.12893) it derived a key for 5.2% of sentences (1,037 of 19,851 across six transcripts), and — the part that matters —
 it does not hold a *stable* key across a real correction chain, because "my official title … **was** Junior
 Data Analyst" and "**so my current title is** Data Analyst" yield different keys that never meet. On raw
-chat transcripts, supersession therefore mostly does not fire and mnemo behaves as a verbatim store.
+chat transcripts, supersession therefore mostly does not fire and inspeximus behaves as a verbatim store.
 **If you control the write, pass `key=` explicitly** — that is the path where corrections-stick, `revert`
 and the erasure guarantees actually hold. (This README previously said the extractors exist "so supersession
 engages over free text"; that was too strong. See CHANGELOG 1.23.1, which also fixes a real data-loss bug
@@ -196,10 +197,10 @@ found in the same measurement.)
 
 ## Give your agent this memory in 60 seconds (MCP)
 
-Using **Claude Code**? One command registers mnemo as your agent's memory ([uv](https://docs.astral.sh/uv/) fetches it, nothing else to install):
+Using **Claude Code**? One command registers inspeximus as your agent's memory ([uv](https://docs.astral.sh/uv/) fetches it, nothing else to install):
 
 ```bash
-claude mcp add mnemo -e MNEMO_PATH=~/.mnemo_memory.json -- uvx --from "agora-mnemo[mcp]" mnemo-mcp
+claude mcp add inspeximus -e MNEMO_PATH=~/.mnemo_memory.json -- uvx --from "inspeximus[mcp]" inspeximus-mcp
 ```
 
 **Claude Desktop / Cursor / any MCP client** — add to your MCP config (`claude_desktop_config.json`, `.cursor/mcp.json`, …):
@@ -207,9 +208,9 @@ claude mcp add mnemo -e MNEMO_PATH=~/.mnemo_memory.json -- uvx --from "agora-mne
 ```json
 {
   "mcpServers": {
-    "mnemo": {
+    "inspeximus": {
       "command": "uvx",
-      "args": ["--from", "agora-mnemo[mcp]", "mnemo-mcp"],
+      "args": ["--from", "inspeximus[mcp]", "inspeximus-mcp"],
       "env": { "MNEMO_PATH": "~/.mnemo_memory.json" }
     }
   }
@@ -224,7 +225,7 @@ fields; `get(id)` / `neighbors(id)` for detail on demand). Eighteen tools total;
 **Jump to:** [Correction (measured)](#correction-is-a-first-class-operation-measured-across-systems) ·
 [Governance & erasure](#governance-erasure--audit) · [Org-wide erasure receipt](#org-wide-erasure-receipt-one-signed-manifest-across-every-store-you-register) · [Install](#install) ·
 [MCP server](#use-it-as-an-mcp-server-any-claude--cursor--agent-client) ·
-[Shell CLI](#use-it-from-the-shell-the-mnemo-cli-1124) ·
+[Shell CLI](#use-it-from-the-shell-the-inspeximus-cli-1124) ·
 [Framework integrations](#framework-integrations) ·
 [The four operations](#the-four-operations) · [Five rules](#five-rules-it-wont-break-each-one-cost-us-to-learn) ·
 [Provenance & receipts](#provenance--why-these-rules-with-receipts) · [Threat model](#threat-model--layered-defense-adversarial-memory-integrity)
@@ -240,7 +241,7 @@ Adapters for LangGraph, CrewAI, LangChain, LlamaIndex, AutoGen and the rest,
 with copy-paste snippets: **[docs/INTEGRATIONS.md](docs/INTEGRATIONS.md)**.
 ## Use it as an MCP server (any Claude / Cursor / agent client)
 
-`mnemo` ships an [MCP](https://modelcontextprotocol.io) stdio server so any MCP-compatible agent can
+`inspeximus` ships an [MCP](https://modelcontextprotocol.io) stdio server so any MCP-compatible agent can
 use it as long-term memory — `remember` (with a per-type decay prior), value-ranked `recall`,
 `consolidate`, `consolidate_clusters`, `contradictions`, `value_by_cohort`, `forget` (verified erasure).
 Correction is first-class over MCP too: `revert` / `route` undo a correction on an unmarked "go back", and the
@@ -254,8 +255,8 @@ Install and run the server straight from PyPI (the `[mcp]` extra pulls the MCP S
 dependency-free):
 
 ```bash
-pip install "agora-mnemo[mcp]"     # the library + the MCP server SDK
-mnemo-mcp                          # speaks MCP over stdio
+pip install "inspeximus[mcp]"     # the library + the MCP server SDK
+inspeximus-mcp                          # speaks MCP over stdio
 ```
 
 Register it with any MCP client — Claude Code (`.mcp.json`), Claude Desktop
@@ -264,22 +265,22 @@ Register it with any MCP client — Claude Code (`.mcp.json`), Claude Desktop
 ```json
 {
   "mcpServers": {
-    "mnemo": {
+    "inspeximus": {
       "command": "uvx",
-      "args": ["--from", "agora-mnemo[mcp]", "mnemo-mcp"],
+      "args": ["--from", "inspeximus[mcp]", "inspeximus-mcp"],
       "env": { "MNEMO_PATH": "./mnemo_memory.json" }
     }
   }
 }
 ```
 
-Or, after `pip install "agora-mnemo[mcp]"`, with the console script directly:
+Or, after `pip install "inspeximus[mcp]"`, with the console script directly:
 
 ```json
 {
   "mcpServers": {
-    "mnemo": {
-      "command": "mnemo-mcp",
+    "inspeximus": {
+      "command": "inspeximus-mcp",
       "env": { "MNEMO_PATH": "./mnemo_memory.json" }
     }
   }
@@ -290,14 +291,14 @@ For **semantic** recall, point it at any OpenAI-compatible embeddings endpoint v
 `MNEMO_EMBED_URL` / `MNEMO_EMBED_MODEL` / `MNEMO_EMBED_KEY`; with none set it uses the lexical
 fallback. The agent then calls `recall(query)` before reasoning and `remember(fact)` as it learns —
 its memory is value-ranked and append-only, not a recency buffer. If `MNEMO_EMBED_MODEL` contains
-`nomic` (nomic-embed-text is asymmetric — see its model card; like E5's `passage:`/`query:`), mnemo auto-applies its
+`nomic` (nomic-embed-text is asymmetric — see its model card; like E5's `passage:`/`query:`), inspeximus auto-applies its
 required task prefixes — `search_document: ` for stored text, `search_query: ` for the query (opt out with
 `MNEMO_NOMIC_PREFIX=0`). Omitting them was simply using the model wrong; with prefixes on, our own
 reinforcement-controlled re-measure lands recall_any@1 at 0.397 on one LoCoMo config (n=1536, deterministic
 retrieval-recall — an upper bound, not end-to-end QA; a self-comparison, not a cross-system claim; the earlier
 0.19→0.29 delta was contaminated by a since-fixed recall-reinforcement confound — see the 1.15.0 CHANGELOG correction). In the library, pass a separate `Mnemo(embed=…, embed_query=…)` for any
 asymmetric embedder. If you use `persist_vectors=True`, also pass `Mnemo(embed_id="…")` (a recipe fingerprint): when
-it changes, mnemo re-embeds the persisted vectors once so a new-space query can't silently mis-match old vectors.
+it changes, inspeximus re-embeds the persisted vectors once so a new-space query can't silently mis-match old vectors.
 
 **Compact recall + progressive disclosure (1.14.0).** Over MCP, `recall` returns a compact projection — `{id,
 text, score, value, tags}` — dropping internal bookkeeping fields the model doesn't reason over, and `k` is
@@ -308,7 +309,7 @@ returns one full record, `neighbors(id, k)` a bounded local expansion (excludes 
 complete records. `token_report(query, k)` is a **deterministic, no-LLM** (~chars/4) payload-size estimate
 comparing the compact projection to the full records for the **same k hits** — an apples-to-apples sizing aid, not
 a whole-store comparison and not a measured token saving. None of this is novel — it's standard MCP/RAG
-context-economy practice (progressive disclosure / small-to-big retrieval); mnemo never emitted embedding vectors.
+context-economy practice (progressive disclosure / small-to-big retrieval); inspeximus never emitted embedding vectors.
 
 ## The four operations
 
@@ -340,9 +341,9 @@ context-economy practice (progressive disclosure / small-to-big retrieval); mnem
 ## Provenance — why these rules, with receipts
 
 <details>
-<summary>Why these rules — the measured receipts behind mnemo's design. Click to expand.</summary>
+<summary>Why these rules — the measured receipts behind inspeximus's design. Click to expand.</summary>
 
-`mnemo`'s design isn't taste; it's what Agora's lab *measured*:
+`inspeximus`'s design isn't taste; it's what Agora's lab *measured*:
 
 - **Semantic recall beats keyword recall, and the gap widens with scale** — as the store grows to
   a corpus of several thousand notes, lexical `recall@5` decays from **0.94** (small store) to **0.25**,
@@ -375,10 +376,10 @@ context-economy practice (progressive disclosure / small-to-big retrieval); mnem
   head-to-head on a synthetic *evolving + contaminated* stream (stable / superseded / poisoned facts,
   local `nomic`): a naive **cosine top-1** store scores **42%** (fine on stable, but blind to
   supersession — **0/8** on updated facts — and fooled by repeated lies); a **recency** store **67%**
-  (fixes supersession but serves the *freshest lie* — **0/8** on poison); `mnemo` — deterministic
+  (fixes supersession but serves the *freshest lie* — **0/8** on poison); `inspeximus` — deterministic
   supersession key **+** corroboration gate **+** value-ranking — is **100%**, robust across all three.
   Each single mechanism wins one regime and loses another (the *memory operating-point trap*), which is
-  why the durable layer needs all three together (probe `mnemo/probes/operating_point_memory.py`).
+  why the durable layer needs all three together (probe `inspeximus/probes/operating_point_memory.py`).
 - **Cohort-level value** — per-memory outcome attribution is **statistically underpowered at n-of-1**
   (the best proxy reached only ~0.36 power at realistic sample sizes); the cohort is where the
   signal lives. Hence rule 4.
@@ -394,10 +395,10 @@ context-economy practice (progressive disclosure / small-to-big retrieval); mnem
 <details>
 <summary>The full adversarial threat model + layered defenses. Click to expand.</summary>
 
-An untrusted-ingestion memory store cannot decide whether a written claim is *true*. mnemo doesn't try to;
+An untrusted-ingestion memory store cannot decide whether a written claim is *true*. inspeximus doesn't try to;
 it makes the attacker **pay**, and the honest map of what each layer buys — worked to bedrock across a public
 practitioner thread with adversarial review — is below. Every claim here has a runnable receipt in
-[`mnemo/probes/`](probes/); this is textbook mechanism with a receipt, **not** a new theory.
+[`inspeximus/probes/`](probes/); this is textbook mechanism with a receipt, **not** a new theory.
 
 **A defense the attacker can also write is a suggestion, not a defense.** Content-declared provenance is
 theater: `Source: X` and `corroborated by N` are strings a writer controls, so default (distinct source
@@ -477,4 +478,4 @@ round-trip on a synthetic vault (diagnose → suggest → apply); `maintenance_r
 in `second_brain_mcp.py` expose it to any MCP agent.
 
 <!-- MCP registry ownership proof -->
-mcp-name: io.github.DanceNitra/mnemo
+mcp-name: io.github.DanceNitra/inspeximus

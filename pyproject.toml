@@ -14,9 +14,9 @@ authors = [{ name = "Rastislav Drahoš (Agora)" }]
 classifiers = ["Programming Language :: Python :: 3", "Intended Audience :: Science/Research", "Topic :: Scientific/Engineering :: Artificial Intelligence"]
 
 [project.urls]
-Homepage = "https://dancenitra.github.io/mnemo/"
-Source = "https://github.com/DanceNitra/mnemo"
-Repository = "https://github.com/DanceNitra/mnemo"
+Homepage = "https://dancenitra.github.io/inspeximus/"
+Source = "https://github.com/DanceNitra/inspeximus"
+Repository = "https://github.com/DanceNitra/inspeximus"
 
 [project.optional-dependencies]
 mcp = ["mcp[cli]>=1.0"]
