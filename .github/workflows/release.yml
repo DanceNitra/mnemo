@@ -10,10 +10,21 @@ name: release
 #   Owner: DanceNitra · Repository: inspeximus · Workflow: release.yml · Environment: pypi
 # After that, publishing needs no secret at all.
 
+# The two LangGraph wrapper distributions version independently of the core, so they publish from
+# their OWN tags (langgraph-store-inspeximus-v0.1.1) while the core keeps using v*. Both live in this
+# one workflow file on purpose: PyPI's Trusted Publishing binds a project to a specific WORKFLOW
+# FILENAME, and all three projects are registered against release.yml. A separate file would need a
+# separate registration and would fail OIDC until someone remembered that.
 on:
   push:
-    tags: ["v*"]
+    tags: ["v*", "langgraph-*-v*"]
   workflow_dispatch:
+    inputs:
+      package:
+        description: "wrapper package to publish (leave blank for the core)"
+        required: false
+        type: choice
+        options: ["", "langgraph-checkpoint-inspeximus", "langgraph-store-inspeximus"]
 
 permissions:
   contents: read
@@ -22,6 +33,7 @@ jobs:
   audit:
     # Never publish something the audits have not just passed on a clean runner.
     name: audits must pass first
+    if: ${{ !startsWith(github.ref_name, 'langgraph-') && !inputs.package }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -38,6 +50,7 @@ jobs:
 
   build:
     name: build sdist + wheel
+    if: ${{ !startsWith(github.ref_name, 'langgraph-') && !inputs.package }}
     needs: audit
     runs-on: ubuntu-latest
     steps:
@@ -61,6 +74,7 @@ jobs:
 
   publish:
     name: publish to PyPI (trusted, attested)
+    if: ${{ !startsWith(github.ref_name, 'langgraph-') && !inputs.package }}
     needs: build
     runs-on: ubuntu-latest
     environment: pypi
@@ -76,3 +90,47 @@ jobs:
       - uses: pypa/gh-action-pypi-publish@release/v1
         with:
           attestations: true
+
+  # ── the LangGraph wrapper distributions ──────────────────────────────────────────────────────────
+  wrapper:
+    name: publish a LangGraph wrapper package
+    if: ${{ startsWith(github.ref_name, 'langgraph-') || inputs.package }}
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+      attestations: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: work out which package, from the tag or the dispatch input
+        id: pick
+        run: |
+          if [ -n "${{ inputs.package }}" ]; then
+            PKG="${{ inputs.package }}"
+          else
+            PKG="$(echo "${{ github.ref_name }}" | sed -E 's/-v[0-9].*$//')"
+          fi
+          test -d "packages/$PKG" || { echo "::error::no such package dir: packages/$PKG"; exit 1; }
+          echo "pkg=$PKG" >> "$GITHUB_OUTPUT"
+      - run: python -m pip install --upgrade build
+      - run: python -m build
+        working-directory: packages/${{ steps.pick.outputs.pkg }}
+      - name: the wrapper must import and re-export what it claims
+        run: |
+          python -m pip install packages/${{ steps.pick.outputs.pkg }}/dist/*.whl
+          python -c "import importlib,sys; m='${{ steps.pick.outputs.pkg }}'.replace('langgraph-','langgraph.').replace('-inspeximus','.inspeximus').replace('-','_'); mod=importlib.import_module(m); print(m, mod.__all__)"
+      - name: version in the artifact must match the tag
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          TAG="$(echo '${{ github.ref_name }}' | sed -E 's/^.*-v//')"
+          FOUND="$(ls packages/${{ steps.pick.outputs.pkg }}/dist/*.whl | sed -E 's/.*-([0-9][0-9.]*)-py3.*/\1/')"
+          echo "tag=$TAG wheel=$FOUND"
+          test "$TAG" = "$FOUND"
+      - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          attestations: true
+          packages-dir: packages/${{ steps.pick.outputs.pkg }}/dist/
