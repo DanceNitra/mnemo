@@ -3,6 +3,35 @@
 All notable changes to inspeximus (`inspeximus`). Format loosely follows Keep a Changelog; versioning is semver
 (MAJOR = stable/breaking, MINOR = features, PATCH = fixes).
 
+## 1.27.0 — `inspeximus install --ide <host>`
+
+One command wires the MCP server into an editor's own config. Hosts: claude, cursor, windsurf,
+codex, cline. `--dry-run` prints the exact unified diff and writes nothing; `--scope project`
+where the host supports one.
+
+It edits files it did not write, so it is deliberately timid:
+
+- **Never clobbers.** Unknown top-level keys survive, other people's servers survive, and -- the
+  case that bit during testing -- keys on OUR OWN entry survive too. Re-running without `--store`
+  used to drop the env the first run wrote, along with any `timeout` the user had added by hand.
+- **Refuses malformed input.** A config that exists but does not parse is a hard stop with the
+  parser's message, never an overwrite with a "clean" file.
+- **Idempotent.** A second run reports "already present, unchanged".
+- **Backs up** the original next to it, and writes through a temp file.
+- **Says UNVERIFIED when it is.** `verified` means the shape came from the host's own documentation
+  AND was exercised here. Only `claude` carries it: written to a real `~/.claude.json`, then
+  `claude mcp list` reported Connected. The other four print the diff and the doc URL instead of
+  implying they work.
+
+Host-specific facts that a shared writer would have got wrong, each taken from the host's own docs:
+Claude Code needs an explicit `type` (a missing one is skipped with a warning); Codex is TOML with
+`deny_unknown_fields`, so one extra key is a parse error; Cline's timeout is in SECONDS and its
+settings moved to `~/.cline/data/settings/` -- the VS Code globalStorage path most guides still
+quote is legacy; Windsurf has no project-scoped config at all, so none is invented.
+
+`uvx` is resolved to an absolute path at install time, because a GUI-launched editor does not
+necessarily inherit the shell PATH and the failure mode is a bare "failed to connect".
+
 ## 1.26.1 — the MCP server could not start (shadowed its own SDK)
 
 1.26.0 renamed `mnemo_mcp.py` to `mcp.py`. That file also carried an old line inserting its own

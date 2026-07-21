@@ -144,7 +144,10 @@ HOSTS = {
         # Claude Code treats a missing `type` as a configuration error and skips the entry with a
         # warning, so it is written explicitly rather than relying on a stdio default.
         "fields": lambda blk: {"type": "stdio", **blk},
-        "verified": False,          # flipped to True below once exercised on this machine
+        # VERIFIED: written to a real ~/.claude.json on Windows, then `claude mcp list` reported
+        # "Connected" for it. That round trip is what verified means here -- the first attempt wrote a
+        # perfectly valid config for a server that could not start, and only launching it caught that.
+        "verified": True,
         "docs": "https://code.claude.com/docs/en/mcp.md",
         "note": "Claude Code reads the config at session start: restart the session to pick it up. "
                 "A project-scoped .mcp.json additionally needs interactive approval on first use.",
@@ -238,6 +241,12 @@ def plan(host, scope=None, project=None, store_path=None, name=SERVER_NAME):
             res["error"] = f"{path}: '{spec['root_key']}' is not an object; refusing to touch it"
             return res
         existing = servers.get(name)
+        # NEVER CLOBBER, applied to the ENTRY and not just the file. A second run without --store
+        # would otherwise replace the whole entry and silently drop the env the first run wrote, along
+        # with any key the user added by hand (timeout, alwaysLoad, autoApprove...). Anything we do not
+        # explicitly emit is carried across.
+        if isinstance(existing, dict):
+            block = {**existing, **block}
         res["action"] = ("unchanged" if existing == block
                          else "update" if existing is not None
                          else "create" if not path.exists() else "add")
