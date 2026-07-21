@@ -70,7 +70,7 @@ def c_zero_deps():
         for ln in meta[0].read_text(encoding="utf-8", errors="replace").splitlines():
             if ln.startswith("Requires-Dist:") and "extra ==" not in ln:
                 requires.append(ln.split(":", 1)[1].strip())
-    core = root / "inspeximus.py"
+    core = root / "core.py"
     return (not requires), f"mandatory requirements={requires or 'none'}; core file={core.stat().st_size//1024} KB"
 
 
