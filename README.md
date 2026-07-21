@@ -10,7 +10,7 @@
 back — deterministically, with no LLM on the write path. Extracted from an autonomous research OS that has run
 it daily over 10,000 notes.*
 
-`pip install agora-mnemo` → `import mnemo` · [PyPI](https://pypi.org/project/agora-mnemo/) · [Hugging Face](https://huggingface.co/Danchi17/mnemo) · [DOI](https://doi.org/10.5281/zenodo.21128549) · [Homepage](https://dancenitra.github.io/mnemo/) · MIT · v1.24.1
+`pip install agora-mnemo` → `import mnemo` · [PyPI](https://pypi.org/project/agora-mnemo/) · [Hugging Face](https://huggingface.co/Danchi17/mnemo) · [DOI](https://doi.org/10.5281/zenodo.21128549) · [Homepage](https://dancenitra.github.io/mnemo/) · MIT · v1.24.4
 
 [![audit](https://github.com/DanceNitra/mnemo/actions/workflows/audit.yml/badge.svg)](https://github.com/DanceNitra/mnemo/actions/workflows/audit.yml)
 [![Star on GitHub](https://img.shields.io/github/stars/DanceNitra/mnemo?style=social)](https://github.com/DanceNitra/mnemo)
@@ -98,7 +98,7 @@ what makes three things possible the mainstream libraries don't offer:
 
 > **What that costs, measured on someone else's benchmark.** On the [MemOps](https://github.com/MemTensor/MemOps)
 > long-context scenarios (24 scenarios, ~50 sessions each), ingesting one scenario through mem0's default
-> pipeline took **600–730 s of LLM extraction**; mnemo's write path made **zero model calls**. Read the rest
+> pipeline took **519–917 s of LLM extraction** (median 606 s, n=24); mnemo's write path made **zero model calls**. Read the rest
 > before quoting that: on the same run, answer accuracy was **statistically indistinguishable** — mnemo 0.593,
 > a naive keep-all store 0.592, mem0 0.544, with every bootstrap CI crossing zero. So the honest claim is *same
 > answers, no write-time model cost*, not *better answers*. About 2% of mem0's extraction calls failed to parse
