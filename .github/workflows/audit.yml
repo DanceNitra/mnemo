@@ -108,6 +108,23 @@ jobs:
             exit 1
           fi
 
+  haystack-parity:
+    name: InspeximusDocumentStore vs Haystack's own document store
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade haystack-ai
+      - run: python haystack_audit.py
+      - name: parity check must fail when writes are swallowed
+        run: |
+          if HAYSTACK_FALSIFY=1 python haystack_audit.py --repeats 1; then
+            echo "::error::falsification control PASSED — the parity comparison proves nothing"
+            exit 1
+          fi
+
   published:
     name: the PUBLISHED wheel from PyPI
     runs-on: ubuntu-latest

@@ -3,6 +3,16 @@
 All notable changes to inspeximus (`inspeximus`). Format loosely follows Keep a Changelog; versioning is semver
 (MAJOR = stable/breaking, MINOR = features, PATCH = fixes).
 
+## 1.29.0 - a Haystack DocumentStore
+
+`InspeximusDocumentStore` implements Haystack's `DocumentStore` protocol (write_documents /
+filter_documents / delete_documents / count_documents), a drop-in for `InMemoryDocumentStore` that
+persists to a file and whose delete removes the value from disk. Duplicate policies (SKIP / OVERWRITE /
+NONE / FAIL) match the reference exactly, and filtering reuses Haystack's own `document_matches_filter`,
+so a `FilterRetriever` and pipeline serialization work unchanged. `haystack_audit.py` checks all of it
+against `InMemoryDocumentStore` with a falsification control; nine tests cover the duplicate policies,
+filter semantics, no-op delete, reopen, and on-disk erasure.
+
 ## 1.28.1 - receipts signed with `receipt_key` alone could never be verified
 
 Passing `receipt_key` without `receipt_pubkey` signed every write receipt with `"pubkey": None`, so
