@@ -383,6 +383,17 @@ def check_self_narration(text: str) -> dict:
 
 
 @mcp.tool()
+def selection_integrity(query: str, k: int = 6) -> dict:
+    """Make SELECTION-LEVEL manipulation auditable (read-only, no LLM). Provenance/tamper-evidence check that
+    retrieved records are authentic, but are blind to an attacker who injects authentic-looking UNTRUSTED
+    writes that REROUTE which trusted facts reach the top-k. This diffs the top-k the agent ACTUALLY gets
+    against the top-k of only trust-anchored memories, and surfaces any qualified fact that untrusted writes
+    displaced, plus the untrusted records occupying top-k slots. Returns {stable, displaced, untrusted_in_topk,
+    k}. Needs a trust root (trust_seeds / attested writes); without one it says so. Flags, never rewrites."""
+    return _MEM.selection_integrity(query, k=k)
+
+
+@mcp.tool()
 def value_by_cohort() -> dict:
     """Per-tag value rollup (count / total value / average). Reported at the cohort level on purpose:
     at n-of-1 a single memory's value is noise; the tag/time-block is where the signal is real."""

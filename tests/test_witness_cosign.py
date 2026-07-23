@@ -95,6 +95,26 @@ def test_no_common_witness_no_proof():
                                      B, [(w2[1], witness_cosign(w2[0], B))], [w1[1], w2[1]])
     assert r["inconsistent"] is True and r["fork"] is False and r["evidence"] == [], r
 
+def test_malformed_inputs_reject_not_crash():
+    """Gate-caught robustness: malformed anchors/cosignatures must reject safely, never crash."""
+    a = _sth(5, "aaa"); W = new_ed25519_keypair()
+    # bad sth_hash
+    r = Inspeximus.verify_cosigned_anchor({"sth_hash": "zz"}, [(W[1], "00" * 64)], [W[1]])
+    assert r["ok"] is False and "error" in r, r
+    # unhashable / non-str pubkey in a cosignature -> skipped, no crash
+    r2 = Inspeximus.verify_cosigned_anchor(a, [(["x"], "sig"), (W[1], witness_cosign(W[0], a))], [W[1]], threshold=1)
+    assert r2["ok"] is True and r2["count"] == 1, r2
+    # malformed anchor sizes in detect_split_view -> no crash
+    r3 = Inspeximus.detect_split_view({"n_writes": "abc"}, [], {"n_writes": 5}, [], [W[1]])
+    assert r3["fork"] is False, r3
+
+def test_split_view_undetermined_on_different_sizes():
+    """Different-size heads are UNDETERMINED (need verify_consistency), NOT 'no fork'."""
+    A = _sth(5, "aaa"); B = _sth(8, "bbb"); W = new_ed25519_keypair()
+    r = Inspeximus.detect_split_view(A, [(W[1], witness_cosign(W[0], A))],
+                                     B, [(W[1], witness_cosign(W[0], B))], [W[1]])
+    assert r["fork"] is False and r["inconsistent"] is False and r["undetermined"] is True, r
+
 def test_real_store_anchor_cosign():
     m = Inspeximus(path=None, receipts=True)
     m.remember("the sky is blue", key="sky::color", object="blue")

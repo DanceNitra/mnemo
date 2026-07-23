@@ -3,6 +3,30 @@
 All notable changes to inspeximus (`inspeximus`). Format loosely follows Keep a Changelog; versioning is semver
 (MAJOR = stable/breaking, MINOR = features, PATCH = fixes).
 
+## 1.35.0 - selection_integrity + a compliance mapping + adversarial-gate fixes
+
+New primitive `selection_integrity(query, k)` (library + MCP tool): make SELECTION-LEVEL manipulation
+auditable. Tamper-evidence checks that what you retrieved is authentic, but is blind to an attacker who
+injects authentic-looking UNTRUSTED writes that reroute WHICH trusted facts reach the top-k (Fei et al.,
+'Selection Integrity for LLM Graph Memory', arXiv 2606.12290). It diffs the top-k actual recall against the
+top-k of only trust-anchored memories and surfaces any trusted fact displaced by untrusted writes, plus the
+untrusted records occupying top-k slots. Flags, never rewrites. Returns stable=None (unknown, not "safe")
+when no trust root is configured.
+
+Also: `docs/COMPLIANCE.md` — an honest control mapping (NIST SP 800-53r5 / 800-218A / AI 600-1 / 800-88,
+OWASP LLM Top 10 & ASI06, GDPR, EU AI Act) with a mapping-is-not-certification disclaimer and a gaps section.
+
+Adversarial-gate fixes (a two-cluster security audit of every new function this cycle):
+  - **verify_claim (correctness):** the numeric/negation clash heuristic was blind to CATEGORICAL corrections,
+    so with `object` omitted a claim citing a corrected categorical value (e.g. "Berlin" after Berlin->Munich)
+    could read as `supported`. Now the record's stored `object` is the discriminator on BOTH the keyed and
+    keyless paths, so categorical stale/contradiction is caught. (Fix to the 1.32.0 primitive.)
+  - **witness co-signing (robustness):** `verify_cosigned_anchor` and `detect_split_view` now reject malformed
+    anchors/cosignatures safely instead of crashing; `detect_split_view` returns an explicit `undetermined`
+    field so different-size heads (not settleable from tree heads alone) do not read as "no fork".
+  - `selection_integrity` returns `stable=None` rather than `True` when it is blind.
+Exposed MCP tools 46 -> 47. New tests across all three areas; full suite green (226 passed).
+
 ## 1.34.0 - witness co-signing: split-view detection (the gossip layer no competitor ships)
 
 anchor()/verify_consistency() catch a rewrite on ONE timeline, but a compromised operator can still show

@@ -64,6 +64,31 @@ def test_unsupported_keyless_fabrication():
     r = m.verify_claim("the office is closed on Mondays")
     assert r["verdict"] == "unsupported", r
 
+def test_categorical_contradiction_keyed_without_object():
+    """Gate-caught: a categorical correction (no number/negation) must NOT read as 'supported' when object
+    is omitted — the stored object is the discriminator."""
+    m = fresh()
+    m.remember("User lives in Munich", key="user::city", object="Munich")
+    r = m.verify_claim("you live in Berlin", key="user::city")     # object omitted
+    assert r["verdict"] == "contradicted", r                       # was wrongly 'supported' before the fix
+    assert r["current"] == "Munich", r
+
+def test_categorical_stale_keyed_without_object():
+    m = fresh()
+    m.remember("User lives in Berlin", key="user::city", object="Berlin")
+    m.remember("User lives in Munich", key="user::city", object="Munich")   # Berlin retired
+    r = m.verify_claim("you live in Berlin", key="user::city")     # object omitted
+    assert r["verdict"] == "stale_superseded", r
+    assert r["current"] == "Munich", r
+
+def test_categorical_stale_keyless():
+    """Keyless categorical correction must not be called 'supported'."""
+    m = fresh()
+    m.remember("User lives in Berlin", key="user::city", object="Berlin")
+    m.remember("User lives in Munich", key="user::city", object="Munich")
+    r = m.verify_claim("you live in Berlin")                       # keyless
+    assert r["verdict"] == "stale_superseded", r                   # not 'supported'
+
 def test_does_not_write():
     """verify_claim must be read-only."""
     m = fresh()

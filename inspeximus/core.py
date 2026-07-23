@@ -468,7 +468,7 @@ def verify_erasure_certificate(cert: dict, store_path: str | None = None,
     return {"valid": valid, "checks": checks, "problems": problems, "count": cert.get("count")}
 
 
-__version__ = "1.34.0"
+__version__ = "1.35.0"
 
 # Internal sentinel: marks a reaffirm write already authorized by submit_revert() (which verified the
 # signed INTENT). Object identity — no text/content path can ever produce it.
@@ -2367,17 +2367,20 @@ class Inspeximus:
         threshold. Read-only; needs no access to the log. Needs `cryptography`."""
         if not _HAVE_ED:
             raise RuntimeError("verifying witness co-signatures needs the `cryptography` package")
-        h = anchor.get("sth_hash")
-        if not h:
-            return {"ok": False, "count": 0, "threshold": threshold, "signers": [], "error": "anchor has no sth_hash"}
+        h = anchor.get("sth_hash") if isinstance(anchor, dict) else None
+        try:
+            msg = bytes.fromhex(h) if isinstance(h, str) else None
+        except ValueError:
+            msg = None
+        if not msg:
+            return {"ok": False, "count": 0, "threshold": threshold, "signers": [], "error": "anchor has no valid sth_hash"}
         allow = set(witnesses); cls = witnesses if isinstance(witnesses, dict) else {}
-        msg = bytes.fromhex(h)
         classes, signers = set(), []
         for item in (cosignatures or []):
             if not (isinstance(item, (list, tuple)) and len(item) == 2):
                 continue
             pk, sg = item
-            if pk not in allow:
+            if not (isinstance(pk, str) and isinstance(sg, str)) or pk not in allow:   # malformed rejects, never crashes
                 continue
             try:
                 _Ed25519PK.from_public_bytes(bytes.fromhex(pk)).verify(bytes.fromhex(sg), msg)
@@ -2401,16 +2404,30 @@ class Inspeximus:
         = both heads independently carry >=1 valid allowlisted co-signature. HONEST LIMIT: decidable from signed
         tree heads alone ONLY at a SHARED size — if the two logs differ in size, append-only-vs-fork needs a
         consistency proof (verify_consistency), reported here as inconsistent=False (undetermined)."""
-        inconsistent, where = False, []
+        def _int(x, d):
+            try:
+                return int(x)
+            except (TypeError, ValueError):
+                return d
+        a = anchor_a if isinstance(anchor_a, dict) else {}
+        b = anchor_b if isinstance(anchor_b, dict) else {}
+        inconsistent, where, diff_size = False, [], False
         for ntag, tiptag in (("n_writes", "writes_tip"), ("n_tombstones", "tombstones_tip")):
-            if int(anchor_a.get(ntag, -1)) == int(anchor_b.get(ntag, -2)) and \
-               anchor_a.get(tiptag) != anchor_b.get(tiptag):
-                inconsistent = True; where.append(ntag)
-        va = Inspeximus.verify_cosigned_anchor(anchor_a, cosigs_a, witnesses, threshold=1)
-        vb = Inspeximus.verify_cosigned_anchor(anchor_b, cosigs_b, witnesses, threshold=1)
+            na, nb = _int(a.get(ntag), -1), _int(b.get(ntag), -2)
+            if na == nb and a.get(tiptag) != b.get(tiptag):
+                inconsistent = True; where.append(ntag)         # same size, different tip = decidable fork
+            elif na != nb:
+                diff_size = True                                # different size on this chain -> not STH-decidable
+        va = Inspeximus.verify_cosigned_anchor(a, cosigs_a, witnesses, threshold=1)
+        vb = Inspeximus.verify_cosigned_anchor(b, cosigs_b, witnesses, threshold=1)
         common = sorted(set(va["signers"]) & set(vb["signers"]))
-        return {"fork": bool(inconsistent and common), "inconsistent": inconsistent, "at": where,
-                "evidence": common, "both_cosigned": bool(va["ok"] and vb["ok"])}
+        # undetermined: no decidable inconsistency AND the heads differ in size, so append-only-vs-fork
+        # cannot be settled from signed tree heads alone — run verify_consistency against a replica.
+        undetermined = (not inconsistent) and diff_size
+        return {"fork": bool(inconsistent and common), "inconsistent": inconsistent, "undetermined": undetermined,
+                "at": where, "evidence": common, "both_cosigned": bool(va["ok"] and vb["ok"]),
+                "note": ("different-size heads: run verify_consistency against a replica to settle append-only"
+                         if undetermined else "")}
 
     def retract_lineage(self, subject: str, reason: str = "lineage_corrected") -> dict:
         """Lineage-aware correction: the MIDDLE PATH between a value-only supersession (which leaves records
@@ -5151,21 +5168,34 @@ class Inspeximus:
         — one that cites a value which WAS true but has since been SUPERSEDED or reverted. Deterministic and
         supersession-AWARE, which an LLM grounding judge does not reliably get (a corrected value is usually
         MORE embedding-similar to the claim than a rephrase, so a cosine/LLM check reads it as 'grounded').
-        Does NOT write. Returns {'verdict', 'current', 'matched'} with verdict in:
-          - 'supported'        : matches an ACTIVE memory (key+object, or a similar memory with no clash)
-          - 'stale_superseded' : matches a RETIRED value whose key now holds a DIFFERENT current value — the
-                                 reply is citing a corrected fact (the dangerous case; 'current' = the truth now)
-          - 'contradicted'     : clashes with the CURRENT active value (asserts against current truth)
-          - 'unsupported'      : no matching memory at all (possible fabrication)
+        Does NOT write. A record's stored `object` (its value) is the discriminator, so a CATEGORICAL
+        correction (Berlin->Munich) is caught, not only a numeric one. Returns {'verdict', 'current',
+        'matched'} with verdict in:
+          - 'supported'        : the claim asserts the ACTIVE value (exact object, the value appears in the
+                                 claim, or — for object-less free text — no numeric/negation clash)
+          - 'stale_superseded' : the claim asserts a RETIRED value whose key now holds a DIFFERENT current value
+                                 — the reply is citing a corrected fact (the dangerous case; 'current' = truth now)
+          - 'contradicted'     : asserts against the CURRENT active value
+          - 'unsupported'      : no matching memory (possible fabrication)
+        HONEST LIMIT: on the KEYLESS path a categorical contradiction with no matching retired value may report
+        'unsupported' rather than 'contradicted' (without a key there is no value axis to contradict on);
+        pass `key` (and ideally `object`) for the precise supersession-aware verdict.
 
         This is the deterministic, retire-history-aware read-side of the 'model proposes, store decides'
         boundary: a write-gate stops a corrected fact being re-STORED, but only a check against current-truth-
         vs-history catches the same corrected fact being re-ASSERTED in the generated reply."""
         inc = incompatible or (lambda a, b: _value_clash(a, b) or _negation_clash(a, b))
+        low = (text or "").lower()
         def _matches(rec_object, rec_text):
+            # Does the CLAIM assert this record's value? Use the stored object as the discriminator so a
+            # CATEGORICAL correction (Berlin->Munich; no number, no negation) is caught, not only numeric ones
+            # (the numeric/negation clash heuristic alone was blind to categorical value changes).
             if object is not None and rec_object is not None:
-                return str(rec_object) == str(object)          # both values known -> compare directly
-            return not inc(text, rec_text or "")               # else: no value clash / negation flip
+                return str(rec_object) == str(object)                       # both values known -> exact compare
+            if rec_object is not None:
+                v = str(rec_object).lower().strip()                         # record's known value in the claim?
+                return bool(v) and re.search(r"(?<![a-z0-9])" + re.escape(v) + r"(?![a-z0-9])", low) is not None
+            return not inc(text, rec_text or "")                            # no object anywhere -> clash heuristic
         def _out(verdict, cur, matched):
             return {"verdict": verdict,
                     "current": (cur.get("object") if isinstance(cur, dict) else cur),
@@ -5195,21 +5225,53 @@ class Inspeximus:
             if r.get("status") != "active":
                 continue
             if self._similarity(text, r, tvec) >= sim_threshold:
-                if not inc(text, r["text"]):
+                if _matches(r.get("object"), r["text"]):                    # claim asserts THIS record's value
                     return _out("supported", r.get("object"),
                                 {"id": r["id"], "object": r.get("object"), "text": r["text"][:200]})
-                if contra is None:
+                if contra is None and inc(text, r["text"]):
                     contra = r
         for r in rows:
             if r.get("status") == "active":
                 continue
-            if self._similarity(text, r, tvec) >= sim_threshold and not inc(text, r["text"]):
+            if self._similarity(text, r, tvec) >= sim_threshold and _matches(r.get("object"), r["text"]):
                 return _out("stale_superseded", None,
                             {"id": r["id"], "object": r.get("object"), "text": r["text"][:200]})
         if contra is not None:
             return _out("contradicted", contra.get("object"),
                         {"id": contra["id"], "object": contra.get("object"), "text": contra["text"][:200]})
         return _out("unsupported", None, None)
+
+    def selection_integrity(self, query: str, k: int = 6, pool: int = 50) -> dict:
+        """Make SELECTION-LEVEL manipulation AUDITABLE. Tamper-evidence/provenance verify that WHAT you
+        retrieved is authentic, but are blind by construction to an attacker who injects authentic-looking
+        UNTRUSTED writes that REROUTE which trusted facts land in the top-k — every cited record stays genuine
+        while the SELECTION is steered (Fei et al., 'Selection Integrity for LLM Graph Memory', arXiv
+        2606.12290: a faithful information-flow check is no defense against selection rerouting). inspeximus's
+        answer, in its flag-don't-silently-fix spirit: diff the top-k the agent ACTUALLY gets against the top-k
+        of only PROVENANCE-QUALIFIED memories (attested by / vouched by the trust root, via recall's
+        trusted_only), and surface any qualified fact that untrusted writes DISPLACED out of the result, plus
+        the untrusted records now occupying top-k slots. Deterministic, read-only (recall reinforcement off).
+
+        Returns {stable, displaced, untrusted_in_topk, k, note?}: stable=True iff no provenance-qualified fact
+        was pushed out of the top-k by untrusted writes. HONEST SCOPE: it makes the reroute VISIBLE for the
+        caller to gate on — it does NOT prevent the untrusted write (a flag, by design), and 'qualified' is
+        exactly your attestation / trust-seed policy. With no trust root configured it cannot distinguish
+        trusted from untrusted and says so (note)."""
+        actual = self.recall(query, k=k, reinforce=False)
+        actual_ids = {r["id"] for r in actual}
+        if not self.trust_seeds:
+            return {"stable": None, "displaced": [], "untrusted_in_topk": [],
+                    "k": k, "note": "no trust root configured (set trust_seeds / attest writes) — selection "
+                                    "integrity cannot distinguish trusted from untrusted here (unknown, not safe)"}
+        qualified = self.recall(query, k=k, trusted_only=True, reinforce=False)
+        trusted_pool = self.recall(query, k=max(k, pool), trusted_only=True, reinforce=False)
+        trusted_ids = {r["id"] for r in trusted_pool}
+        displaced = [{"id": r["id"], "text": (r.get("text") or "")[:160]}
+                     for r in qualified if r["id"] not in actual_ids]
+        untrusted = [{"id": r["id"], "text": (r.get("text") or "")[:160]}
+                     for r in actual if r["id"] not in trusted_ids]
+        return {"stable": not displaced, "displaced": displaced,
+                "untrusted_in_topk": untrusted, "k": k}
 
     @staticmethod
     def check_self_narration(text: str) -> dict:
@@ -5508,6 +5570,7 @@ class _TenantView:
     def contradictions(self, *a, **k):  return Inspeximus.contradictions(self, *a, **k)
     def check_conflict(self, *a, **k):  return Inspeximus.check_conflict(self, *a, **k)
     def verify_claim(self, *a, **k):    return Inspeximus.verify_claim(self, *a, **k)
+    def selection_integrity(self, *a, **k): return Inspeximus.selection_integrity(self, *a, **k)
     def _cluster_active(self, *a, **k): return Inspeximus._cluster_active(self, *a, **k)
     def _supersede_by_key(self, *a, **k): return Inspeximus._supersede_by_key(self, *a, **k)
     def candidates(self, *a, **k):      return Inspeximus.candidates(self, *a, **k)
