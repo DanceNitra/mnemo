@@ -500,6 +500,64 @@ def supersession_report() -> dict:
     return _MEM.supersession_report()
 
 
+@mcp.tool()
+def state_digest() -> str:
+    """A deterministic SHA-256 fingerprint of the CURRENT store state (order-independent; covers what recall can
+    serve). Pin it, do work, compare later — a changed digest means a write/supersession/revert/erasure happened.
+    The lightweight sibling of witness()/anchor()."""
+    return _MEM.state_digest()
+
+
+@mcp.tool()
+def erasure_report() -> dict:
+    """Audit view of every deliberate erasure: total tombstones plus each {memory_id, ts, request_id} — the
+    read-only 'what was erased, when, for which request' log a DPO/auditor asks for. Content-free (no PII)."""
+    return _MEM.erasure_report()
+
+
+@mcp.tool()
+def erasure_certificate(request_id: str = "", expected_pubkey: str = "") -> dict:
+    """A portable, INDEPENDENTLY-VERIFIABLE erasure certificate — the auditor-grade receipt proving records were
+    erased (optionally scoped to one `request_id`). Hand it to a third party who can check it WITHOUT your store;
+    pass `expected_pubkey` to also assert a specific signing key. The GDPR Art.17 / EU AI Act Art.12 proof object."""
+    return _MEM.erasure_certificate(request_id=request_id or None, expected_pubkey=expected_pubkey or None)
+
+
+@mcp.tool()
+def history(key: str) -> dict:
+    """The full validity timeline for `key`: every value it has held, in event-time order — the audit trail a plain
+    vector store cannot produce. Read-only."""
+    return {"key": key, "history": _MEM.history(key)}
+
+
+@mcp.tool()
+def as_of(key: str, when: float, as_recorded: float = 0.0) -> dict:
+    """POINT-IN-TIME (bitemporal) query: the value that was CURRENT for `key` at event-time `when` (UTC epoch
+    seconds), optionally as the store KNEW it at record-time `as_recorded`. 'What did we believe about X on date D.'"""
+    return {"key": key, "when": when, "value": _MEM.as_of(key, when, as_recorded=as_recorded or None)}
+
+
+@mcp.tool()
+def verify_attribution() -> dict:
+    """TAMPER-EVIDENCE for the attribution / poison-defense layer: are k, the influence budget, the influence gate,
+    and the slash ledger internally consistent and unedited? The integrity check for the poison-resistance state."""
+    return _MEM.verify_attribution()
+
+
+@mcp.tool()
+def irreversible_budget_report(budget: float = 1.0) -> dict:
+    """Audit view of the per-source lifetime IRREVERSIBLE-influence budget: how much durable pull each source has
+    spent against its cap — the 'no single source can quietly entrench itself' ledger. Read-only."""
+    return _MEM.irreversible_budget_report(budget=budget)
+
+
+@mcp.tool()
+def memory_report(dup_threshold: float = 0.9) -> dict:
+    """INSPECTOR overview — 'what is in memory, and is it clean': active/superseded counts, by type, likely
+    duplicates (>= dup_threshold), and integrity posture. The at-a-glance store-health view. Read-only."""
+    return _MEM.memory_report(dup_threshold=dup_threshold)
+
+
 # ── RESOURCES (read-only URIs — the second MCP primitive; lets a client browse memory as addressable context) ──
 @mcp.resource("inspeximus://digest")
 def digest_resource() -> str:

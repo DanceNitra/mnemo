@@ -3,6 +3,17 @@
 All notable changes to inspeximus (`inspeximus`). Format loosely follows Keep a Changelog; versioning is semver
 (MAJOR = stable/breaking, MINOR = features, PATCH = fixes).
 
+## 1.31.0 - expose the auditor's toolkit over MCP
+
+Eight more read-mostly governance/audit primitives are now MCP tools, completing the DPO/auditor surface an
+agent can call without dropping to the library: `erasure_certificate` (portable, independently-verifiable
+GDPR Art.17 / EU AI Act Art.12 receipt), `erasure_report` (the erasure log), `state_digest` (deterministic
+state fingerprint), `history` (a key's full validity timeline), `as_of` (bitemporal point-in-time recall),
+`verify_attribution` (tamper-evidence for the poison-defense layer), `irreversible_budget_report`, and
+`memory_report` (inspector overview). All read-only/deterministic; the mutating governance actions
+(slash/shred/spend/submit_revert) are deliberately left to the library API. Exposed MCP tools 32 -> 42.
+Verified: all eight execute end-to-end on a signed store. No new dependencies.
+
 ## 1.30.0 - expose the operator-adversarial provenance primitives over MCP
 
 `anchor()` and `verify_consistency()` are now MCP tools. Both already existed in the core but were
