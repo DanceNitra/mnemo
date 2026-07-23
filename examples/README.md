@@ -8,6 +8,7 @@ Runnable, copy-paste examples. Each is self-contained and needs only `pip instal
 | [`02_correction_and_erasure.py`](02_correction_and_erasure.py) | `echo_guard` (a restated stale value doesn't resurrect), `forget()`, and audited `forget_subject()` erasure |
 | [`03_semantic_recall.py`](03_semantic_recall.py) | plug **any** `embed=` function for semantic recall; runs as-is with a dependency-free stand-in |
 | [`04_encryption.py`](04_encryption.py) | AES-256-GCM **encryption-at-rest** + **crypto-shredding** erasure (needs `cryptography`) |
+| [`06_gdpr_erasure_receipt.py`](06_gdpr_erasure_receipt.py) | **signed erasure receipt** (GDPR Art. 17 / EU AI Act Art. 12): Ed25519-signed, hash-chained, content-free tombstones grouped by DSAR request id, provable end-to-end via `verify_writes()` + `governance_report()` |
 
 ```bash
 pip install inspeximus
