@@ -417,6 +417,29 @@ def verify_writes() -> dict:
 
 
 @mcp.tool()
+def anchor() -> dict:
+    """OPERATOR-ADVERSARIAL commitment: emit a Certificate-Transparency-style SIGNED TREE HEAD — a compact,
+    externally-publishable snapshot {n_writes, writes_tip, n_tombstones, tombstones_tip, ts} that hash-commits to
+    the ENTIRE write + erasure history at this instant. Publish it somewhere the store operator cannot retroactively
+    alter (a public log, a third-party witness, the auditor's own records). This closes the one hole verify_writes()
+    cannot: an operator who HOLDS the receipt key can rewrite AND re-sign the whole history so it still verifies
+    internally — but they cannot make the rewritten tip equal an anchor an outsider already witnessed. Record this
+    now; check later with verify_consistency(). (RFC 6962 model; the external witnessing is the auditor's job.)"""
+    return _MEM.anchor()
+
+
+@mcp.tool()
+def verify_consistency(prior_anchor: dict) -> dict:
+    """Detect an APPEND-ONLY VIOLATION against a `prior_anchor` an auditor recorded out of band: re-derive each
+    chain's tip and confirm the store is a consistent forward-extension of the witnessed anchor (nothing was
+    rewritten, rolled back, or re-signed away). Returns {consistent, problems}. This is the operator-adversarial
+    check verify_writes() cannot do on its own — it catches a store operator who forged history and re-signed it,
+    because the forged tip won't reconcile with the tip an outsider already pinned. Deterministic, no LLM."""
+    ok, problems = _MEM.verify_consistency(prior_anchor)
+    return {"consistent": bool(ok), "problems": problems}
+
+
+@mcp.tool()
 def witness() -> dict:
     """HYDRATION WITNESS: a compact, deterministic receipt of the store state your answer was derived from —
     "this answer reflects store state as of revision X". Call it right after recall() and attach the result to
