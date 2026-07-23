@@ -3,6 +3,27 @@
 All notable changes to inspeximus (`inspeximus`). Format loosely follows Keep a Changelog; versioning is semver
 (MAJOR = stable/breaking, MINOR = features, PATCH = fixes).
 
+## 1.34.0 - witness co-signing: split-view detection (the gossip layer no competitor ships)
+
+anchor()/verify_consistency() catch a rewrite on ONE timeline, but a compromised operator can still show
+DIFFERENT histories to different clients (a split-view / fork). This release adds the Certificate-Transparency
+GOSSIP layer that closes it — external witnesses co-sign the signed tree head, k-of-n:
+  - `witness_cosign(witness_sk, anchor, prior_anchor=None)` — a witness co-signs the sth_hash and REFUSES
+    (raises) an obvious fork it can see with no log: a rolled-back size, or the SAME size with a different tip.
+  - `Inspeximus.verify_cosigned_anchor(anchor, cosignatures, witnesses, threshold=k)` — client-side k-of-n
+    trust: an operator that forks must get k independent allowlisted witnesses to co-sign the fork; honest
+    witnesses refuse. Supports a {pubkey: class} allowlist so Sybil variants collapse to one vote.
+  - `Inspeximus.detect_split_view(anchor_a, cosigs_a, anchor_b, cosigs_b, witnesses)` — auditor-side FORK
+    PROOF: a witness that validly co-signed two inconsistent heads (same size, different tip) is cryptographic
+    proof the operator presented divergent histories.
+  - `new_ed25519_keypair()` convenience for minting witness/attestation keys.
+Result: a compromised host cannot silently show two different memory histories without corrupting the
+witnesses — the operator-adversarial guarantee none of the 2026 memory-integrity peers (MemLineage, Portable
+Agent Memory, mnemosyne-guard) provide. Honest limit: split-view is decidable from tree heads alone only at a
+shared log size; different sizes still need verify_consistency against a replica. Ed25519 (already a dep of the
+signed-store path); no NEW dependencies. Exposed MCP tools 44 -> 46. 13 tests incl. the split-view scenario;
+full suite green (217 passed).
+
 ## 1.33.0 - check_self_narration: keep the assistant's self-talk out of the store
 
 New write-gate primitive `check_self_narration(text)` (library + MCP tool). An LLM memory-writer routinely

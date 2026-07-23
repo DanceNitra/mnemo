@@ -462,6 +462,30 @@ def verify_consistency(prior_anchor: dict) -> dict:
 
 
 @mcp.tool()
+def verify_cosigned_anchor(anchor: dict, cosignatures: list, witnesses: list, threshold: int = 1) -> dict:
+    """CLIENT-side k-of-n trust: how many DISTINCT allowlisted WITNESSES validly co-signed this anchor's signed
+    tree head? This is the gossip layer that upgrades tamper-evidence (which catches a rewrite on ONE timeline)
+    into SPLIT-VIEW detection: a compromised operator cannot show divergent histories to different clients
+    without getting `threshold` independent witnesses to co-sign the fork — and honest witnesses refuse. Pass
+    `cosignatures` as [[pubkey_hex, sig_hex], ...] and `witnesses` as the allowlist [pubkey_hex, ...]. Returns
+    {ok, count, threshold, signers}; ok = count >= threshold. Read-only; needs no access to the log."""
+    from .core import Inspeximus
+    return Inspeximus.verify_cosigned_anchor(anchor, cosignatures, witnesses, threshold=threshold)
+
+
+@mcp.tool()
+def detect_split_view(anchor_a: dict, cosigs_a: list, anchor_b: dict, cosigs_b: list, witnesses: list) -> dict:
+    """AUDITOR-side FORK PROOF: given two co-signed anchors (e.g. the head shown to client A vs client B), is
+    there a witness that validly co-signed BOTH over an INCONSISTENT pair of heads (same log size, different
+    tip)? One such witness is cryptographic proof of a split-view — an honest witness refuses the second
+    signature, so a valid double-sign means the operator presented divergent histories. Returns {fork,
+    inconsistent, at, evidence, both_cosigned}. Honest limit: decidable from tree heads alone only at a shared
+    size; different-size logs need verify_consistency (reported inconsistent=False = undetermined)."""
+    from .core import Inspeximus
+    return Inspeximus.detect_split_view(anchor_a, cosigs_a, anchor_b, cosigs_b, witnesses)
+
+
+@mcp.tool()
 def witness() -> dict:
     """HYDRATION WITNESS: a compact, deterministic receipt of the store state your answer was derived from —
     "this answer reflects store state as of revision X". Call it right after recall() and attach the result to

@@ -175,6 +175,49 @@ def attest(text: str, source_sk_hex: str, source_doc=None) -> str:
     return sk.sign(_attest_message(text, source_doc)).hex()
 
 
+def new_ed25519_keypair() -> tuple[str, str]:
+    """Convenience: mint a fresh Ed25519 keypair as (secret_hex, public_hex) for an attestation source or a
+    witness, so callers need not touch `cryptography` directly. The public hex goes on an allowlist; the
+    secret stays with the signer. Needs `cryptography`."""
+    if not _HAVE_ED:
+        raise RuntimeError("key generation needs the `cryptography` package (pip install cryptography)")
+    sk = _Ed25519SK.generate()
+    pk = sk.public_key()
+    from cryptography.hazmat.primitives import serialization as _ser
+    sk_raw = sk.private_bytes(_ser.Encoding.Raw, _ser.PrivateFormat.Raw, _ser.NoEncryption())
+    pk_raw = pk.public_bytes(_ser.Encoding.Raw, _ser.PublicFormat.Raw)
+    return sk_raw.hex(), pk_raw.hex()
+
+
+def witness_cosign(witness_sk_hex: str, anchor: dict, prior_anchor: dict | None = None) -> str:
+    """WITNESS-side: co-sign an anchor()'s signed tree head, so a client can require k-of-n INDEPENDENT
+    witnesses before trusting the store's history. This is the external gossip layer that turns inspeximus's
+    tamper-evidence — which catches a rewrite on ONE timeline (verify_consistency) — into SPLIT-VIEW detection:
+    a compromised operator cannot show divergent histories to different clients without getting the witnesses
+    to co-sign both. The witness signs the `sth_hash` (the commitment to the whole write + tombstone history).
+
+    If `prior_anchor` (the last head THIS witness co-signed) is given, the witness REFUSES to sign — raising
+    ValueError — on a fork/rollback it can detect with NO access to the log: a shrunk log (`n_*` rolled back),
+    or the SAME log size carrying a DIFFERENT tip (a fork at a size already witnessed). Full append-only
+    verification between two LARGER sizes still needs a consistency proof against a replica
+    (Inspeximus.verify_consistency); this local guard is the zero-log subset. Returns the Ed25519 hex
+    signature over the sth_hash. Needs `cryptography`."""
+    if not _HAVE_ED:
+        raise RuntimeError("witness co-signing needs the `cryptography` package (pip install cryptography)")
+    h = anchor.get("sth_hash")
+    if not h:
+        raise ValueError("anchor has no sth_hash (produce the head with store.anchor())")
+    if prior_anchor is not None:
+        for ntag, tiptag in (("n_writes", "writes_tip"), ("n_tombstones", "tombstones_tip")):
+            n_new, n_old = int(anchor.get(ntag, 0)), int(prior_anchor.get(ntag, 0))
+            if n_new < n_old:
+                raise ValueError(f"refusing to co-sign: {ntag} rolled back {n_old} -> {n_new} (rollback)")
+            if n_new == n_old and anchor.get(tiptag) != prior_anchor.get(tiptag):
+                raise ValueError(f"refusing to co-sign: {ntag}={n_new} but {tiptag} differs from the prior head "
+                                 f"this witness signed (split-view / fork)")
+    return _Ed25519SK.from_private_bytes(bytes.fromhex(witness_sk_hex)).sign(bytes.fromhex(h)).hex()
+
+
 # --- universal-executor detection (1.2.0) -------------------------------------------------------------------
 # WHY: a per-tool reversibility label is unsound for VERB-POLYMORPHIC universal executors -- a shell / eval /
 # arbitrary-SQL / generic-HTTP tool whose EFFECT is set by a free-form argument, so the same tool is both
@@ -425,7 +468,7 @@ def verify_erasure_certificate(cert: dict, store_path: str | None = None,
     return {"valid": valid, "checks": checks, "problems": problems, "count": cert.get("count")}
 
 
-__version__ = "1.33.0"
+__version__ = "1.34.0"
 
 # Internal sentinel: marks a reaffirm write already authorized by submit_revert() (which verified the
 # signed INTENT). Object identity — no text/content path can ever produce it.
@@ -2310,6 +2353,64 @@ class Inspeximus:
                 problems.append(f"{kind} history rewritten after the anchor: tip {tip[:12]}.. != "
                                 f"anchored {str(prior_anchor.get(tiptag))[:12]}.. (fork detected)")
         return (len(problems) == 0, problems)
+
+    @staticmethod
+    def verify_cosigned_anchor(anchor: dict, cosignatures, witnesses, threshold: int = 1) -> dict:
+        """CLIENT-side k-of-n trust on an anchor: how many DISTINCT allowlisted witnesses validly co-signed
+        THIS anchor's sth_hash? An operator that forks the history must get `threshold` independent witnesses
+        to co-sign the forked head — honest witnesses refuse (witness_cosign), so a fork cannot reach the
+        threshold without corrupting them; that is the upgrade over 'trust the operator'. `cosignatures` =
+        iterable of (pubkey_hex, sig_hex). `witnesses` = the allowlist: a set/list of pubkey_hex, OR a
+        {pubkey_hex: class} map so Sybil variants declared to one class collapse to a single vote
+        (independence is a DECLARED grouping the allowlist curator owns — the store enforces it but cannot
+        prove two classes are causally independent). Returns {ok, count, threshold, signers}; ok = count >=
+        threshold. Read-only; needs no access to the log. Needs `cryptography`."""
+        if not _HAVE_ED:
+            raise RuntimeError("verifying witness co-signatures needs the `cryptography` package")
+        h = anchor.get("sth_hash")
+        if not h:
+            return {"ok": False, "count": 0, "threshold": threshold, "signers": [], "error": "anchor has no sth_hash"}
+        allow = set(witnesses); cls = witnesses if isinstance(witnesses, dict) else {}
+        msg = bytes.fromhex(h)
+        classes, signers = set(), []
+        for item in (cosignatures or []):
+            if not (isinstance(item, (list, tuple)) and len(item) == 2):
+                continue
+            pk, sg = item
+            if pk not in allow:
+                continue
+            try:
+                _Ed25519PK.from_public_bytes(bytes.fromhex(pk)).verify(bytes.fromhex(sg), msg)
+            except Exception:
+                continue
+            c = cls.get(pk, pk)
+            if c not in classes:
+                classes.add(c); signers.append(pk)
+        count = len(classes)
+        return {"ok": count >= threshold, "count": count, "threshold": threshold, "signers": signers}
+
+    @staticmethod
+    def detect_split_view(anchor_a: dict, cosigs_a, anchor_b: dict, cosigs_b, witnesses) -> dict:
+        """AUDITOR-side fork proof: given two co-signed anchors — e.g. the head the operator showed client A
+        and the one it showed client B — is there a witness that validly co-signed BOTH over an INCONSISTENT
+        pair of heads (the SAME log size carrying a DIFFERENT tip)? One such witness is cryptographic proof of
+        a split-view: an honest witness refuses that second signature (witness_cosign), so a valid double-sign
+        means the operator presented divergent histories (or that witness is dishonest — either way, a detected
+        fork). Returns {fork, inconsistent, at, evidence, both_cosigned}: `inconsistent` = the two heads
+        disagree at a shared size; `evidence` = witnesses that validly signed BOTH (the proof); `both_cosigned`
+        = both heads independently carry >=1 valid allowlisted co-signature. HONEST LIMIT: decidable from signed
+        tree heads alone ONLY at a SHARED size — if the two logs differ in size, append-only-vs-fork needs a
+        consistency proof (verify_consistency), reported here as inconsistent=False (undetermined)."""
+        inconsistent, where = False, []
+        for ntag, tiptag in (("n_writes", "writes_tip"), ("n_tombstones", "tombstones_tip")):
+            if int(anchor_a.get(ntag, -1)) == int(anchor_b.get(ntag, -2)) and \
+               anchor_a.get(tiptag) != anchor_b.get(tiptag):
+                inconsistent = True; where.append(ntag)
+        va = Inspeximus.verify_cosigned_anchor(anchor_a, cosigs_a, witnesses, threshold=1)
+        vb = Inspeximus.verify_cosigned_anchor(anchor_b, cosigs_b, witnesses, threshold=1)
+        common = sorted(set(va["signers"]) & set(vb["signers"]))
+        return {"fork": bool(inconsistent and common), "inconsistent": inconsistent, "at": where,
+                "evidence": common, "both_cosigned": bool(va["ok"] and vb["ok"])}
 
     def retract_lineage(self, subject: str, reason: str = "lineage_corrected") -> dict:
         """Lineage-aware correction: the MIDDLE PATH between a value-only supersession (which leaves records
