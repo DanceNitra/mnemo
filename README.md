@@ -63,19 +63,27 @@ number](#correction-is-a-first-class-operation-measured-across-systems) below is
 
 ## New — the EU AI Act compliance-evidence layer for agent memory
 
-When the AI Act's high-risk obligations start applying (**2 Aug 2026**, Annex III systems), a provider must
-*produce* evidence about what its agent **remembers**: tamper-evident record-keeping (Art. 12/19), accuracy and
-resistance to tampering (Art. 15), and provable erasure on request (GDPR Art. 17). Agent-memory libraries ship
-none of it. inspeximus is, to our knowledge, **the only open agent-memory library that ships verifiable erasure
-(with a receipt) and tamper-evident record-keeping as reusable evidence** for that memory slice — a drop-in
-overlay, not a rebuild:
+When the AI Act's high-risk obligations start applying (**2 Dec 2027** for standalone Annex III systems,
+**2 Aug 2028** for Annex I product-embedded ones — deferred from 2 Aug 2026 by Regulation (EU) 2026/1744, the
+[Digital Omnibus on AI](https://eur-lex.europa.eu/eli/reg/2026/1744/oj/eng), in force 27 Jul 2026), a provider
+of one -- and, for log-keeping, its deployer under Art. 26(6) -- has to be able to *show* things about what its
+agent **remembers**. The Act requires automatic event
+logging over the system's lifetime (Art. 12) and log retention (Art. 19); accuracy, robustness and
+cybersecurity including resilience to attempts to alter performance (Art. 15); and GDPR Art. 17 gives data
+subjects a right to erasure. **None of those articles say memory, provenance or tamper-evidence** — mapping
+them onto agent memory is our reading, not the text, and this is not legal advice.
+
+Of the agent-memory libraries we read (mem0, Zep/Graphiti, Cognee, Letta, LangMem — source at `main`,
+24 Jul 2026), none ship verifiable erasure with a receipt or tamper-evident record-keeping; inspeximus does, as a
+drop-in overlay rather than a rebuild. We have not surveyed the whole field, and smaller projects exist that we
+have not read — tell us if we have missed one and we will correct this.
 
 ```bash
 inspeximus compliance --out report.html     # article-labelled evidence, live counts from your store
 inspeximus audit-build --out bundle.json    # hand an auditor the bundle; they verify it offline (audit-verify)
 ```
 
-Evidence, not certification; the memory slice only, and the obligations bind the deployer, not the library.
+Evidence, not certification; the memory slice only, and the obligations bind the provider/deployer, not the library.
 → **[docs/AI_ACT.md](docs/AI_ACT.md)**
 
 ## Every claim below is checked by a script you can run
@@ -157,7 +165,8 @@ survives a restart.
 
 ### Portable audit bundle — hand an auditor one file they verify offline
 
-EU AI Act **Article 12** (record-keeping / logging, enforceable **2 Aug 2026**) and GDPR Art.17/30 ask an
+EU AI Act **Article 12** (record-keeping / logging; applies to high-risk systems from **2 Dec 2027**, Annex III)
+and GDPR Art.17/30 ask an
 operator to *produce*, on demand, a tamper-evident log of what the system recorded, what changed, and what was
 erased — and to let an independent party verify it. inspeximus already computes every piece; `audit_bundle`
 serialises them into **one content-free artifact** with a **standalone verifier that needs neither the live
@@ -466,8 +475,9 @@ context-economy practice (progressive disclosure / small-to-big retrieval); insp
 
 ## Where did this fact come from?
 
-The question people actually ask a memory layer is not "can you undo it" — it's *"why do you hold this,
-and who told you?"* `provenance()` answers it in one call, for one fact, in the order an auditor asks:
+You rarely reach for provenance going forwards. You reach for it backwards — when someone says *"delete
+that"*, and the fact is back next session because a summary that three other episodes still support had
+absorbed it. `provenance()` answers that in one call, for one fact, in the order an auditor asks:
 
 ```python
 m.provenance(key="billing-api::auth")     # or provenance(id="…") for one record
@@ -493,13 +503,25 @@ MCP (`provenance`). It assembles what the store already carries, rather than add
 | `origin` | the declared source; the taint it **inherited transitively** through summarization, so a derived note is never mistaken for a first-hand one; whether an **origin attestation** bound it to a verified key; the acting user/agent/session | `source` + `derived_from` + `attested_key` |
 | `trust` | the evidence grade — `claimed` → `corroborated` → `verified` → `settled`, earned from corroboration and external ratifications and **never settable by the writer** | `grade()` |
 | `timeline` | every value the fact has held, its validity interval, and **which policy retired each one** (`keyed_lww`, `echo_guard`, `state_toggle`, …) | `history()` |
-| `integrity` | whether the record still matches the write receipt committed at write time — so a later **relabel of its source is loud, not silent** — plus the current anchor to pin the answer against | `verify_attribution()` + `anchor()` |
+| `integrity` | whether the record still matches the content **and sources** its write receipt committed to — so an out-of-band edit that rewrites a record's source **without also rewriting the receipts sidecar** is caught — plus the current anchor to pin the answer against | `verify_attribution()` + `anchor()` |
 
 **What it does not prove**, returned in a `limits` field so a caller rendering this cannot quietly drop it:
 this is tamper-**evident**, not **correct** — a source that was already wrong when it was written is
 committed faithfully and nothing here can tell. And unsigned (the default), the receipt chain only catches
-an editor who cannot *also* rewrite the `.receipts` sidecar; pass `receipt_key=`, or have `anchor()`
-witnessed externally, for the loud property to hold against someone who owns the store.
+an editor who cannot *also* rewrite the `.receipts` sidecar — which sits next to the store, so an attacker
+with that much file access simply recomputes it and passes. We ship that as a failing negative control, not
+as prose (`test_provenance.py::test_an_attacker_who_rewrites_the_sidecar_too_is_NOT_caught`). Pass
+`receipt_key=` with the key off the write path, or have `anchor()` witnessed externally, for the property to
+mean anything against someone who owns the store. Note too that `attribution_matches_receipt` is a *change*
+detector: a legitimate re-derivation upstream can flip it with no attacker present.
+
+None of the machinery here is new. Binding the actor and attribution into a tamper-evident provenance chain
+so retroactive relabeling is detectable is Hasan, Sion & Winslett, *The Case of the Fake Picasso: Preventing History
+Forgery with Secure Provenance* (USENIX FAST 2009; journal version ACM TOS 5(4), 2009); answering provenance facets from one call is standard in provenance-aware
+databases (Perm, ProvSQL, ProQL); signed, Merkle-logged lineage for LLM agent memory specifically is
+MemLineage ([arXiv:2605.14421](https://arxiv.org/abs/2605.14421)), which inspeximus's lineage auto-stamping
+already credits. What is ours is the packaging: all of it in one zero-dependency file, on by default, with
+the limits attached to the answer.
 
 ## Five rules it won't break (each one cost us to learn)
 

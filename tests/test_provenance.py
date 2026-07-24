@@ -96,6 +96,31 @@ def test_a_relabel_is_loud():
     assert p["integrity"]["chain_ok"] is True                    # the LOG is intact; the RECORD moved
 
 
+def test_an_attacker_who_rewrites_the_sidecar_too_is_NOT_caught():
+    """NEGATIVE CONTROL — the limit `provenance()` states about itself, demonstrated rather than asserted.
+
+    The receipts sidecar sits next to the store and is UNSIGNED by default, and the attribution commitment
+    is a hash of public inputs with no secret. So an attacker with enough file access to relabel a record
+    can equally recompute the whole chain and pass every check. If this test ever started FAILING (i.e. we
+    caught them), the honest limits in the docstring would be understating what we do.
+    """
+    path = os.path.join(tempfile.mkdtemp(), "m.json")
+    m = Inspeximus(path=path, receipts=True)
+    m.remember("billing uses oauth2", key="billing::auth", object="oauth2", source={"doc": "adr-014"})
+
+    # the attacker relabels the source AND regenerates the receipt chain over the new state
+    rec = next(r for r in m.items if r.get("key") == "billing::auth")
+    rec["source"] = {"doc": "forged-source"}
+    m._receipts = []
+    m._emit_write_receipt(rec)
+    m._save(force=True)
+
+    p = Inspeximus(path=path, receipts=True).provenance(key="billing::auth")
+    assert p["integrity"]["attribution_matches_receipt"] is True    # NOT caught — this is the point
+    assert p["integrity"]["chain_ok"] is True
+    assert any("sidecar" in lim for lim in p["limits"]), "the answer must carry this limit with it"
+
+
 def test_receipts_off_says_so_instead_of_claiming_integrity():
     m = _store()
     m.remember("billing uses oauth2", key="billing::auth", object="oauth2")

@@ -5,6 +5,18 @@ All notable changes to inspeximus (`inspeximus`). Format loosely follows Keep a 
 
 ## 1.47.0 - provenance(): one answer to "where did this fact come from?", and every adapter goes compliance-aware
 
+**Correction first, because we got it wrong in public.** Until today this project's README, `docs/AI_ACT.md`,
+`docs/COMPLIANCE.md` and the ai-act landing page all said the EU AI Act's Annex III high-risk obligations start
+applying on **2 Aug 2026**. That was correct when written and is now wrong: **Regulation (EU) 2026/1744** (the
+Digital Omnibus on AI, adopted 8 Jul 2026, published in the OJ on 24 Jul 2026, in force 27 Jul 2026 —
+[ELI](https://eur-lex.europa.eu/eli/reg/2026/1744/oj/eng)) deferred those obligations to **2 Dec 2027**
+(standalone Annex III, Art. 6(2)) and **2 Aug 2028** (Annex I product-embedded, Art. 6(1)). Every date in this
+repo is corrected as of this release. We are stating it here rather than quietly editing the pages, because a
+compliance-adjacent project that silently fixes its own deadline copy has not earned the word evidence. We have
+also removed the implication that the Act *requires* memory provenance or tamper-evidence: Art. 12 requires
+automatic event logging, Art. 19 retention, Art. 15 accuracy/robustness/cybersecurity, and none of them name
+memory, provenance or tamper-evidence. These features exceed the text; they are not mandated by it.
+
 **`provenance(key=…)` / `provenance(id=…)`** assembles the answer a memory layer is asked for most often, from
 primitives that already existed but had to be called separately and in the right order: `origin` (the declared
 source, the taint inherited **transitively** through summarization, origin attestation, acting
@@ -102,7 +114,7 @@ report with LIVE counts, so the compliance mapping is demonstrable per store, no
 Scope is stated in every output: the AGENT-MEMORY slice only, EVIDENCE not certification, obligations bind the
 controller/provider/deployer not the library. Article wording traceable to Reg (EU) 2024/1689 / 2016/679 (see
 docs/COMPLIANCE.md, updated with the audit bundle + the staggered-enforcement note: the memory-relevant
-high-risk duties bite 2 Aug 2026 for Annex III systems, not "the whole Act at once"). New
+high-risk duties bite 2 Aug 2026 for Annex III systems, not "the whole Act at once" -- SUPERSEDED: deferred to 2 Dec 2027 by Reg. (EU) 2026/1744; see 1.47.0). New
 `tests/test_compliance.py` (6), `examples/10_compliance_overlay.py`. No behavior change to existing APIs.
 
 ## 1.40.0 - portable audit bundle: hand an auditor one file they verify offline

@@ -1,7 +1,9 @@
 # The EU AI Act compliance-evidence layer for AI-agent memory
 
-When the EU AI Act's high-risk obligations start to apply on **2 Aug 2026** (for Annex III systems), a provider
-has to *produce* three things about what its AI agent **remembers**: a tamper-evident record of what was logged
+When the EU AI Act's high-risk obligations start to apply — **2 Dec 2027** for standalone Annex III systems and
+**2 Aug 2028** for Annex I product-embedded ones, deferred from 2 Aug 2026 by Regulation (EU) 2026/1744 (the
+[Digital Omnibus on AI](https://eur-lex.europa.eu/eli/reg/2026/1744/oj/eng), published 24 Jul 2026, in force
+27 Jul 2026) — a provider has to *produce* three things about what its AI agent **remembers**: a tamper-evident record of what was logged
 (Art. 12 / 19), evidence that the memory is kept accurate and resists tampering (Art. 15), and provable erasure
 on request (GDPR Art. 17). Agent-memory libraries ship none of it.
 
@@ -95,7 +97,25 @@ Full control mapping (NIST 800-53r5 / 218A / 600-1 / 88, OWASP LLM Top 10 / ASI,
 
 Article quotations were verified verbatim against the EU Publications Office consolidated texts (the primary OJ
 manifestation): **Regulation (EU) 2024/1689** (AI Act) — EUR-Lex ELI `https://eur-lex.europa.eu/eli/reg/2024/1689/oj`
-— and **Regulation (EU) 2016/679** (GDPR) — `https://eur-lex.europa.eu/eli/reg/2016/679/oj`. Enforcement dates
-per AI Act Art. 113: general application 2 Aug 2026; Chapters I–II from 2 Feb 2025; GPAI/governance/penalty
-provisions from 2 Aug 2025 (except Art. 101); Art. 6(1) (Annex I route) from 2 Aug 2027. Annex III high-risk
-systems are classified under Art. 6(2) and fall under the 2 Aug 2026 date.
+— and **Regulation (EU) 2016/679** (GDPR) — `https://eur-lex.europa.eu/eli/reg/2016/679/oj`.
+
+**Application dates (updated 24 Jul 2026).** AI Act Art. 113 was amended by **Regulation (EU) 2026/1744**
+(Digital Omnibus on AI, adopted 8 Jul 2026, OJ 24 Jul 2026, in force 27 Jul 2026 —
+[ELI](https://eur-lex.europa.eu/eli/reg/2026/1744/oj/eng)), which **deferred** the high-risk obligations of
+Chapter III Sections 1–3 from 2 Aug 2026 to:
+- **2 Dec 2027** — standalone high-risk systems (Art. 6(2) / Annex III), where Art. 10/12/13/14/15/19 sit;
+- **2 Aug 2028** — high-risk AI embedded in regulated products (Art. 6(1) / Annex I).
+
+Unchanged by the deferral: Chapters I–II and the Art. 5 prohibitions (since 2 Feb 2025); GPAI, governance and
+penalty provisions (since 2 Aug 2025, except Art. 101); the Art. 50 transparency duties and the Art. 4 AI
+literacy duty.
+
+**What this means for this document, stated plainly:** the record-keeping duties these tools produce evidence
+for are **not yet in application** — they bite in Dec 2027. Nothing here should be read as "you are required to
+have this today". Article 12 requires *automatic event logging over the system's lifetime*; it does not name
+memory, provenance, lineage, attestation or tamper-evidence (its concrete minimum content list in Art. 12(3)
+binds only Annex III point 1(a) biometric-identification systems, and the ≥6-month retention duty sits in
+Art. 19). These features therefore **exceed** anything the text mandates rather than being required by it —
+build with them because you would rather hold the evidence than reconstruct it later, not because a deadline
+forces you. We have not tested how any conformity assessor or auditor actually treats them; we make no claim
+about that.

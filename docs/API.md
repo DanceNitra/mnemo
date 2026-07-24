@@ -774,3 +774,30 @@ report *about* the chain must load it. Read-only, no new state, no new claim lay
 **correct** (a source that was wrong at write time is committed faithfully — the oracle problem, untouched),
 and unsigned it only catches an editor who cannot also rewrite the `.receipts` sidecar. Receipt:
 `tests/test_provenance.py` (9/9, incl. a relabel-detection case).
+
+**Two further limits worth stating precisely.** (1) The database-provenance literature separates *where*
+(source location), *why* (witness set) and *how* (semiring derivation) provenance, and proves they are not
+interchangeable — where-provenance is not expressible in the semiring model (Cheney, Chiticariu & Tan, *FnT
+Databases* 1(4), 2009, §5.4; how-provenance is Green, Karvounarakis & Tannen, PODS 2007). What
+`provenance()` returns is **where-provenance plus a lineage edge set**, not a derivation semiring: it tells
+you which sources a value is attributable to and which ancestors a retraction would reach, not how the value
+was computed from them. (2) Propagating taint through summarization inherits the taint-analysis dilemma
+(Schwartz, Avgerinos & Brumley, IEEE S&P 2010): propagate everything and eventually all memory is tainted;
+propagate nothing and you miss real flows. inspeximus propagates along **explicit `derived_from` edges only**,
+which is deliberately on the under-tainting side — it will miss a derivation the caller never declared.
+
+For context on where this sits: reading the memory-write paths of mem0, Zep/Graphiti, Cognee, Letta and LangMem
+at `main` on 24 Jul 2026, we found no hash chain, signature or anchoring over memory writes, and no transitive
+lineage taint through summarization (Cognee's `source_content_hash` is the nearest thing and is a content
+identifier, not a chain). That is five libraries, not the field — smaller projects do ship hash-chained memory
+audit logs, and we read the write paths rather than every file. Graphiti carries the richest lineage —
+`EntityEdge.episodes` plus validity intervals — and its own docs are explicit that `remove_episode` does not
+regenerate node summaries, which is the same summarization boundary described above.
+
+**Prior art, credited.** Committing the actor/attribution into a tamper-evident provenance chain so a
+retroactive relabel is detectable is Hasan, Sion & Winslett, *The Case of the Fake Picasso: Preventing History
+Forgery with Secure Provenance* (USENIX FAST 2009; journal version ACM TOS 5(4), 2009); serving provenance facets from a single call is standard in provenance-aware
+databases (Perm, ProvSQL, ProQL); signed Merkle-logged lineage for LLM agent memory is MemLineage
+([arXiv:2605.14421](https://arxiv.org/abs/2605.14421)), already credited in `remember()`'s lineage
+auto-stamping. The mechanism is not new; the contribution is packaging it into one zero-dependency library
+with the limits returned alongside the answer.

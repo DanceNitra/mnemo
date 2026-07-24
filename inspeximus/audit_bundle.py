@@ -1,7 +1,8 @@
 """Portable audit bundle -- hand a DPO/auditor ONE file and a one-line command, no live store, no library
 internals, no PII.
 
-EU AI Act Article 12 (record-keeping / logging, enforceable 2 Aug 2026) and GDPR Art.17/30 (erasure + a record
+EU AI Act Article 12 (record-keeping / logging; applies to high-risk systems from 2 Dec 2027 for standalone
+Annex III systems, deferred from 2 Aug 2026 by Reg (EU) 2026/1744) and GDPR Art.17/30 (erasure + a record
 of the erasure ACT) ask an operator to PRODUCE, on demand, a tamper-evident log of what the system recorded,
 what changed, and what was erased -- and to let an independent party verify it. inspeximus already computes
 every piece (governance_report, supersession_report, anchor, the hash-linked write/tombstone chains); this
