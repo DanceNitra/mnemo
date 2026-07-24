@@ -11,7 +11,7 @@ attests it unaltered. The self-correcting memory layer for AI agents.*
 back — deterministically, with no LLM on the write path. Extracted from an autonomous research OS that has run
 it daily over 10,000 notes.*
 
-`pip install inspeximus` → `import inspeximus` · [PyPI](https://pypi.org/project/inspeximus/) · [Hugging Face](https://huggingface.co/Danchi17/inspeximus) · [DOI](https://doi.org/10.5281/zenodo.21128549) · [Homepage](https://dancenitra.github.io/inspeximus/) · MIT · v1.25.0
+`pip install inspeximus` → `import inspeximus` · [PyPI](https://pypi.org/project/inspeximus/) · [Hugging Face](https://huggingface.co/Danchi17/inspeximus) · [DOI](https://doi.org/10.5281/zenodo.21128549) · [Homepage](https://dancenitra.github.io/inspeximus/) · MIT · v1.41.0
 
 [![audit](https://github.com/DanceNitra/inspeximus/actions/workflows/audit.yml/badge.svg)](https://github.com/DanceNitra/inspeximus/actions/workflows/audit.yml)
 [![Star on GitHub](https://img.shields.io/github/stars/DanceNitra/inspeximus?style=social)](https://github.com/DanceNitra/inspeximus)
@@ -40,6 +40,23 @@ project. Nothing to configure by hand, and nothing to install globally.
 Prefer the manual route? `pip install "inspeximus[mcp]"` and point your client at `inspeximus-mcp` — the
 extra matters, because the core library is deliberately zero-dependency and the MCP server is the one
 piece that needs a dependency.
+
+## New — the EU AI Act compliance-evidence layer for agent memory
+
+When the AI Act's high-risk obligations start applying (**2 Aug 2026**, Annex III systems), a provider must
+*produce* evidence about what its agent **remembers**: tamper-evident record-keeping (Art. 12/19), accuracy and
+resistance to tampering (Art. 15), and provable erasure on request (GDPR Art. 17). Agent-memory libraries ship
+none of it. inspeximus is, to our knowledge, **the only open agent-memory library that ships verifiable erasure
+(with a receipt) and tamper-evident record-keeping as reusable evidence** for that memory slice — a drop-in
+overlay, not a rebuild:
+
+```bash
+inspeximus compliance --out report.html     # article-labelled evidence, live counts from your store
+inspeximus audit-build --out bundle.json    # hand an auditor the bundle; they verify it offline (audit-verify)
+```
+
+Evidence, not certification; the memory slice only, and the obligations bind the deployer, not the library.
+→ **[docs/AI_ACT.md](docs/AI_ACT.md)**
 
 ## Every claim below is checked by a script you can run
 
