@@ -3,6 +3,15 @@
 All notable changes to inspeximus (`inspeximus`). Format loosely follows Keep a Changelog; versioning is semver
 (MAJOR = stable/breaking, MINOR = features, PATCH = fixes).
 
+## 1.45.0 - the EU AI Act compliance surface over MCP
+
+The whole agent-memory compliance capability is now callable by any MCP client (Claude Code, Cursor, …). Five
+new MCP tools delegating to the free modules: `compliance_report`, `compliance_check`, `retention`,
+`audit_bundle`, `verify_audit_bundle`. New env `INSPEXIMUS_RECEIPTS=1` (opt-in, default off) turns on the
+tamper-evident write/erasure chain the record-keeping tools evidence, without an existing MCP store gaining a
+sidecar unexpectedly. So an agent can produce and verify its own EU AI Act evidence in-loop. docs/AI_ACT.md
+notes the MCP surface. New tests (2). No behavior change to existing tools; the store defaults to receipts off.
+
 ## 1.44.0 - compliance-aware framework integrations (LangGraph / CrewAI)
 
 New `inspeximus.integrations.governance.ComplianceMixin` — an integration store that holds an inspeximus in

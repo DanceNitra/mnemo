@@ -75,8 +75,12 @@ def _make_embedders():
 
 
 _PATH = os.environ.get("INSPEXIMUS_PATH", "inspeximus_memory.json")
+# INSPEXIMUS_RECEIPTS (opt-in, default off): keep the tamper-evident write/erasure chain that the compliance_*
+# / audit_bundle MCP tools evidence (EU AI Act Art. 12/19). Off by default so an existing MCP store gains no
+# sidecar file unexpectedly; set INSPEXIMUS_RECEIPTS=1 to enable it.
+_RECEIPTS = os.environ.get("INSPEXIMUS_RECEIPTS", "").strip().lower() in ("1", "true", "yes", "on")
 _EMB_DOC, _EMB_QUERY, _EMB_ID = _make_embedders()
-_MEM = Inspeximus(_PATH, embed=_EMB_DOC, embed_query=_EMB_QUERY, embed_id=_EMB_ID)
+_MEM = Inspeximus(_PATH, embed=_EMB_DOC, embed_query=_EMB_QUERY, embed_id=_EMB_ID, receipts=_RECEIPTS)
 # ECHO GUARD is ON by default on the MCP surface (a fresh product surface, not bound by the library's
 # byte-identical-legacy default): a keyed fact that is corrected and then RE-STATED (a benign restatement
 # or an attacker re-injecting the old value) otherwise resurrects the stale value. Measured on RAMR
@@ -555,6 +559,55 @@ def supersession_report() -> dict:
     """The correction ledger: which facts have been superseded/reverted, by key — the auditable 'what changed and
     what's current' view that an append-only-plus-supersession store can produce and a plain vector store cannot."""
     return _MEM.supersession_report()
+
+
+@mcp.tool()
+def compliance_report(expected_pubkey: str = "") -> dict:
+    """EU AI Act AGENT-MEMORY compliance EVIDENCE (read-only, no LLM): an article-labelled report (AI Act
+    Art. 12/15/19; GDPR Art. 17/30/5(1)(d)) with LIVE counts from this store and an honest per-control status
+    ('evidence' / 'available' / 'needs_receipts'). Scope: the agent-memory slice only — EVIDENCE, not a
+    certification; obligations bind the deployer, not the tool. For the record-keeping controls, enable the
+    tamper-evident chain with the env var INSPEXIMUS_RECEIPTS=1."""
+    from .compliance import compliance_report as _cr
+    return _cr(_MEM, expected_pubkey=(expected_pubkey or None))
+
+
+@mcp.tool()
+def compliance_check(require_receipts: bool = True, max_pii_age_days: float | None = None) -> dict:
+    """CI/CONTINUOUS compliance GATE (read-only, no LLM): assert the invariants a store claiming AI-Act
+    record-keeping must hold and report any regression. Returns {ok, violations, checked} — violations include
+    receipts_disabled (Art.12/19), integrity_failed (Art.12/15), pii_over_retention (GDPR 5(1)(e)). ok=False
+    means the memory posture regressed. Needs INSPEXIMUS_RECEIPTS=1 for the record-keeping checks."""
+    from .compliance import compliance_check as _cc
+    return _cc(_MEM, require_receipts=require_receipts, max_pii_age_days=max_pii_age_days)
+
+
+@mcp.tool()
+def retention(max_age_days: float, pii_only: bool = True, apply: bool = False) -> dict:
+    """STORAGE-LIMITATION enforcement (GDPR Art. 5(1)(e); read-only unless apply=True): find ACTIVE records
+    older than `max_age_days` and, with apply=True, hard-delete them — each erasure leaving a signed tombstone,
+    so the enforcement is itself auditable. DRY-RUN by default: returns {eligible, ids, applied, erased} so you
+    review before enforcing. `pii_only` (default True) restricts to PII-tagged records."""
+    from .compliance import retention_sweep
+    return retention_sweep(_MEM, max_age_days, pii_only=pii_only, apply=apply)
+
+
+@mcp.tool()
+def audit_bundle(expected_pubkey: str = "") -> dict:
+    """Export a portable, CONTENT-FREE audit bundle of this store's whole write + erasure history (EU AI Act
+    Art. 12/19). An auditor verifies it OFFLINE with verify_audit_bundle — no live store, no key. Needs
+    INSPEXIMUS_RECEIPTS=1 (else the chain is empty). Save the returned dict as json to hand over."""
+    from .audit_bundle import build_bundle
+    return build_bundle(_MEM, expected_pubkey=(expected_pubkey or None))
+
+
+@mcp.tool()
+def verify_audit_bundle(bundle: dict, witnesses: list | None = None, threshold: int = 1) -> dict:
+    """OFFLINE verification of an audit_bundle() — needs only the bundle (no store, no key). Re-walks both
+    hash-chains from genesis, matches the tips/counts to the signed anchor, and (with `witnesses`) checks
+    external co-signatures. Returns {ok, checks, problems, summary}; any post-export tamper fails it."""
+    from .audit_bundle import verify_bundle
+    return verify_bundle(bundle, witnesses=witnesses, threshold=threshold)
 
 
 @mcp.tool()

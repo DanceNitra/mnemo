@@ -48,6 +48,11 @@ inspeximus audit-verify bundle.json         # ...they verify it offline: exit 0 
 evidence, and a **live count from your store** — marked `evidence` (exercised), `available` (shipped, not
 exercised here), or `needs receipts`.
 
+The same surface is callable **over MCP** — `compliance_report`, `compliance_check`, `retention`,
+`audit_bundle`, `verify_audit_bundle` — so an agent (Claude Code, Cursor, any MCP client) can produce and check
+its own AI-Act evidence. Start the server with `INSPEXIMUS_RECEIPTS=1` to keep the tamper-evident chain those
+tools evidence.
+
 ### Keep it enforced — the continuous compliance gate
 
 A one-time report drifts. `inspeximus compliance --check` is a **CI gate** that exits non-zero the moment the
