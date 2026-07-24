@@ -75,6 +75,37 @@ def test_dotted_symbol_deprecation():
     assert len(hits) == 1 and hits[0]["replacement"] == "Client.open", hits
 
 
+def test_scan_lines_reports_line_numbers():
+    from inspeximus.code_guard import scan_lines
+    s = _store()
+    deprecate_symbol(s, "old_fn", "new_fn", reason="renamed")
+    code = "a = 1\nb = old_fn(a)\nc = 2\nd = old_fn(b)\n"
+    lines = scan_lines(s, code)
+    assert [h["line"] for h in lines] == [2, 4], lines
+    assert all(h["replacement"] == "new_fn" for h in lines), lines
+
+
+def test_scan_lines_empty_when_no_deprecations():
+    from inspeximus.code_guard import scan_lines
+    assert scan_lines(_store(), "x = foo()\n") == []
+
+
+def test_cli_check_code_exit_codes(tmp_path):
+    """The CI contract: `inspeximus check-code` exits 1 on a resurrection, 0 when clean."""
+    import os
+    from inspeximus.cli import main
+    store = str(tmp_path / "store.json")
+    os.environ["INSPEXIMUS_PATH"] = store
+    try:
+        assert main(["deprecate", "legacy_call", "new_call", "--reason", "gone in 2.0"]) == 0
+        dirty = tmp_path / "dirty.py"; dirty.write_text("x = legacy_call(1)\n", encoding="utf-8")
+        clean = tmp_path / "clean.py"; clean.write_text("x = new_call(1)\n", encoding="utf-8")
+        assert main(["check-code", str(dirty)]) == 1
+        assert main(["check-code", str(clean)]) == 0
+    finally:
+        os.environ.pop("INSPEXIMUS_PATH", None)
+
+
 if __name__ == "__main__":
     fns = [v for k, v in sorted(globals().items()) if k.startswith("test_") and callable(v)]
     p = 0

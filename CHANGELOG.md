@@ -3,6 +3,20 @@
 All notable changes to inspeximus (`inspeximus`). Format loosely follows Keep a Changelog; versioning is semver
 (MAJOR = stable/breaking, MINOR = features, PATCH = fixes).
 
+## 1.39.0 - code_guard as a CI gate: `inspeximus check-code` + pre-commit hook
+
+Turn 1.38.0's coding-agent guard from a library call into an enforceable build gate — the distribution wedge:
+  - `code_guard.scan_lines(store, code)` — per-occurrence view of check_code with 1-based line numbers
+    ([{symbol, replacement, reason, line, snippet}]); the CI-grade output shape.
+  - `inspeximus deprecate <old> <new> [--reason ...]` — record a refactor from the shell (keyed supersession).
+  - `inspeximus check-code <files...>` — scan files and EXIT NON-ZERO (with `file:line: resurrected ...`) if any
+    deprecated symbol reappears; exit 0 when clean. `--json` for machine output.
+  - `.pre-commit-hooks.yaml` — reference this repo as a pre-commit hook (`id: inspeximus-check-code`) so a
+    resurrected API cannot be committed. Commit the store (`.inspeximus/memory.json`) and the deterministic
+    token scan is a pass/fail every clone reproduces.
+New tests (scan_lines line numbers, CLI exit-code contract), README "Enforce it in CI" section. No behavior
+change to existing APIs; check_code/symbol_status/deprecate_symbol unchanged.
+
 ## 1.38.0 - code_guard: the coding-agent "don't resurrect the deleted API" wedge
 
 New module `inspeximus.code_guard` + three MCP tools that shape keyed supersession for the coding loop — the

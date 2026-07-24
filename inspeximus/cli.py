@@ -114,6 +114,16 @@ def main(argv=None):
     re_.add_argument("--all", action="store_true", help="re-embed EVERY record, not just the ones missing a vector")
     re_.add_argument("--batch", type=int, default=None, help="cap how many records this run re-embeds")
 
+    dep = sub.add_parser("deprecate", help="record a refactor: code symbol OLD was replaced by NEW "
+                                           "(coding-agent guard; keyed supersession)")
+    dep.add_argument("old", help="the removed/renamed symbol as it appears in code (e.g. db.query)")
+    dep.add_argument("new", help="what to use instead (e.g. db.execute)")
+    dep.add_argument("--reason", help="one-line why (shown when the old symbol is flagged)")
+
+    ck = sub.add_parser("check-code", help="scan files for any deprecated symbol they RESURRECT and exit "
+                                           "non-zero if any (drop into CI / pre-commit)")
+    ck.add_argument("paths", nargs="+", help="source files to scan")
+
     ins = sub.add_parser("install", help="register the MCP server in an editor's own config file")
     ins.add_argument("--ide", required=True,
                      help="host to configure: " + ", ".join(sorted(_install.HOSTS)))
@@ -245,6 +255,39 @@ def main(argv=None):
     elif a.cmd == "why":
         exp = m.why_recalled(a.query)
         _out(exp, a.json) or print(json.dumps(exp, indent=2, default=str))
+
+    elif a.cmd == "deprecate":
+        from inspeximus.code_guard import deprecate_symbol
+        try:
+            res = deprecate_symbol(m, a.old, a.new, reason=a.reason or "")
+        except ValueError as e:
+            print(f"deprecate: {e}", file=sys.stderr)
+            return 2
+        m._save(force=True)
+        _out(res, a.json) or print(f"deprecated `{res['symbol']}` -> `{res['replacement']}`"
+                                   + (f"  ({res['reason']})" if res['reason'] else ""))
+
+    elif a.cmd == "check-code":
+        from inspeximus.code_guard import scan_lines
+        violations = []
+        for path in a.paths:
+            try:
+                code = open(path, encoding="utf-8", errors="replace").read()
+            except OSError as e:
+                print(f"check-code: {e}", file=sys.stderr)
+                return 2
+            for h in scan_lines(m, code):
+                h = dict(h, file=path)
+                violations.append(h)
+        if a.json:
+            _out(violations, True)
+        else:
+            for h in violations:
+                print(f"{h['file']}:{h['line']}: resurrected `{h['symbol']}` -> use `{h['replacement']}`"
+                      + (f" ({h['reason']})" if h['reason'] else ""))
+            print(f"check-code: {'clean' if not violations else str(len(violations)) + ' resurrected deprecated symbol(s)'}",
+                  file=sys.stderr)
+        return 1 if violations else 0
 
     elif a.cmd == "distill":
         from inspeximus import default_distiller

@@ -1,0 +1,16 @@
+# Reference this repo from your own .pre-commit-config.yaml to fail a commit that reintroduces a code symbol a
+# refactor already deprecated (recorded with `inspeximus deprecate <old> <new>`). Point the guard at your
+# project's memory store via INSPEXIMUS_PATH (e.g. .inspeximus/memory.json committed to the repo).
+#
+#   repos:
+#     - repo: https://github.com/<owner>/inspeximus
+#       rev: v1.39.0
+#       hooks:
+#         - id: inspeximus-check-code
+- id: inspeximus-check-code
+  name: inspeximus check-code (no resurrected deprecated APIs)
+  description: Fail if a commit reintroduces a code symbol a refactor deprecated.
+  entry: inspeximus check-code
+  language: python
+  types: [python]
+  require_serial: true

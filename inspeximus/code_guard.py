@@ -74,6 +74,26 @@ def _deprecations(store) -> dict:
     return out
 
 
+def scan_lines(store, code: str) -> list:
+    """Per-OCCURRENCE view of check_code with 1-based line numbers -- the CI / pre-commit output shape. Returns
+    [{symbol, replacement, reason, line, snippet}] in file order for every resurrected deprecated symbol (empty
+    = clean). Same whole-identifier match as check_code; use `inspeximus check-code <files>` to fail a build on
+    a non-empty result."""
+    deps = _deprecations(store)
+    if not deps:
+        return []
+    compiled = {sym: re.compile(r"(?<![A-Za-z0-9_])" + re.escape(sym) + r"(?![A-Za-z0-9_])")
+                for sym in deps if sym}
+    out = []
+    for i, ln in enumerate((code or "").splitlines(), 1):
+        for sym, rx in compiled.items():
+            if rx.search(ln):
+                rec = deps[sym]
+                out.append({"symbol": sym, "replacement": rec.get("object"),
+                            "reason": _reason_from(rec), "line": i, "snippet": ln.strip()[:120]})
+    return out
+
+
 def check_code(store, code: str) -> list:
     """Scan a code blob for any symbol a refactor already deprecated -- the 'don't resurrect the old API' guard.
     Whole-identifier match (so `foo` matches `foo(` and `x.foo` but never `foobar`, `foo_bar` or `threshold`);

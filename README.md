@@ -276,6 +276,24 @@ similarity guess, no new storage. Full runnable demo: `examples/08_code_guard.py
 need behind Claude Code #14227 ("don't resurrect the old API after a refactor"), served by the primitive
 inspeximus already ships.
 
+**Enforce it in CI, not just in the loop.** The same guard is a shell command that exits non-zero when a
+deprecated symbol reappears — drop it into a pre-commit hook or a CI step so a human (or an agent) cannot merge
+a resurrected API:
+
+```bash
+inspeximus deprecate db.query db.execute --reason "query() removed in 3.0"   # record the refactor once
+inspeximus check-code src/**/*.py                                            # exits 1 with file:line on any resurrection
+```
+```yaml
+# .pre-commit-config.yaml  (point INSPEXIMUS_PATH at a store committed to the repo, e.g. .inspeximus/memory.json)
+- repo: https://github.com/<owner>/inspeximus
+  rev: v1.39.0
+  hooks: [{ id: inspeximus-check-code }]
+```
+
+Commit the store (`.inspeximus/memory.json`) so every clone shares the refactor history; the guard is a
+deterministic token scan, so the same commit is a pass or a fail on every machine.
+
 **Jump to:** [Correction (measured)](#correction-is-a-first-class-operation-measured-across-systems) ·
 [Governance & erasure](#governance-erasure--audit) · [Org-wide erasure receipt](#org-wide-erasure-receipt-one-signed-manifest-across-every-store-you-register) · [Install](#install) ·
 [MCP server](#use-it-as-an-mcp-server-any-claude--cursor--agent-client) ·
