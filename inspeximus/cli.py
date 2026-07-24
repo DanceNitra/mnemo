@@ -128,6 +128,11 @@ def main(argv=None):
                                            "non-zero if any (drop into CI / pre-commit)")
     ck.add_argument("paths", nargs="+", help="source files to scan")
 
+    cp_ = sub.add_parser("compliance", help="article-labelled agent-memory compliance EVIDENCE report "
+                                            "(EU AI Act Art.12/15/19 + GDPR Art.17/30) — HTML or JSON")
+    cp_.add_argument("--out", default=None, help="write a self-contained HTML report here")
+    cp_.add_argument("--expected-pubkey", default=None, help="pin the integrity check to this key")
+
     ab = sub.add_parser("audit-build", help="export a portable, content-free audit bundle "
                                             "(EU AI Act Art.12 / GDPR record-keeping) — hand it to an auditor")
     ab.add_argument("--out", default="inspeximus_audit_bundle.json", help="output json path")
@@ -183,8 +188,25 @@ def main(argv=None):
                   f"{', operator-adversarial' if s.get('operator_adversarial') else ''})")
         return 0 if res["ok"] else 1
 
-    # audit-build must reload the receipt/tombstone chains, so force receipts on regardless of the global flag.
-    m = _store(a.path, receipts=a.receipts or a.cmd == "audit-build")
+    # audit-build/compliance must reload the receipt/tombstone chains, so force receipts on regardless of the flag.
+    m = _store(a.path, receipts=a.receipts or a.cmd in ("audit-build", "compliance"))
+
+    if a.cmd == "compliance":
+        from inspeximus.compliance import compliance_report, render_html
+        rep = compliance_report(m, expected_pubkey=a.expected_pubkey)
+        if a.json:
+            _out(rep, True)
+        elif a.out:
+            with open(a.out, "w", encoding="utf-8") as f:
+                f.write(render_html(rep))
+            print(f"wrote compliance report -> {a.out}  "
+                  f"({rep['summary']['controls_with_evidence']}/{len(rep['controls'])} controls with live evidence)")
+        else:
+            from inspeximus.compliance import _STATUS_LABEL
+            for c in rep["controls"]:
+                print(f"  [{_STATUS_LABEL.get(c['status'], c['status'])}] {c['article']} {c['title']}")
+            print(f"\nscope: {rep['scope']}")
+        return 0
 
     if a.cmd == "audit-build":
         from inspeximus.audit_bundle import build_bundle

@@ -3,6 +3,24 @@
 All notable changes to inspeximus (`inspeximus`). Format loosely follows Keep a Changelog; versioning is semver
 (MAJOR = stable/breaking, MINOR = features, PATCH = fixes).
 
+## 1.41.0 - agent-memory compliance overlay: `inspeximus compliance`
+
+The runnable, honest EU-AI-Act-memory-slice overlay — turn a live store into an article-labelled EVIDENCE
+report with LIVE counts, so the compliance mapping is demonstrable per store, not asserted. New module
+`inspeximus.compliance`:
+  - `compliance_report(store, expected_pubkey=)` — for each memory-relevant control (EU AI Act Art. 12
+    record-keeping, Art. 19 logs-kept-≥6-months, Art. 15 accuracy/robustness/cybersecurity, Art. 10 data
+    governance; GDPR Art. 17 erasure, Art. 30 records-of-processing, Art. 5(1)(d) accuracy) returns the
+    obligation, the inspeximus evidence, a LIVE count from the store, and an honest per-store status:
+    'evidence' (exercised), 'available' (shipped, not exercised here), or 'needs_receipts'.
+  - `render_html(report)` — a self-contained, theme-aware, JS-free DPO-facing page.
+  - CLI `inspeximus compliance [--out report.html | --json]`.
+Scope is stated in every output: the AGENT-MEMORY slice only, EVIDENCE not certification, obligations bind the
+controller/provider/deployer not the library. Article wording traceable to Reg (EU) 2024/1689 / 2016/679 (see
+docs/COMPLIANCE.md, updated with the audit bundle + the staggered-enforcement note: the memory-relevant
+high-risk duties bite 2 Aug 2026 for Annex III systems, not "the whole Act at once"). New
+`tests/test_compliance.py` (6), `examples/10_compliance_overlay.py`. No behavior change to existing APIs.
+
 ## 1.40.0 - portable audit bundle: hand an auditor one file they verify offline
 
 The governance / EU AI Act Art.12 wedge — a portable, content-free record-keeping artifact + a STANDALONE
