@@ -3,6 +3,23 @@
 All notable changes to inspeximus (`inspeximus`). Format loosely follows Keep a Changelog; versioning is semver
 (MAJOR = stable/breaking, MINOR = features, PATCH = fixes).
 
+## 1.38.0 - code_guard: the coding-agent "don't resurrect the deleted API" wedge
+
+New module `inspeximus.code_guard` + three MCP tools that shape keyed supersession for the coding loop — the
+single most common way agent memory fails there: a refactor renamed/removed a function, but the model re-emits
+the old call because the old signature is still in its context.
+  - `deprecate_symbol(store, old, new, reason)` — record a refactor (a keyed supersession, deterministic, no
+    LLM). A later deprecation of the same `old` supersedes the replacement.
+  - `symbol_status(store, name)` — one-shot verdict for a symbol about to be emitted: 'superseded' (with the
+    `replacement` to use) or 'active' (no recorded deprecation).
+  - `check_code(store, code)` — the echo-guard for code: scan a whole generated snippet and flag every
+    deprecated symbol it resurrects (whole-identifier match — `foo` matches `foo(`/`x.foo`, never `foobar`;
+    a lexical token scan, not an AST parse). Returns [{symbol, replacement, reason, occurrences}], empty = clean.
+Exposed over MCP as `deprecate_symbol` / `symbol_status` / `check_code`. Built entirely on the proven core
+(`remember` keyed supersession + `_current_active`) — no new storage, no LLM, no embeddings. New
+`tests/test_code_guard.py` (8), `examples/08_code_guard.py`, README "For coding agents" section. Serves the
+vendor-abandoned need behind Claude Code #14227. No behavior change to existing APIs.
+
 ## 1.37.0 - reference witness server: stand up your own witness network
 
 Turns 1.36.0's witness pool into something you can actually deploy across independent hosts, with zero new

@@ -251,7 +251,30 @@ claude mcp add inspeximus -e INSPEXIMUS_PATH=~/.inspeximus_memory.json -- uvx --
 Your agent now has `remember` / `recall` / `history` — and corrections that stick: when a fact is superseded,
 recall serves the current value, a restated stale value can't resurrect it (`echo_guard`), and `revert` /
 `route` undo a correction on an unmarked "go back". `recall` returns compact records by default (drops internal
-fields; `get(id)` / `neighbors(id)` for detail on demand). Eighteen tools total; [details below](#use-it-as-an-mcp-server-any-claude--cursor--agent-client).
+fields; `get(id)` / `neighbors(id)` for detail on demand). [Full tool list below](#use-it-as-an-mcp-server-any-claude--cursor--agent-client).
+
+### For coding agents: stop resurrecting an API a refactor already deleted
+
+The single most common way memory fails inside a **coding loop**: a refactor renamed or removed a function, but
+the model re-emits the old call because the old signature is still all over its context. That is keyed
+supersession + an echo check — inspeximus's core competence — shaped for code, as three MCP tools:
+
+```python
+from inspeximus import Inspeximus
+from inspeximus.code_guard import deprecate_symbol, symbol_status, check_code
+mem = Inspeximus(path=".inspeximus/memory.json")
+
+deprecate_symbol(mem, "db.query", "db.execute", reason="query() removed in 3.0; execute() returns a cursor")
+symbol_status(mem, "db.query")          # -> {'verdict':'superseded','replacement':'db.execute', ...}
+check_code(mem, generated_snippet)      # -> [{'symbol':'db.query','replacement':'db.execute','occurrences':1}, ...]
+```
+
+`check_code` scans a whole generated snippet and flags every deprecated symbol it resurrects (whole-identifier
+match, most-used first; empty = clean) so the agent rewrites *before* returning code. Over MCP the same three
+are `deprecate_symbol` / `symbol_status` / `check_code`. Deterministic table lookup — no LLM, no embedding
+similarity guess, no new storage. Full runnable demo: `examples/08_code_guard.py`. This is the vendor-abandoned
+need behind Claude Code #14227 ("don't resurrect the old API after a refactor"), served by the primitive
+inspeximus already ships.
 
 **Jump to:** [Correction (measured)](#correction-is-a-first-class-operation-measured-across-systems) ·
 [Governance & erasure](#governance-erasure--audit) · [Org-wide erasure receipt](#org-wide-erasure-receipt-one-signed-manifest-across-every-store-you-register) · [Install](#install) ·

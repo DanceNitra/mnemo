@@ -558,6 +558,37 @@ def supersession_report() -> dict:
 
 
 @mcp.tool()
+def deprecate_symbol(old: str, new: str, reason: str = "") -> dict:
+    """CODING-AGENT REFACTOR RECORD (write, deterministic, no LLM): record that a code symbol `old` was replaced
+    by `new` (a function/method/constant renamed or removed in a refactor). This is the fix for the single most
+    common coding-loop memory failure — the model re-emitting a call the refactor already deleted because the old
+    signature is still in its context. A later deprecate_symbol of the same `old` supersedes the replacement.
+    Then call check_code(generated) before emitting code. Returns the recorded deprecation."""
+    from .code_guard import deprecate_symbol as _dep
+    return _dep(_MEM, old, new, reason)
+
+
+@mcp.tool()
+def symbol_status(name: str) -> dict:
+    """One-shot verdict for a single code symbol you are about to emit (read-only, no LLM): returns
+    {'symbol','verdict','replacement','reason'} — verdict 'superseded' means a refactor replaced it and
+    `replacement` is what to use instead (do NOT resurrect `name`); 'active' means no recorded deprecation."""
+    from .code_guard import symbol_status as _st
+    return _st(_MEM, name)
+
+
+@mcp.tool()
+def check_code(code: str) -> list[dict]:
+    """ECHO-GUARD FOR CODE (read-only, no LLM): scan a generated snippet and flag every deprecated symbol it
+    RESURRECTS. Call it on your own output before returning code. Whole-identifier match (`foo` matches `foo(`
+    and `x.foo`, never `foobar`); a lexical token scan, not an AST parse. Returns [{symbol, replacement, reason,
+    occurrences}] for each deprecated symbol the code still uses (empty = clean) so you can rewrite before
+    emitting. Powered by keyed supersession — records come from deprecate_symbol."""
+    from .code_guard import check_code as _cc
+    return _cc(_MEM, code)
+
+
+@mcp.tool()
 def state_digest() -> str:
     """A deterministic SHA-256 fingerprint of the CURRENT store state (order-independent; covers what recall can
     serve). Pin it, do work, compare later — a changed digest means a write/supersession/revert/erasure happened.
