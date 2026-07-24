@@ -41,6 +41,26 @@ Prefer the manual route? `pip install "inspeximus[mcp]"` and point your client a
 extra matters, because the core library is deliberately zero-dependency and the MCP server is the one
 piece that needs a dependency.
 
+## What you install, and what it does that others don't
+
+A **mem0 alternative** built the opposite way: deterministic, not an LLM extracting facts on every write — a
+memory that keeps a correction corrected and can *prove* what it erased. At a glance:
+
+| | **inspeximus** | mem0 / cognee / Zep&nbsp;·&nbsp;Graphiti |
+|---|---|---|
+| **Write path** | deterministic — **no LLM** | LLM extraction on every `add()` |
+| **Correction (a fact changes)** | keyed supersession serves current truth; a restated stale value can't creep back (`echo_guard`); `revert()` | LLM re-extract / bitemporal invalidation |
+| **Verifiable erasure** | **signed, content-free tombstone + an offline-verifiable receipt** | `delete()` — unverified |
+| **Tamper-evident record-keeping** | hash-linked receipts + a signed anchor, verified offline | SOC 2 audit logs (not cryptographic) / none |
+| **EU AI Act / GDPR evidence** | **`inspeximus compliance` overlay + audit bundle** | not framed |
+| **Dependencies** | **zero — one file** | server / DB / vector / graph stack |
+| **MCP server** | yes (one-command install) | varies |
+
+To our knowledge the only agent-memory library that ships verifiable erasure **and** tamper-evident
+record-keeping (a scan of nine products — [details](docs/AI_ACT.md); honest: Zep has a real SOC 2/HIPAA surface,
+just not verifiable erasure or AI-Act framing). And it doesn't cost you recall — the [measured integrity
+number](#correction-is-a-first-class-operation-measured-across-systems) below is the proof no competitor shows.
+
 ## New — the EU AI Act compliance-evidence layer for agent memory
 
 When the AI Act's high-risk obligations start applying (**2 Aug 2026**, Annex III systems), a provider must
