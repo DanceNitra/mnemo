@@ -26,11 +26,16 @@ from langchain_core.messages import BaseMessage, message_to_dict, messages_from_
 
 from inspeximus import Inspeximus
 
+from .governance import ComplianceMixin
 
-class InspeximusRetriever(BaseRetriever):
+
+class InspeximusRetriever(BaseRetriever, ComplianceMixin):
     """A LangChain retriever backed by inspeximus. Its differentiator vs a plain vector retriever: recall() hides
     superseded values, so a corrected fact is never retrieved back into the prompt (write facts with a
-    supersession `key=` for that to engage; plain text is stored append-only)."""
+    supersession `key=` for that to engage; plain text is stored append-only).
+
+    Mixes in `ComplianceMixin`: the same retriever yields the EU AI Act evidence (compliance_report /
+    compliance_check / retention / audit_bundle) with no extra wiring. Enable `receipts=True` on the store."""
 
     k: int = 5
     store: Any = None
@@ -52,9 +57,12 @@ class InspeximusRetriever(BaseRetriever):
         self.store.remember(text, key=key, **kw)
 
 
-class InspeximusChatMessageHistory(BaseChatMessageHistory):
+class InspeximusChatMessageHistory(BaseChatMessageHistory, ComplianceMixin):
     """A conversation history persisted in a inspeximus store, scoped per session_id. Messages are appended;
-    current-truth recall over the same store is available via `.store.recall(...)`."""
+    current-truth recall over the same store is available via `.store.recall(...)`.
+
+    Mixes in `ComplianceMixin`: the same history object yields the EU AI Act evidence (compliance_report /
+    compliance_check / retention / audit_bundle) with no extra wiring. Enable `receipts=True` on the store."""
 
     def __init__(self, session_id: str, path: str | None = None, store: Any = None, embed=None):
         self.session_id = session_id

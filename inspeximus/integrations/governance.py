@@ -10,13 +10,17 @@ enforce retention — all on the memory the agent is already writing to. Pure de
 Enable `receipts=True` on the store for the record-keeping chain (Art. 12/19) these reports evidence.
 """
 from __future__ import annotations
-from typing import Any
 
 
 class ComplianceMixin:
-    """Requires `self.store` to be an `inspeximus.Inspeximus`. Read-only except `retention(apply=True)`."""
+    """Requires `self.store` to be an `inspeximus.Inspeximus`. Read-only except `retention(apply=True)`.
 
-    store: Any
+    Deliberately declares NO class-level `store` annotation. Several adapters are pydantic models
+    (LangChain `BaseRetriever`, LlamaIndex `BaseMemoryBlock`, ...); pydantic collects annotations from
+    plain mixin bases too, so a `store: Any` here would be promoted to a model FIELD and would SHADOW an
+    adapter that exposes `store` as a `@property` — `self.store` would then return the property object
+    instead of the store. Measured, not assumed (see tests/test_governance_mixin.py).
+    """
 
     def compliance_report(self, expected_pubkey: str | None = None) -> dict:
         """Article-labelled EVIDENCE report (AI Act Art. 12/15/19; GDPR 17/30/5(1)(d)) with live counts."""

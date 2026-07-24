@@ -25,9 +25,15 @@ from pydantic import Field, PrivateAttr
 from llama_index.core.memory import BaseMemoryBlock
 from llama_index.core.base.llms.types import ChatMessage
 
+from .governance import ComplianceMixin
 
-class InspeximusMemoryBlock(BaseMemoryBlock[str]):
-    """A persistent long-term memory block whose recall is supersession-filtered (current-truth)."""
+
+class InspeximusMemoryBlock(BaseMemoryBlock[str], ComplianceMixin):
+    """A persistent long-term memory block whose recall is supersession-filtered (current-truth).
+
+    Mixes in `ComplianceMixin`: the same memory block yields the EU AI Act evidence (compliance_report /
+    compliance_check / retention / audit_bundle) with no extra wiring. Enable `receipts=True` on the store.
+    The mixin carries no annotations, so it cannot shadow this class's `store` property."""
 
     name: str = Field(default="InspeximusMemory")
     description: Optional[str] = Field(

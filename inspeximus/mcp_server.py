@@ -674,6 +674,16 @@ def history(key: str) -> dict:
 
 
 @mcp.tool()
+def provenance(key: str = "", id: str = "") -> dict:
+    """WHERE DID THIS FACT COME FROM — one answer, assembled from the whole record: the declared source and the
+    lineage it inherited through summarization, whether an origin attestation bound it to a verified key, its
+    evidence grade, every value it has held and WHICH policy retired each one, and whether it still matches the
+    write receipt committed at write time (so a later relabel is loud). Pass `key` (the fact, across all its
+    values) or `id` (one record). Read-only; the returned `limits` state honestly what this does NOT prove."""
+    return _MEM.provenance(key=key or None, id=id or None)
+
+
+@mcp.tool()
 def as_of(key: str, when: float, as_recorded: float = 0.0) -> dict:
     """POINT-IN-TIME (bitemporal) query: the value that was CURRENT for `key` at event-time `when` (UTC epoch
     seconds), optionally as the store KNEW it at record-time `as_recorded`. 'What did we believe about X on date D.'"""

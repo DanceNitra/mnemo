@@ -3,6 +3,37 @@
 All notable changes to inspeximus (`inspeximus`). Format loosely follows Keep a Changelog; versioning is semver
 (MAJOR = stable/breaking, MINOR = features, PATCH = fixes).
 
+## 1.47.0 - provenance(): one answer to "where did this fact come from?", and every adapter goes compliance-aware
+
+**`provenance(key=…)` / `provenance(id=…)`** assembles the answer a memory layer is asked for most often, from
+primitives that already existed but had to be called separately and in the right order: `origin` (the declared
+source, the taint inherited **transitively** through summarization, origin attestation, acting
+user/agent/session, the orphan flag, and any ancestor since erased), `trust` (the evidence grade — earned, never
+writer-settable), `timeline` (`history()`, incl. the policy that retired each value), and `integrity` (whether
+the record still matches the content **and attribution** its write receipt committed to — so a post-hoc relabel
+of a source is loud, not silent — plus the current `anchor()`). A `limits` field rides along stating what this
+does NOT prove (tamper-*evident*, not *correct*; unsigned it only catches an editor who cannot also rewrite the
+`.receipts` sidecar), so a renderer cannot quietly drop the caveat. Exposed as `inspeximus provenance <key>`
+(`--json`) and the `provenance` MCP tool — MCP surface = 54 tools. Read-only; no new state, no write-path cost.
+
+**Fix (same area):** the CLI opens stores without receipts by default, so a report *about* the receipt chain
+described a receipted store as "receipts off at write time" — wrong, not merely unhelpful. `provenance` now
+forces receipts on for the read, like `audit-build` / `compliance` / `retention` already did.
+
+**`ComplianceMixin` now on every class-based adapter** (was LangGraph + CrewAI only): LangChain
+`InspeximusRetriever` and `InspeximusChatMessageHistory`, LlamaIndex `InspeximusMemoryBlock`, AutoGen
+`InspeximusMemory`, OpenAI-Agents `InspeximusSession`, Haystack `InspeximusDocumentStore`, ADK
+`InspeximusMemoryService`. Whichever framework you already use, the AI-Act evidence comes off the same object
+your agent writes memory to. Pydantic AI stays out on purpose — it exposes a function toolset, not a class.
+
+**Measured, not assumed:** the mixin's `store: Any` class annotation had to be REMOVED. Pydantic collects
+annotations from plain mixin bases too, so it was promoted to a model field on the pydantic-based adapters and
+shadowed LlamaIndex's `store` **property** — `self.store` returned the property object and every compliance
+call would have failed on a non-store. Caught before rollout; pinned by a regression test.
+
+New tests (16, in `tests/test_provenance.py` + `tests/test_governance_mixin.py`); the mixin test also runs in
+the four CI audit jobs that install a real framework. No behavior change to any existing call.
+
 ## 1.46.0 - forget(dry_run=True): preview a bulk delete before you commit it
 
 A safety valve on the one irreversible operation. `forget(..., dry_run=True)` returns

@@ -371,11 +371,16 @@ page; everything else is there when you need it.
 Adapters for LangGraph, CrewAI, LangChain, LlamaIndex, AutoGen and the rest,
 with copy-paste snippets: **[docs/INTEGRATIONS.md](docs/INTEGRATIONS.md)**.
 
-**Compliance-aware out of the box.** The LangGraph `InspeximusStore` and CrewAI `InspeximusStorage` mix in
+**Compliance-aware out of the box.** Every class-based adapter — LangGraph `InspeximusStore`, CrewAI
+`InspeximusStorage`, LangChain `InspeximusRetriever` / `InspeximusChatMessageHistory`, LlamaIndex
+`InspeximusMemoryBlock`, AutoGen `InspeximusMemory`, OpenAI-Agents `InspeximusSession`, Haystack
+`InspeximusDocumentStore`, ADK `InspeximusMemoryService` — mixes in
 `ComplianceMixin`, so the same object your agent writes memory to also produces the EU AI Act evidence —
 `store.compliance_report()`, `store.compliance_check()`, `store.audit_bundle()`, `store.retention(...)`. Pass
 `receipts=True` for the tamper-evident record-keeping chain those reports evidence. See
-[docs/AI_ACT.md](docs/AI_ACT.md).
+[docs/AI_ACT.md](docs/AI_ACT.md). (Pydantic AI is the one exception: it exposes a *function* toolset,
+`inspeximus_toolset(store)`, so there is no adapter object — call the evidence operations on the store you
+passed in.)
 ## Use it as an MCP server (any Claude / Cursor / agent client)
 
 `inspeximus` ships an [MCP](https://modelcontextprotocol.io) stdio server so any MCP-compatible agent can
@@ -458,6 +463,43 @@ context-economy practice (progressive disclosure / small-to-big retrieval); insp
 | `consolidate_clusters(threshold)` | **cluster-triggered** consolidation: consolidate a semantic cluster only once it's grown past `threshold` — sparse topics keep their raw episodes, dense ones don't grow unbounded |
 | `contradictions()` | flag mutually-incompatible **related** memories (similarity-gated) for human review |
 | `forget(ids, where)` | the one op that **truly deletes** (the rest is append-only): hard-removes the matched records *and* scrubs their ids from every survivor's links + toggle pointers + the vec/token caches, so a forgotten memory can't resurface via recall, a consolidation link, or the dream pass. For erasure / right-to-be-forgotten, poison removal, or a hard correction — measured 15/15 on a verified-forgetting severe-test |
+
+## Where did this fact come from?
+
+The question people actually ask a memory layer is not "can you undo it" — it's *"why do you hold this,
+and who told you?"* `provenance()` answers it in one call, for one fact, in the order an auditor asks:
+
+```python
+m.provenance(key="billing-api::auth")     # or provenance(id="…") for one record
+```
+
+```
+fact      billing-api::auth
+  now       oauth2  [active]
+  source    adr-014  (not attested)
+  lineage   primary observation
+  trust     claimed
+  history   2 value(s), 1 retired
+              api-keys  ->  retired by keyed_lww
+              oauth2  ->  active
+  integrity content matches; attribution matches; chain ok; unsigned the write receipt
+```
+
+Same answer from the shell (`inspeximus provenance billing-api::auth`, `--json` for the full object) and over
+MCP (`provenance`). It assembles what the store already carries, rather than adding a new claim layer:
+
+| field | what it answers | built from |
+|---|---|---|
+| `origin` | the declared source; the taint it **inherited transitively** through summarization, so a derived note is never mistaken for a first-hand one; whether an **origin attestation** bound it to a verified key; the acting user/agent/session | `source` + `derived_from` + `attested_key` |
+| `trust` | the evidence grade — `claimed` → `corroborated` → `verified` → `settled`, earned from corroboration and external ratifications and **never settable by the writer** | `grade()` |
+| `timeline` | every value the fact has held, its validity interval, and **which policy retired each one** (`keyed_lww`, `echo_guard`, `state_toggle`, …) | `history()` |
+| `integrity` | whether the record still matches the write receipt committed at write time — so a later **relabel of its source is loud, not silent** — plus the current anchor to pin the answer against | `verify_attribution()` + `anchor()` |
+
+**What it does not prove**, returned in a `limits` field so a caller rendering this cannot quietly drop it:
+this is tamper-**evident**, not **correct** — a source that was already wrong when it was written is
+committed faithfully and nothing here can tell. And unsigned (the default), the receipt chain only catches
+an editor who cannot *also* rewrite the `.receipts` sidecar; pass `receipt_key=`, or have `anchor()`
+witnessed externally, for the loud property to hold against someone who owns the store.
 
 ## Five rules it won't break (each one cost us to learn)
 

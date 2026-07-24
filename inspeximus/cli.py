@@ -112,6 +112,11 @@ def main(argv=None):
     wy = sub.add_parser("why", help="explain why memories were recalled for a query (per-channel breakdown)")
     wy.add_argument("query")
 
+    pv = sub.add_parser("provenance", help="where a fact came from: source, lineage, trust grade, what it "
+                                           "superseded, and whether it still matches its write receipt")
+    pv.add_argument("key", nargs="?", help="the supersession key of the fact (omit when using --id)")
+    pv.add_argument("--id", help="look up one record by id instead of by key")
+
     di = sub.add_parser("distill", help="LLM-distill a transcript into memories (needs INSPEXIMUS_LLM_URL)")
     di.add_argument("--file", help="read text from a file (else stdin)")
 
@@ -205,7 +210,9 @@ def main(argv=None):
         return 0 if res["ok"] else 1
 
     # audit-build/compliance/retention must have the receipt+tombstone chains, so force receipts on.
-    m = _store(a.path, receipts=a.receipts or a.cmd in ("audit-build", "compliance", "retention"))
+    # `provenance` REPORTS on the receipt chain, so it must load it — otherwise a receipted store would be
+    # described as "receipts off at write time", which is not merely unhelpful but wrong.
+    m = _store(a.path, receipts=a.receipts or a.cmd in ("audit-build", "compliance", "retention", "provenance"))
 
     if a.cmd == "retention":
         from inspeximus.compliance import retention_sweep
@@ -383,6 +390,52 @@ def main(argv=None):
     elif a.cmd == "why":
         exp = m.why_recalled(a.query)
         _out(exp, a.json) or print(json.dumps(exp, indent=2, default=str))
+
+    elif a.cmd == "provenance":
+        if (a.key is None) == (a.id is None):
+            print("provenance: give a KEY or --id (exactly one)", file=sys.stderr)
+            return 2
+        p = m.provenance(key=a.key, id=a.id)
+        if a.json:
+            _out(p, True)
+        elif not p["found"]:
+            print(f"no such fact: {a.key or a.id}")
+            return 1
+        else:
+            cur, org, integ = p["current"], p["origin"], p["integrity"]
+            src = org["source"]
+            src = (src.get("doc") or src.get("name") or json.dumps(src)) if isinstance(src, dict) else (src or "-")
+            print(f"fact      {p['key'] or '(unkeyed)'}")
+            print(f"  now       {cur['object'] or cur['text']}  [{cur['status']}]")
+            print(f"  source    {src}" + ("  (attested)" if org["attested"] else "  (not attested)"))
+            if org["derived"]:
+                print(f"  lineage   derived from {len(org['ancestors'])} ancestor(s); "
+                      f"taint: {', '.join(org['inherited_taint']) or '-'}")
+            elif org["orphan"]:
+                print("  lineage   ORPHAN: no source and no resolvable parent -- earns no corroboration standing")
+            else:
+                print("  lineage   primary observation")
+            if org["actor"]:
+                print("  actor     " + ", ".join(f"{k}={v}" for k, v in org["actor"].items()))
+            print(f"  trust     {p['trust']['grade']}")
+            if p["timeline"]:
+                print(f"  history   {len(p['timeline'])} value(s), {p['superseded_count']} retired")
+                for h in p["timeline"]:
+                    label = h["object"] or (h["text"] or "")[:48]
+                    print(f"              {label}  ->  " +
+                          (f"retired by {h['policy'] or 'unstamped'}" if h["status"] == "superseded"
+                           else h["status"]))
+            if not integ["receipted"]:
+                print("  integrity no write receipt for this record (receipts off at write time)")
+            else:
+                bits = ["content " + ("matches" if integ["content_matches_receipt"] else "DIFFERS FROM"),
+                        "attribution " + ({True: "matches", False: "DIFFERS FROM", None: "not committed in"}
+                                          [integ["attribution_matches_receipt"]]),
+                        "chain " + ("ok" if integ["chain_ok"] else "BROKEN"),
+                        "signed" if integ["signed"] else "unsigned"]
+                print("  integrity " + "; ".join(bits) + " the write receipt")
+            for lim in p["limits"]:
+                print(f"  limit     {lim}")
 
     elif a.cmd == "deprecate":
         from inspeximus.code_guard import deprecate_symbol

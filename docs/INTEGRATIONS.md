@@ -20,6 +20,33 @@ zero-dependency, and the framework is imported lazily only when you use its adap
 
 Details for each below.
 
+### Every adapter is compliance-aware: `ComplianceMixin` (1.44.0 → all adapters in 1.47.0)
+
+Each class-based adapter above mixes in `inspeximus.integrations.governance.ComplianceMixin`, so the EU AI Act
+evidence operations come off **the same object your agent writes memory to** — no reaching past the framework
+adapter to the store, no extra wiring:
+
+```python
+store = InspeximusStore(path="mem.json", receipts=True)   # or any adapter in the table
+store.compliance_report()        # article-labelled EVIDENCE report, live counts (Art. 12/15/19, GDPR 17/30)
+store.compliance_check()         # CI gate: {ok, violations} — fails when the memory posture regresses
+store.audit_bundle()             # portable, content-free bundle an auditor verifies offline
+store.retention(max_age_days=90) # storage-limitation sweep; DRY-RUN unless apply=True
+```
+
+Pure delegation to the free `inspeximus.compliance` / `inspeximus.audit_bundle` APIs — nothing is added to the
+write path. Pass `receipts=True` for the tamper-evident chain those reports evidence. See
+[AI_ACT.md](AI_ACT.md).
+
+**One exception, deliberately:** Pydantic AI exposes a *function* toolset (`inspeximus_toolset(store)`), not a
+class, so there is no adapter object to mix into — call the operations on the store you passed in.
+
+**Implementation note worth knowing if you subclass an adapter:** the mixin declares **no class-level
+annotations**. Several adapters subclass pydantic models (LangChain `BaseRetriever`, LlamaIndex
+`BaseMemoryBlock`), and pydantic collects annotations from plain mixin bases too — a `store: Any` on the
+mixin would be promoted to a model *field* and would shadow an adapter that exposes `store` as a
+`@property`, silently breaking every compliance call. Pinned by `tests/test_governance_mixin.py`.
+
 ### Current-truth retriever for LangChain: `InspeximusRetriever` (1.11.0+)
 `inspeximus.integrations.langchain.InspeximusRetriever` is a LangChain [`BaseRetriever`](https://python.langchain.com/docs/concepts/retrievers/)
 — the same slot a vector-store retriever fills in a RAG chain — so you get value-ranked recall with

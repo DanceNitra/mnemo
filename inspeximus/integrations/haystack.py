@@ -32,9 +32,14 @@ from haystack.document_stores.errors import DuplicateDocumentError, MissingDocum
 from haystack.document_stores.types import DuplicatePolicy
 from haystack.utils.filters import document_matches_filter
 
+from .governance import ComplianceMixin
 
-class InspeximusDocumentStore:
-    """A Haystack DocumentStore over a inspeximus store (persistent, erasure leaves the disk clean)."""
+
+class InspeximusDocumentStore(ComplianceMixin):
+    """A Haystack DocumentStore over a inspeximus store (persistent, erasure leaves the disk clean).
+
+    Mixes in `ComplianceMixin`: the same document store yields the EU AI Act evidence (compliance_report /
+    compliance_check / retention / audit_bundle) with no extra wiring. Enable `receipts=True` on the store."""
 
     def __init__(self, path: str | None = None, store: Any = None):
         if store is None:

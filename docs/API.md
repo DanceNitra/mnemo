@@ -758,3 +758,19 @@ load-bearing only against a party who does not hold `receipt_key`. Prior art: cr
 event-sourcing tombstones; GDPR Art. 30 erasure logs; Crosby-Wallach / Certificate-Transparency
 tamper-evident logs. Receipt: `inspeximus/probes/forget_subject_tombstone_probe.py` (8/8).
 
+
+### One answer to "where did this fact come from?": `provenance()` (1.47.0)
+The parts were all there — `source` + `derived_from` taint, `attested_key`, `grade()`, `history()`,
+`verify_attribution()`, `anchor()` — but answering the single most-asked question of a memory layer meant
+calling six of them and knowing which. `provenance(key=…)` (or `id=…`) assembles them for ONE fact:
+`origin` (declared source, the taint inherited **transitively** through summarization, attestation, the
+acting user/agent/session, the orphan flag, and any ancestor that has since been erased), `trust` (the
+evidence grade — never writer-settable), `timeline` (`history()`, incl. the policy that retired each value),
+and `integrity` (whether the record still matches the content **and attribution** its write receipt
+committed to, so a later relabel is loud; plus the current `anchor()` to pin the answer against). Exposed as
+`inspeximus provenance <key>` (`--json`) and the `provenance` MCP tool; the CLI forces receipts on, since a
+report *about* the chain must load it. Read-only, no new state, no new claim layer.
+**Honest scope**, returned in a `limits` field so a renderer cannot silently drop it: tamper-**evident**, not
+**correct** (a source that was wrong at write time is committed faithfully — the oracle problem, untouched),
+and unsigned it only catches an editor who cannot also rewrite the `.receipts` sidecar. Receipt:
+`tests/test_provenance.py` (9/9, incl. a relabel-detection case).

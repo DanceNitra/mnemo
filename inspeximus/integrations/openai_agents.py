@@ -33,9 +33,14 @@ from __future__ import annotations
 import json
 from typing import Any
 
+from .governance import ComplianceMixin
 
-class InspeximusSession:
-    """Persistent OpenAI-Agents `Session` backed by a inspeximus store (one store, many sessions)."""
+
+class InspeximusSession(ComplianceMixin):
+    """Persistent OpenAI-Agents `Session` backed by a inspeximus store (one store, many sessions).
+
+    Mixes in `ComplianceMixin`: the same session object yields the EU AI Act evidence (compliance_report /
+    compliance_check / retention / audit_bundle) with no extra wiring. Enable `receipts=True` on the store."""
 
     def __init__(self, session_id: str, path: str | None = None, store: Any = None, extractor=None):
         """Pass a `path` (a inspeximus store is created/opened there) OR an existing inspeximus `store` to share one

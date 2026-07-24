@@ -24,9 +24,14 @@ it, and `query`/`update_context` then surface only PST. Without a key, entries a
 from __future__ import annotations
 from typing import Any
 
+from .governance import ComplianceMixin
 
-class InspeximusMemory:
-    """AutoGen `Memory` backed by a inspeximus store; injects supersession-filtered current-truth context."""
+
+class InspeximusMemory(ComplianceMixin):
+    """AutoGen `Memory` backed by a inspeximus store; injects supersession-filtered current-truth context.
+
+    Mixes in `ComplianceMixin`: the same memory object yields the EU AI Act evidence (compliance_report /
+    compliance_check / retention / audit_bundle) with no extra wiring. Enable `receipts=True` on the store."""
 
     def __init__(self, path: str | None = None, store: Any = None, k: int = 5, source: str | None = None,
                  extractor=None):

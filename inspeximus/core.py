@@ -468,7 +468,7 @@ def verify_erasure_certificate(cert: dict, store_path: str | None = None,
     return {"valid": valid, "checks": checks, "problems": problems, "count": cert.get("count")}
 
 
-__version__ = "1.46.0"
+__version__ = "1.47.0"
 
 # Internal sentinel: marks a reaffirm write already authorized by submit_revert() (which verified the
 # signed INTENT). Object identity — no text/content path can ever produce it.
@@ -3104,6 +3104,113 @@ class Inspeximus:
                  "valid_from": r.get("valid_from", r["ts"]), "invalidated_at": r.get("invalidated_at"),
                  "policy": (r.get("meta") or {}).get("superseded_by_policy"),
                  "id": r["id"]} for r in recs]
+
+    def provenance(self, key: str | None = None, id: str | None = None) -> dict:
+        """ONE call that answers "where did this fact come from, and how far does that answer bind?"
+
+        The most-asked question of a memory layer is not "can you undo it" — it is "why do you hold this,
+        and who told you". inspeximus already carries every part of the answer: the declared source and the
+        lineage taint it inherited through summarization, the origin attestation, the supersession timeline
+        with the policy that adjudicated each retirement, the evidence grade, and the write-receipt
+        commitment that makes a later relabel loud. But they live in history() / grade() /
+        verify_attribution() / anchor(). This assembles them for ONE fact, in the order an auditor asks.
+
+        Pass `key=` (the supersession key — provenance of a FACT, across every value it has held) or `id=`
+        (one record; if that record is keyed, its whole chain is still reported).
+
+        Returns {key, found, current, origin, trust, timeline, integrity, limits}:
+          - origin: the declared source; the canonical sources the record is attributable to (its own plus
+            taint inherited transitively via derived_from); whether an origin ATTESTATION bound it to a
+            verified key; the ancestors a retraction would reach; the orphan flag; and the acting
+            user/agent/session when the caller supplied them.
+          - trust: the evidence grade (claimed | corroborated | verified | settled), earned from external
+            ratifications and corroboration — never settable by the writer.
+          - timeline: history(key) — every value held, its validity interval, and WHICH policy retired it.
+          - integrity: whether THIS record is covered by a write receipt; whether its content and its
+            attribution still match what was committed at write time (relabel detection); whether the
+            receipt chain verifies and is signed; plus the current anchor, so the answer can be pinned.
+
+        Read-only. HONEST LIMITS (returned in `limits` too, so a caller rendering this cannot quietly drop
+        them): provenance here is tamper-EVIDENT, not CORRECT — a source that was already wrong at write
+        time is committed faithfully and nothing here can tell; and UNSIGNED (the default) the receipt
+        chain only catches an editor who cannot ALSO rewrite the .receipts sidecar. Pass receipt_key=, or
+        have anchor() witnessed externally, for the loud property to hold against a store-capable actor."""
+        if (key is None) == (id is None):
+            raise ValueError("provenance() takes exactly one of key= or id=")
+        by_id = {x["id"]: x for x in self.items}
+        if id is not None:
+            rec = by_id.get(str(id))
+            key = rec.get("key") if rec is not None else None
+        else:
+            key = str(key)
+            same = [r for r in self.items if r.get("key") == key]
+            same.sort(key=lambda r: r.get("valid_from", r["ts"]))
+            active = [r for r in same if r.get("status") == "active"]
+            rec = active[-1] if active else (same[-1] if same else None)
+        out: dict = {"key": key, "found": rec is not None}
+        limits = [
+            "tamper-evident, not correct: a source that was wrong at write time is committed faithfully",
+            "unsigned receipts only catch an editor who cannot also rewrite the .receipts sidecar: "
+            "pass receipt_key= or have anchor() witnessed externally",
+        ]
+        if rec is None:
+            out.update({"current": None, "origin": None, "trust": None, "timeline": [],
+                        "integrity": None, "limits": limits})
+            return out
+        out["current"] = {"id": rec["id"], "text": rec.get("text"), "object": rec.get("object"),
+                          "status": rec.get("status"), "mtype": rec.get("mtype"), "ts": rec.get("ts"),
+                          "valid_from": rec.get("valid_from", rec["ts"])}
+        # ── origin: declared source + the lineage a retraction would travel ──────────────────────────
+        ancestors, unresolved, stack = [], [], list(rec.get("derived_from") or [])
+        while stack:                                   # transitive: provenance rides through summarization
+            pid = stack.pop()
+            if pid in ancestors or pid in unresolved:
+                continue
+            p = by_id.get(pid)
+            if p is None:
+                unresolved.append(pid)                 # a dangling parent = lineage we cannot follow
+                continue
+            ancestors.append(pid)
+            stack.extend(p.get("derived_from") or [])
+        _meta = rec.get("meta") or {}            # the tenancy triple is stored under meta as uid/aid/sid
+        actor = {name: _meta[short] for short, name in
+                 (("uid", "user_id"), ("aid", "agent_id"), ("sid", "session_id")) if _meta.get(short)}
+        out["origin"] = {
+            "source": rec.get("source"),
+            "canonical_sources": sorted(Inspeximus._rec_sources(rec)),
+            "attested": bool(rec.get("attested_key")), "attested_key": rec.get("attested_key"),
+            "derived": bool(rec.get("derived_from")), "derived_from": list(rec.get("derived_from") or []),
+            "ancestors": ancestors, "unresolved_parents": unresolved,
+            "inherited_taint": sorted(rec.get("taint") or []),
+            "orphan": bool(rec.get("orphan")), "actor": actor or None,
+        }
+        out["trust"] = self.grade(rec, _by_id=by_id)
+        out["timeline"] = self.history(key) if key else []
+        out["superseded_count"] = sum(1 for r in out["timeline"] if r.get("status") == "superseded")
+        # ── integrity: does the record still match what the receipt chain committed to? ──────────────
+        integ: dict = {"receipted": False, "content_matches_receipt": None,
+                       "attribution_matches_receipt": None, "chain_ok": None, "signed": False}
+        receipts = getattr(self, "_receipts", None) or []
+        mine = [r for r in receipts if r.get("memory_id") == rec["id"]]
+        if mine:
+            committed = mine[-1].get("commit") or {}
+            current = self._write_commit(rec)
+            integ["receipted"] = True
+            integ["signed"] = "sig" in mine[-1]
+            integ["content_matches_receipt"] = committed.get("content_sha256") == current["content_sha256"]
+            integ["attribution_matches_receipt"] = (
+                None if committed.get("attrib_sha256") is None       # written before attribution was committed
+                else committed.get("attrib_sha256") == current["attrib_sha256"])
+        if receipts:
+            integ["chain_ok"] = self.verify_attribution().get("chain_ok")
+        if receipts or getattr(self, "_tombstones", None):
+            integ["anchor"] = self.anchor()
+        else:
+            limits.append("receipts are off: no write-time commitment exists to compare against "
+                          "(construct with receipts=True)")
+        out["integrity"] = integ
+        out["limits"] = limits
+        return out
 
     def supersession_report(self) -> dict:
         """Audit view of WHY memories were retired: a count of superseded records per adjudicating

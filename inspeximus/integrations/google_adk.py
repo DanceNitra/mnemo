@@ -29,6 +29,8 @@ from google.adk.memory.base_memory_service import BaseMemoryService, SearchMemor
 from google.adk.memory.memory_entry import MemoryEntry
 from google.genai import types as _gt
 
+from .governance import ComplianceMixin
+
 
 _UNKNOWN_SESSION = "_unknown_session"
 
@@ -37,8 +39,11 @@ def _subject(app_name: str, user_id: str) -> str:
     return f"adk::{app_name}::{user_id}"
 
 
-class InspeximusMemoryService(BaseMemoryService):
-    """ADK BaseMemoryService over a inspeximus store (persistent, current-truth recall, per-user erasure)."""
+class InspeximusMemoryService(BaseMemoryService, ComplianceMixin):
+    """ADK BaseMemoryService over a inspeximus store (persistent, current-truth recall, per-user erasure).
+
+    Mixes in `ComplianceMixin`: the same memory service yields the EU AI Act evidence (compliance_report /
+    compliance_check / retention / audit_bundle) with no extra wiring. Enable `receipts=True` on the store."""
 
     def __init__(self, path: str | None = None, store: Any = None, k: int = 10, extractor=None):
         if store is None:
