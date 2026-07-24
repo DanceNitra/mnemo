@@ -3,6 +3,15 @@
 All notable changes to inspeximus (`inspeximus`). Format loosely follows Keep a Changelog; versioning is semver
 (MAJOR = stable/breaking, MINOR = features, PATCH = fixes).
 
+## 1.46.0 - forget(dry_run=True): preview a bulk delete before you commit it
+
+A safety valve on the one irreversible operation. `forget(..., dry_run=True)` returns
+`{would_forget, ids, sample, dry_run:True}` — a count plus a few matched record texts so you can eyeball what a
+bulk `where=`/`--contains` selector actually caught — and deletes NOTHING (no delete, no tombstone, no save).
+Exposed on the CLI (`inspeximus forget --contains X --dry-run`) and over MCP (`forget(dry_run=True)`). This is
+the "bulk forget with dryRun" the docs call a moat: review before you erase. New tests (2). No behavior change
+to a normal forget (dry_run defaults False).
+
 ## 1.45.0 - the EU AI Act compliance surface over MCP
 
 The whole agent-memory compliance capability is now callable by any MCP client (Claude Code, Cursor, …). Five

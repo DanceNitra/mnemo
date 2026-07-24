@@ -86,6 +86,8 @@ def main(argv=None):
     f.add_argument("--key")
     f.add_argument("--id")
     f.add_argument("--contains", help="delete every memory whose text contains this substring")
+    f.add_argument("--dry-run", action="store_true",
+                   help="preview what would be deleted (with a text sample) — deletes nothing")
 
     ls = sub.add_parser("list", help="list recent active memories")
     ls.add_argument("-n", type=int, default=10)
@@ -300,7 +302,16 @@ def main(argv=None):
         if not ids and where is None:
             print("forget: pass --key, --id, or --contains", file=sys.stderr)
             return 2
-        res = m.forget(ids=ids, where=where)
+        res = m.forget(ids=ids, where=where, dry_run=a.dry_run)
+        if res.get("dry_run"):
+            if a.json:
+                _out(res, True)
+            else:
+                print(f"forget (DRY-RUN): {res['would_forget']} memory(ies) would be deleted. Sample:")
+                for s in res["sample"]:
+                    print(f"  - {s['text']}" + (f"  [key={s['key']}]" if s.get("key") else ""))
+                print("Re-run without --dry-run to delete.")
+            return 0
         m._save(force=True)
         _out(res, a.json) or print(f"forgot {res.get('forgotten', 0)} memory(ies)")
 

@@ -468,7 +468,7 @@ def verify_erasure_certificate(cert: dict, store_path: str | None = None,
     return {"valid": valid, "checks": checks, "problems": problems, "count": cert.get("count")}
 
 
-__version__ = "1.45.0"
+__version__ = "1.46.0"
 
 # Internal sentinel: marks a reaffirm write already authorized by submit_revert() (which verified the
 # signed INTENT). Object identity — no text/content path can ever produce it.
@@ -1848,7 +1848,8 @@ class Inspeximus:
 
     def forget(self, ids=None, where=None, redact_links: bool = True,
                request_id: str | None = None, basis: str | None = None,
-               authorized_by: str | None = None, authorization: str | None = None) -> dict:
+               authorized_by: str | None = None, authorization: str | None = None,
+               dry_run: bool = False) -> dict:
         """HARD-DELETE memories — the one operation that genuinely REMOVES content. inspeximus is otherwise
         append-only: supersession / invalidation only DEMOTE a record (it still exists, recallable with
         include_superseded). forget() is for the cases where demotion is not enough: a right-to-be-forgotten
@@ -1869,7 +1870,12 @@ class Inspeximus:
         perfectly legitimate API call. `request_id` and `basis` are carried into the tombstone's committed
         hash so an auditor can see why a record went, not merely that it did.
 
-        Returns {forgotten, ids, scrubbed_links, tombstones}."""
+        `dry_run=True` PREVIEWS instead of deleting: it returns {would_forget, ids, sample, dry_run:True}
+        (a few matched texts so you can eyeball what the selector caught) and touches NOTHING — no delete, no
+        tombstone, no save. The safety valve on the one irreversible operation: review a bulk `where` match
+        before you commit it.
+
+        Returns {forgotten, ids, scrubbed_links, tombstones} (or the dry_run preview above)."""
         target = set()
         if ids is not None:
             target |= ({ids} if isinstance(ids, str) else set(ids))
@@ -1881,6 +1887,11 @@ class Inspeximus:
                 except Exception:
                     pass
         target &= {r["id"] for r in self.items}          # ignore ids not actually present
+        if dry_run:
+            by_id = {r["id"]: r for r in self.items}
+            sample = [{"id": t, "text": (by_id[t].get("text") or "")[:120], "key": by_id[t].get("key")}
+                      for t in sorted(target)[:10]]
+            return {"would_forget": len(target), "ids": sorted(target), "sample": sample, "dry_run": True}
         if not target:
             return {"forgotten": 0, "ids": [], "scrubbed_links": 0}
         self.items = [r for r in self.items if r["id"] not in target]

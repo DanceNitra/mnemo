@@ -72,3 +72,32 @@ def test_auditor_verifies_when_all_purged():
            .register(KVCacheProbe("cache", {})))
     rep = aud.audit("alice", ["diabetes"])
     assert rep["erasure_verified"] is True and rep["leaking_stores"] == []
+
+
+def test_forget_dry_run_previews_without_deleting():
+    """The safety valve: dry_run=True returns a preview (with a text sample) and deletes NOTHING."""
+    m = Inspeximus(receipts=True)
+    for t in ["secret token abc", "public note", "secret key xyz", "another public"]:
+        m.remember(t)
+    n = len(m.items); t_before = len(m._tombstones)
+    dry = m.forget(where=lambda r: "secret" in r["text"], dry_run=True)
+    assert dry["dry_run"] and dry["would_forget"] == 2, dry
+    assert {s["text"] for s in dry["sample"]} == {"secret token abc", "secret key xyz"}, dry["sample"]
+    assert len(m.items) == n and len(m._tombstones) == t_before, "dry_run must not delete or tombstone"
+    # then a real forget on the same selector actually deletes + tombstones
+    real = m.forget(where=lambda r: "secret" in r["text"])
+    assert real["forgotten"] == 2 and len(m.items) == n - 2 and len(m._tombstones) == t_before + 2
+
+
+def test_cli_forget_dry_run(tmp_path):
+    import os as _os
+    from inspeximus.cli import main
+    _os.environ["INSPEXIMUS_PATH"] = str(tmp_path / "s.json")
+    try:
+        assert main(["remember", "delete me please", "--key", "k"]) == 0
+        assert main(["forget", "--contains", "delete", "--dry-run"]) == 0     # preview, exit 0
+        from inspeximus import Inspeximus as _I
+        assert any(r.get("status") == "active" for r in _I(path=str(tmp_path / "s.json")).items)  # nothing deleted
+        assert main(["forget", "--contains", "delete"]) == 0                  # now really delete
+    finally:
+        _os.environ.pop("INSPEXIMUS_PATH", None)
