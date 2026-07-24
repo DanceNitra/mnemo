@@ -14,6 +14,7 @@ DPO-facing page; the CLI is `inspeximus compliance [--out report.html|--json]`.
 """
 from __future__ import annotations
 import html as _html
+import time
 from .core import __version__
 
 # Obligation wording is conservative and traceable to the consolidated Reg (EU) 2024/1689 / Reg (EU) 2016/679
@@ -119,6 +120,59 @@ def compliance_report(store, expected_pubkey: str | None = None) -> dict:
             "controls_with_evidence": sum(1 for c in controls if c["status"] == "evidence"),
         },
     }
+
+
+def compliance_check(store, require_receipts: bool = True, max_pii_age_days: float | None = None,
+                     prior_anchor: dict | None = None, now_ts: float | None = None) -> dict:
+    """CI / CONTINUOUS compliance GATE (read-only, no LLM): assert the invariants a store claiming AI-Act
+    record-keeping must hold, and FAIL if the posture regressed. The read-side complement of the point-in-time
+    compliance_report — same relationship as `check-code` to a code review. Returns {ok, violations, checked}:
+      - receipts_disabled  (Art. 12/19) : tamper-evident logging is off, so no automatic record exists to keep
+      - integrity_failed   (Art. 12/15) : the receipt/tombstone chain fails verify_writes (altered out of band)
+      - not_append_only    (Art. 12/19) : history is not a consistent extension of a pinned `prior_anchor`
+      - pii_over_retention (GDPR 5(1)(e)): active PII records older than `max_pii_age_days` (storage limitation)
+    `ok` is True iff no violations — wire `inspeximus compliance --check` into CI so the AI-Act posture cannot
+    silently regress. `now_ts` overrides the clock for the retention check (testability)."""
+    violations, checked = [], []
+    # Count the ACTUAL receipt chain, not the receipts_enabled flag: a store WRITTEN without receipts has an
+    # empty chain even when reopened with receipts=True (no sidecar to reload), and that is the real regression.
+    n_receipts = len(getattr(store, "_receipts", []))
+    has_content = any(r.get("status") == "active" for r in getattr(store, "items", []))
+
+    checked.append("receipts_enabled")
+    if require_receipts and has_content and n_receipts == 0:
+        violations.append({"code": "receipts_disabled", "article": "Art. 12/19",
+                           "detail": "the store has records but NO write receipts — tamper-evident logging was "
+                                     "off at write time, so no automatic Art.12/19 record exists to keep"})
+
+    checked.append("chain_integrity")
+    if n_receipts:
+        gov = store.governance_report()
+        if (gov.get("proof") or {}).get("verified") is False:
+            violations.append({"code": "integrity_failed", "article": "Art. 12/15",
+                               "detail": "receipt/tombstone chain failed verify_writes — the log was altered out of band"})
+
+    if prior_anchor is not None:
+        checked.append("append_only")
+        ok, probs = store.verify_consistency(prior_anchor)
+        if not ok:
+            violations.append({"code": "not_append_only", "article": "Art. 12/19",
+                               "detail": "history is not an append-only extension of the pinned anchor: " + "; ".join(probs)})
+
+    if max_pii_age_days is not None:
+        checked.append("pii_retention")
+        now = now_ts if now_ts is not None else time.time()
+        cutoff = now - float(max_pii_age_days) * 86400.0
+        tv = getattr(store, "tenant", None)
+        stale = [r["id"] for r in getattr(store, "items", [])
+                 if r.get("status") == "active" and r.get("pii")
+                 and (tv is None or r.get("tenant") == tv) and (r.get("ts") or 0) < cutoff]
+        if stale:
+            violations.append({"code": "pii_over_retention", "article": "GDPR Art. 5(1)(e)",
+                               "detail": f"{len(stale)} active PII record(s) older than {max_pii_age_days} days "
+                                         "— storage-limitation breach; run forget_pii()"})
+
+    return {"ok": not violations, "violations": violations, "checked": checked}
 
 
 _STATUS_LABEL = {"evidence": "Evidence in this store", "available": "Available (not exercised here)",

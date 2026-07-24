@@ -3,6 +3,20 @@
 All notable changes to inspeximus (`inspeximus`). Format loosely follows Keep a Changelog; versioning is semver
 (MAJOR = stable/breaking, MINOR = features, PATCH = fixes).
 
+## 1.42.0 - continuous compliance gate: `inspeximus compliance --check`
+
+Turn the point-in-time compliance overlay into an enforceable CI gate — the same pattern that made
+`check-code` a build gate, now for the AI-Act memory posture. New `compliance.compliance_check(store,
+require_receipts=, max_pii_age_days=, prior_anchor=, now_ts=)` asserts the invariants a store claiming AI-Act
+record-keeping must hold and returns {ok, violations, checked}:
+  - `receipts_disabled` (Art. 12/19) — the store has records but no write receipts (logging was off at write time)
+  - `integrity_failed` (Art. 12/15) — the receipt/tombstone chain fails verify_writes (altered out of band)
+  - `not_append_only` (Art. 12/19) — history isn't a consistent extension of a pinned `prior_anchor`
+  - `pii_over_retention` (GDPR 5(1)(e)) — active PII older than `max_pii_age_days` (storage limitation)
+CLI: `inspeximus compliance --check [--max-pii-age-days N] [--prior-anchor a.json] [--allow-no-receipts]`
+exits non-zero on any violation; `.pre-commit-hooks.yaml` gains `id: inspeximus-compliance-check`. New tests (5),
+docs/AI_ACT.md "continuous compliance gate" section. No behavior change to the existing `compliance` report.
+
 ## 1.41.0 - agent-memory compliance overlay: `inspeximus compliance`
 
 The runnable, honest EU-AI-Act-memory-slice overlay — turn a live store into an article-labelled EVIDENCE

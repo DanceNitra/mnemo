@@ -14,3 +14,10 @@
   language: python
   types: [python]
   require_serial: true
+- id: inspeximus-compliance-check
+  name: inspeximus compliance --check (agent-memory AI-Act posture)
+  description: Fail if the agent-memory store's EU AI Act record-keeping posture regressed.
+  entry: inspeximus compliance --check
+  language: python
+  pass_filenames: false
+  always_run: true

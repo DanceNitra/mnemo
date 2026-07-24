@@ -132,6 +132,14 @@ def main(argv=None):
                                             "(EU AI Act Art.12/15/19 + GDPR Art.17/30) — HTML or JSON")
     cp_.add_argument("--out", default=None, help="write a self-contained HTML report here")
     cp_.add_argument("--expected-pubkey", default=None, help="pin the integrity check to this key")
+    cp_.add_argument("--check", action="store_true",
+                     help="CI GATE: exit non-zero if a compliance invariant is violated (posture regressed)")
+    cp_.add_argument("--max-pii-age-days", type=float, default=None,
+                     help="with --check: fail if any active PII record is older than this (storage limitation)")
+    cp_.add_argument("--prior-anchor", default=None,
+                     help="with --check: json anchor to verify the history is an append-only extension of")
+    cp_.add_argument("--allow-no-receipts", action="store_true",
+                     help="with --check: do not fail when receipts are disabled")
 
     ab = sub.add_parser("audit-build", help="export a portable, content-free audit bundle "
                                             "(EU AI Act Art.12 / GDPR record-keeping) — hand it to an auditor")
@@ -190,6 +198,23 @@ def main(argv=None):
 
     # audit-build/compliance must reload the receipt/tombstone chains, so force receipts on regardless of the flag.
     m = _store(a.path, receipts=a.receipts or a.cmd in ("audit-build", "compliance"))
+
+    if a.cmd == "compliance" and a.check:
+        from inspeximus.compliance import compliance_check
+        prior = None
+        if a.prior_anchor:
+            with open(a.prior_anchor, encoding="utf-8") as f:
+                prior = json.load(f)
+        res = compliance_check(m, require_receipts=not a.allow_no_receipts,
+                               max_pii_age_days=a.max_pii_age_days, prior_anchor=prior)
+        if a.json:
+            _out(res, True)
+        else:
+            for v in res["violations"]:
+                print(f"  VIOLATION [{v['article']}] {v['code']}: {v['detail']}")
+            print(f"compliance --check: {'PASS' if res['ok'] else str(len(res['violations'])) + ' violation(s)'} "
+                  f"(checked: {', '.join(res['checked'])})", file=sys.stderr)
+        return 0 if res["ok"] else 1
 
     if a.cmd == "compliance":
         from inspeximus.compliance import compliance_report, render_html

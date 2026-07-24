@@ -48,6 +48,19 @@ inspeximus audit-verify bundle.json         # ...they verify it offline: exit 0 
 evidence, and a **live count from your store** — marked `evidence` (exercised), `available` (shipped, not
 exercised here), or `needs receipts`.
 
+### Keep it enforced — the continuous compliance gate
+
+A one-time report drifts. `inspeximus compliance --check` is a **CI gate** that exits non-zero the moment the
+posture regresses — tamper-evident logging turned off, the receipt chain failing integrity, history that is no
+longer an append-only extension of a pinned anchor, or PII kept past its retention window:
+
+```bash
+inspeximus compliance --check --max-pii-age-days 90 --prior-anchor last_anchor.json   # exit 1 on any violation
+```
+
+Drop it into CI or a pre-commit hook (`id: inspeximus-compliance-check`) so the agent-memory record-keeping
+duties stay met between audits, not just on audit day.
+
 ## The honest boundary (this is why you can trust it)
 
 This is the **agent-memory slice only** — the records, corrections and erasures in *this* store. It produces

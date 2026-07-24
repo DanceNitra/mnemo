@@ -58,6 +58,58 @@ def test_html_is_self_contained():
     assert "http://" not in html and "https://" not in html and "<script" not in html    # no external assets/JS
 
 
+def test_check_passes_healthy_store():
+    from inspeximus.compliance import compliance_check
+    r = compliance_check(_store())
+    assert r["ok"] and not r["violations"], r
+
+
+def test_check_flags_no_receipts():
+    from inspeximus.compliance import compliance_check
+    m = Inspeximus(path=None, receipts=False)
+    m.remember("x", key="k", object="1")
+    r = compliance_check(m)
+    assert not r["ok"] and any(v["code"] == "receipts_disabled" for v in r["violations"]), r
+
+
+def test_check_flags_pii_over_retention():
+    """A PII record older than the retention window is a storage-limitation violation (GDPR 5(1)(e))."""
+    from inspeximus.compliance import compliance_check
+    m = Inspeximus(path=None, receipts=True)
+    m.remember("contact me at a@b.com", key="c::email", object="a@b.com", pii=["email"])
+    old = m.items[-1]["ts"]                                    # stamp is 'now'; pretend we check 100 days later
+    r = compliance_check(m, max_pii_age_days=30, now_ts=old + 100 * 86400)
+    assert not r["ok"] and any(v["code"] == "pii_over_retention" for v in r["violations"]), r
+    # fresh window -> no violation
+    assert compliance_check(m, max_pii_age_days=30, now_ts=old + 1)["ok"]
+
+
+def test_check_flags_non_append_only():
+    from inspeximus.compliance import compliance_check
+    m = Inspeximus(path=None, receipts=True)
+    m.remember("a", key="k", object="1")
+    anchor = m.anchor()
+    m.remember("b", key="k", object="2")                      # honest extension -> consistent
+    assert compliance_check(m, prior_anchor=anchor)["ok"]
+    forged = dict(anchor, writes_tip="deadbeef" + str(anchor["writes_tip"])[8:])   # a tip that never existed
+    r = compliance_check(m, prior_anchor=forged)
+    assert not r["ok"] and any(v["code"] == "not_append_only" for v in r["violations"]), r
+
+
+def test_cli_check_exit_codes(tmp_path):
+    import os as _os
+    from inspeximus.cli import main
+    _os.environ["INSPEXIMUS_PATH"] = str(tmp_path / "s.json")
+    try:
+        assert main(["--receipts", "remember", "x", "--key", "k", "--object", "1"]) == 0
+        assert main(["compliance", "--check"]) == 0                       # healthy -> exit 0
+        _os.environ["INSPEXIMUS_PATH"] = str(tmp_path / "bad.json")
+        assert main(["remember", "y", "--key", "k", "--object", "1"]) == 0   # written WITHOUT receipts
+        assert main(["compliance", "--check"]) == 1                       # regressed -> exit 1
+    finally:
+        _os.environ.pop("INSPEXIMUS_PATH", None)
+
+
 def test_cli_compliance(tmp_path):
     import os as _os
     from inspeximus.cli import main
