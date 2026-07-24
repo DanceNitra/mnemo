@@ -350,6 +350,12 @@ page; everything else is there when you need it.
 
 Adapters for LangGraph, CrewAI, LangChain, LlamaIndex, AutoGen and the rest,
 with copy-paste snippets: **[docs/INTEGRATIONS.md](docs/INTEGRATIONS.md)**.
+
+**Compliance-aware out of the box.** The LangGraph `InspeximusStore` and CrewAI `InspeximusStorage` mix in
+`ComplianceMixin`, so the same object your agent writes memory to also produces the EU AI Act evidence —
+`store.compliance_report()`, `store.compliance_check()`, `store.audit_bundle()`, `store.retention(...)`. Pass
+`receipts=True` for the tamper-evident record-keeping chain those reports evidence. See
+[docs/AI_ACT.md](docs/AI_ACT.md).
 ## Use it as an MCP server (any Claude / Cursor / agent client)
 
 `inspeximus` ships an [MCP](https://modelcontextprotocol.io) stdio server so any MCP-compatible agent can

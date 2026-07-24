@@ -3,6 +3,17 @@
 All notable changes to inspeximus (`inspeximus`). Format loosely follows Keep a Changelog; versioning is semver
 (MAJOR = stable/breaking, MINOR = features, PATCH = fixes).
 
+## 1.44.0 - compliance-aware framework integrations (LangGraph / CrewAI)
+
+New `inspeximus.integrations.governance.ComplianceMixin` — an integration store that holds an inspeximus in
+`self.store` gains the EU AI Act evidence operations on the SAME object the framework uses as memory, by pure
+delegation to the free compliance/audit APIs: `compliance_report`, `write_compliance_report`,
+`compliance_check`, `retention`, `audit_bundle`, `verify_audit_bundle`. Wired into the LangGraph
+`InspeximusStore` and CrewAI `InspeximusStorage`, both of which also gain a `receipts=True` constructor flag for
+the tamper-evident record-keeping chain those reports evidence. So an agent framework's memory produces
+auditor-ready AI-Act evidence with zero extra wiring. New tests (4, LangGraph skipped when absent). No behavior
+change to existing APIs.
+
 ## 1.43.0 - retention enforcement: `inspeximus retention` (storage limitation)
 
 The enforce-side of `compliance --check`'s `pii_over_retention` flag — close the detect->enforce loop for GDPR

@@ -41,11 +41,18 @@ def _dt(ts: float) -> datetime:
     return datetime.fromtimestamp(ts or 0, tz=timezone.utc)
 
 
-class InspeximusStore(BaseStore):
-    """LangGraph BaseStore over a inspeximus store; keeps queryable value history the built-in store discards."""
+from .governance import ComplianceMixin
+
+
+class InspeximusStore(BaseStore, ComplianceMixin):
+    """LangGraph BaseStore over a inspeximus store; keeps queryable value history the built-in store discards.
+
+    Mixes in `ComplianceMixin`, so the same object the graph writes memory to also produces the EU AI Act
+    agent-memory evidence: `store.compliance_report()`, `store.compliance_check()`, `store.audit_bundle()`,
+    `store.retention(...)`. Pass `receipts=True` for the tamper-evident record-keeping chain those reports need."""
 
     def __init__(self, path: str | None = None, store: Any = None,
-                 prune_empty_namespaces: bool = False):
+                 prune_empty_namespaces: bool = False, receipts: bool = False):
         """`prune_empty_namespaces` decides one behaviour where the reference and an erasure-first
         store genuinely disagree.
 
@@ -61,7 +68,7 @@ class InspeximusStore(BaseStore):
         """
         if store is None:
             from inspeximus import Inspeximus
-            store = Inspeximus(path=path)
+            store = Inspeximus(path=path, receipts=receipts)
         self.store = store
         self.prune_empty_namespaces = prune_empty_namespaces
 

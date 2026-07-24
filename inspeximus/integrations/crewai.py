@@ -28,19 +28,26 @@ from __future__ import annotations
 from typing import Any, Dict, List, Optional
 
 
-class InspeximusStorage:
+from .governance import ComplianceMixin
+
+
+class InspeximusStorage(ComplianceMixin):
     """A CrewAI `Storage` (duck-typed) backed by inspeximus with supersession-filtered, current-truth search.
 
     save(value, metadata) -> None            store a memory; metadata['key'] engages supersession
     search(query, limit, score_threshold)    return current-truth hits (superseded values omitted)
     reset() -> None                          soft-delete every stored memory
+
+    Mixes in `ComplianceMixin`: the same storage object yields the EU AI Act evidence —
+    `storage.compliance_report()`, `.compliance_check()`, `.audit_bundle()`, `.retention(...)`. Pass
+    `receipts=True` for the tamper-evident record-keeping chain those reports evidence.
     """
 
     def __init__(self, path: str | None = None, store: Any = None,
-                 embed=None, extractor=None, tag: str = "crewai"):
+                 embed=None, extractor=None, tag: str = "crewai", receipts: bool = False):
         if store is None:
             from inspeximus import Inspeximus
-            store = Inspeximus(path=path, embed=embed)
+            store = Inspeximus(path=path, embed=embed, receipts=receipts)
         self.store = store
         self._tag = tag
         # OPT-IN extractor (text -> (key, object)): auto-keys save()d values so search() returns current-truth.
