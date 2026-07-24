@@ -3,6 +3,26 @@
 All notable changes to inspeximus (`inspeximus`). Format loosely follows Keep a Changelog; versioning is semver
 (MAJOR = stable/breaking, MINOR = features, PATCH = fixes).
 
+## 1.36.0 - witness pool: the k-of-n co-signing layer made usable
+
+New module `inspeximus.witness_pool` turns the 1.34.0 witness primitives (witness_cosign /
+verify_cosigned_anchor / detect_split_view) into a runnable gossip layer that stops a compromised host from
+showing two different memory histories to different clients:
+  - `Witness` — an independent co-signing party that holds one Ed25519 key and remembers, PER STORE, the last
+    signed tree head, so it REFUSES to co-sign a fork or rollback. That memory is PERSISTED (atomic json) — the
+    refusal must survive a witness restart, or an operator could restart it and fork past it.
+  - `collect_cosignatures(store_id, anchor, witnesses)` — a client gathers k-of-n co-signatures and surfaces
+    any witness that REFUSED as a fork alarm (a refusal is the split-view signal, not a silent drop). Feeds
+    straight into `verify_cosigned_anchor(..., threshold=k)`; a forked head cannot reach threshold because
+    honest witnesses refuse it.
+Witnesses can be local/in-process or wrapped behind HTTP by the caller (a callable `(store_id, anchor) ->
+(pubkey, sig)`); the core logic needs no network, no LLM, no GPU. This is the one operator-adversarial
+guarantee a free single-party certificate structurally cannot provide (it needs an independent third party),
+and the lightest such layer in the field — no competitor ships external witnessing. New example
+`examples/07_witness_pool.py` (end-to-end: honest k-of-n, honest extension, and a forked head that all
+witnesses refuse). 7 tests incl. persistence-survives-restart and split-view proof; full suite green (233).
+No new dependencies (Ed25519 only).
+
 ## 1.35.0 - selection_integrity + a compliance mapping + adversarial-gate fixes
 
 New primitive `selection_integrity(query, k)` (library + MCP tool): make SELECTION-LEVEL manipulation
