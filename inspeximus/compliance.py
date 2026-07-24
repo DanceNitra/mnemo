@@ -175,6 +175,32 @@ def compliance_check(store, require_receipts: bool = True, max_pii_age_days: flo
     return {"ok": not violations, "violations": violations, "checked": checked}
 
 
+def retention_sweep(store, max_age_days: float, now_ts: float | None = None, pii_only: bool = True,
+                    apply: bool = False, basis: str | None = None, request_id: str | None = None) -> dict:
+    """Storage-limitation ENFORCEMENT (GDPR Art. 5(1)(e); the enforce-side of compliance_check's
+    pii_over_retention flag). Finds ACTIVE records older than `max_age_days` and, with `apply=True`, hard-deletes
+    them — emitting a signed tombstone per record, so the erasure is itself auditable. DRY-RUN by default
+    (`apply=False`): returns what WOULD be erased so you review before enforcing. `pii_only` (default True)
+    restricts the window to PII-tagged records; False applies it to every record. Deterministic, no LLM.
+    Returns {eligible, ids, cutoff_ts, applied, erased, request_id}."""
+    now = now_ts if now_ts is not None else time.time()
+    cutoff = now - float(max_age_days) * 86400.0
+    tv = getattr(store, "tenant", None)
+    ids = [r["id"] for r in getattr(store, "items", [])
+           if r.get("status") == "active" and (r.get("pii") if pii_only else True)
+           and (tv is None or r.get("tenant") == tv) and (r.get("ts") or 0) < cutoff]
+    out = {"eligible": len(ids), "ids": ids, "cutoff_ts": cutoff, "applied": False, "erased": 0,
+           "request_id": None}
+    if apply and ids:
+        rid = request_id or f"retention-{int(max_age_days)}d"
+        res = store.forget(ids=ids, request_id=rid,
+                           basis=(basis or f"retention policy: older than {max_age_days} days"))
+        out["applied"] = True
+        out["erased"] = res.get("forgotten", len(ids))
+        out["request_id"] = rid
+    return out
+
+
 _STATUS_LABEL = {"evidence": "Evidence in this store", "available": "Available (not exercised here)",
                  "needs_receipts": "Enable receipts=True"}
 

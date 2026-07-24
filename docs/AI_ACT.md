@@ -61,6 +61,16 @@ inspeximus compliance --check --max-pii-age-days 90 --prior-anchor last_anchor.j
 Drop it into CI or a pre-commit hook (`id: inspeximus-compliance-check`) so the agent-memory record-keeping
 duties stay met between audits, not just on audit day.
 
+And when the gate flags PII past its window, **enforce** it — the same erasure, receipted:
+
+```bash
+inspeximus retention --max-age-days 90            # DRY-RUN: what would be erased (GDPR Art. 5(1)(e))
+inspeximus retention --max-age-days 90 --apply    # erase it, each deletion leaving an auditable tombstone
+```
+
+Dry-run by default; `--apply` hard-deletes past-retention records and writes a signed tombstone per record, so
+the storage-limitation enforcement is itself part of the audit trail.
+
 ## The honest boundary (this is why you can trust it)
 
 This is the **agent-memory slice only** — the records, corrections and erasures in *this* store. It produces

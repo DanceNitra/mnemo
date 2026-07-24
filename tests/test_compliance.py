@@ -96,6 +96,53 @@ def test_check_flags_non_append_only():
     assert not r["ok"] and any(v["code"] == "not_append_only" for v in r["violations"]), r
 
 
+def test_retention_dry_run_does_not_erase():
+    from inspeximus.compliance import retention_sweep
+    m = Inspeximus(path=None, receipts=True)
+    m.remember("contact a@b.com", key="c::email", object="a@b.com", pii=["email"])
+    ts = m.items[-1]["ts"]
+    res = retention_sweep(m, 30, now_ts=ts + 100 * 86400, apply=False)
+    assert res["eligible"] == 1 and not res["applied"], res
+    assert sum(1 for r in m.items if r.get("status") == "active" and r.get("pii")) == 1   # untouched
+
+
+def test_retention_apply_erases_with_tombstone():
+    from inspeximus.compliance import retention_sweep, compliance_check
+    m = Inspeximus(path=None, receipts=True)
+    m.remember("contact a@b.com", key="c::email", object="a@b.com", pii=["email"])
+    ts = m.items[-1]["ts"]
+    n_before = len(m._tombstones)
+    res = retention_sweep(m, 30, now_ts=ts + 100 * 86400, apply=True)
+    assert res["applied"] and res["erased"] == 1, res
+    assert len(m._tombstones) == n_before + 1, "erasure must leave a tombstone (auditable)"
+    assert compliance_check(m, max_pii_age_days=30, now_ts=ts + 100 * 86400)["ok"], "check must pass after sweep"
+
+
+def test_retention_spares_fresh_records():
+    from inspeximus.compliance import retention_sweep
+    m = Inspeximus(path=None, receipts=True)
+    m.remember("fresh a@b.com", key="c::email", object="a@b.com", pii=["email"])
+    ts = m.items[-1]["ts"]
+    res = retention_sweep(m, 30, now_ts=ts + 1, apply=True)      # 1 second old, window 30 days
+    assert res["eligible"] == 0 and res["erased"] == 0, res
+
+
+def test_cli_retention_dry_run_then_apply(tmp_path):
+    import os as _os
+    from inspeximus.cli import main
+    _os.environ["INSPEXIMUS_PATH"] = str(tmp_path / "s.json")
+    try:
+        assert main(["--receipts", "remember", "old note", "--key", "k", "--object", "v"]) == 0
+        assert main(["retention", "--max-age-days", "0", "--all"]) == 0          # dry-run (exit 0, no erase)
+        assert main(["retention", "--max-age-days", "0", "--all", "--apply"]) == 0
+        # after apply, the store has no active records
+        from inspeximus import Inspeximus as _I
+        m = _I(path=str(tmp_path / "s.json"), receipts=True)
+        assert not any(r.get("status") == "active" for r in m.items)
+    finally:
+        _os.environ.pop("INSPEXIMUS_PATH", None)
+
+
 def test_cli_check_exit_codes(tmp_path):
     import os as _os
     from inspeximus.cli import main

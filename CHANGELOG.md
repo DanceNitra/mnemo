@@ -3,6 +3,16 @@
 All notable changes to inspeximus (`inspeximus`). Format loosely follows Keep a Changelog; versioning is semver
 (MAJOR = stable/breaking, MINOR = features, PATCH = fixes).
 
+## 1.43.0 - retention enforcement: `inspeximus retention` (storage limitation)
+
+The enforce-side of `compliance --check`'s `pii_over_retention` flag — close the detect->enforce loop for GDPR
+Art. 5(1)(e) storage limitation. New `compliance.retention_sweep(store, max_age_days, now_ts=, pii_only=True,
+apply=False, basis=, request_id=)`: finds ACTIVE records older than the window and, with `apply=True`,
+hard-deletes them, emitting a signed tombstone per record so the erasure is itself auditable. DRY-RUN by
+default (returns what WOULD be erased). CLI `inspeximus retention --max-age-days N [--all] [--apply]` (dry-run
+unless `--apply`; `--all` applies to every record, default PII-tagged only). Deterministic, no LLM. New tests
+(4), docs/AI_ACT.md enforcement snippet. No behavior change to existing APIs.
+
 ## 1.42.0 - continuous compliance gate: `inspeximus compliance --check`
 
 Turn the point-in-time compliance overlay into an enforceable CI gate — the same pattern that made

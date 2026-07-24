@@ -141,6 +141,12 @@ def main(argv=None):
     cp_.add_argument("--allow-no-receipts", action="store_true",
                      help="with --check: do not fail when receipts are disabled")
 
+    rt = sub.add_parser("retention", help="storage-limitation enforcement: erase records past a retention age "
+                                          "(GDPR Art.5(1)(e)) — DRY-RUN unless --apply")
+    rt.add_argument("--max-age-days", type=float, required=True, help="records older than this are eligible")
+    rt.add_argument("--all", action="store_true", help="apply to EVERY record (default: PII-tagged only)")
+    rt.add_argument("--apply", action="store_true", help="actually erase (default: dry-run, list only)")
+
     ab = sub.add_parser("audit-build", help="export a portable, content-free audit bundle "
                                             "(EU AI Act Art.12 / GDPR record-keeping) — hand it to an auditor")
     ab.add_argument("--out", default="inspeximus_audit_bundle.json", help="output json path")
@@ -196,8 +202,25 @@ def main(argv=None):
                   f"{', operator-adversarial' if s.get('operator_adversarial') else ''})")
         return 0 if res["ok"] else 1
 
-    # audit-build/compliance must reload the receipt/tombstone chains, so force receipts on regardless of the flag.
-    m = _store(a.path, receipts=a.receipts or a.cmd in ("audit-build", "compliance"))
+    # audit-build/compliance/retention must have the receipt+tombstone chains, so force receipts on.
+    m = _store(a.path, receipts=a.receipts or a.cmd in ("audit-build", "compliance", "retention"))
+
+    if a.cmd == "retention":
+        from inspeximus.compliance import retention_sweep
+        res = retention_sweep(m, a.max_age_days, pii_only=not a.all, apply=a.apply)
+        if a.apply and res["applied"]:
+            m._save(force=True)
+        if a.json:
+            _out(res, True)
+        else:
+            scope = "record(s)" if a.all else "PII record(s)"
+            if a.apply:
+                print(f"retention: erased {res['erased']} {scope} older than {a.max_age_days} days "
+                      f"(request_id={res['request_id']})")
+            else:
+                print(f"retention (DRY-RUN): {res['eligible']} {scope} older than {a.max_age_days} days would be "
+                      f"erased. Re-run with --apply to enforce.")
+        return 0
 
     if a.cmd == "compliance" and a.check:
         from inspeximus.compliance import compliance_check
