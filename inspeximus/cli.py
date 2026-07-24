@@ -41,12 +41,14 @@ def _embedder():
     return embed
 
 
-def _store(path, persist_vectors: bool = False):
+def _store(path, persist_vectors: bool = False, receipts: bool = False):
     from inspeximus import Inspeximus
     p = path or os.environ.get("INSPEXIMUS_PATH") or "inspeximus_memory.json"
     # persist_vectors stays OFF by default (vectors are a re-derivable cache; writing them balloons the store
     # file on every command). `reembed` opts in — persisting is the entire point of that command.
-    return Inspeximus(path=p, embed=_embedder(), persist_vectors=persist_vectors)
+    # receipts (OPT-IN): builds the tamper-evident write/erasure chain (persisted to <path>.receipts.json) that
+    # `audit-build` exports; reload needs it on too, so audit-build/governance force it regardless of the flag.
+    return Inspeximus(path=p, embed=_embedder(), persist_vectors=persist_vectors, receipts=receipts)
 
 
 def _out(obj, as_json):
@@ -62,6 +64,8 @@ def main(argv=None):
     ap = argparse.ArgumentParser(prog="inspeximus", description="inspeximus — the self-correcting memory layer (CLI).")
     ap.add_argument("--path", help="store file (default: $INSPEXIMUS_PATH or ./inspeximus_memory.json)")
     ap.add_argument("--json", action="store_true", help="emit JSON")
+    ap.add_argument("--receipts", action="store_true",
+                    help="enable the tamper-evident write/erasure chain (needed to later `audit-build`)")
     sub = ap.add_subparsers(dest="cmd", required=True)
 
     r = sub.add_parser("remember", help="store a memory (a --key makes it correctable/supersedable)")
@@ -124,6 +128,16 @@ def main(argv=None):
                                            "non-zero if any (drop into CI / pre-commit)")
     ck.add_argument("paths", nargs="+", help="source files to scan")
 
+    ab = sub.add_parser("audit-build", help="export a portable, content-free audit bundle "
+                                            "(EU AI Act Art.12 / GDPR record-keeping) — hand it to an auditor")
+    ab.add_argument("--out", default="inspeximus_audit_bundle.json", help="output json path")
+    ab.add_argument("--expected-pubkey", default=None, help="pin the signature-authenticity check to this key")
+
+    av = sub.add_parser("audit-verify", help="verify an audit bundle OFFLINE (needs only the file, no store)")
+    av.add_argument("bundle", help="the bundle json to verify")
+    av.add_argument("--witnesses", default=None, help="comma-separated allowlisted witness pubkeys (hex)")
+    av.add_argument("--threshold", type=int, default=1, help="k-of-n witness threshold")
+
     ins = sub.add_parser("install", help="register the MCP server in an editor's own config file")
     ins.add_argument("--ide", required=True,
                      help="host to configure: " + ", ".join(sorted(_install.HOSTS)))
@@ -149,7 +163,40 @@ def main(argv=None):
         print(f"  {msg}")
         return 0 if ok else 1
 
-    m = _store(a.path)
+    # audit-verify needs only the bundle file — never open a store (that would create one as a side effect).
+    if a.cmd == "audit-verify":
+        from inspeximus.audit_bundle import verify_bundle
+        with open(a.bundle, encoding="utf-8") as f:
+            bundle = json.load(f)
+        wl = [w.strip() for w in a.witnesses.split(",")] if a.witnesses else None
+        res = verify_bundle(bundle, witnesses=wl, threshold=a.threshold)
+        if a.json:
+            _out(res, True)
+        else:
+            for c in res["checks"]:
+                print(f"  OK   {c}")
+            for pr in res["problems"]:
+                print(f"  FAIL {pr}")
+            s = res["summary"]
+            print(f"\nVERDICT: {'PASS' if res['ok'] else 'FAIL'}  "
+                  f"({s.get('writes')} writes, {s.get('erasures')} erasures"
+                  f"{', operator-adversarial' if s.get('operator_adversarial') else ''})")
+        return 0 if res["ok"] else 1
+
+    # audit-build must reload the receipt/tombstone chains, so force receipts on regardless of the global flag.
+    m = _store(a.path, receipts=a.receipts or a.cmd == "audit-build")
+
+    if a.cmd == "audit-build":
+        from inspeximus.audit_bundle import build_bundle
+        bundle = build_bundle(m, expected_pubkey=a.expected_pubkey)
+        with open(a.out, "w", encoding="utf-8") as f:
+            json.dump(bundle, f, ensure_ascii=False, indent=2)
+        n = bundle["anchor"]["n_writes"]
+        _out({"out": a.out, "writes": n, "erasures": bundle["anchor"]["n_tombstones"]}, a.json) or print(
+            f"wrote audit bundle -> {a.out}  ({n} writes, {bundle['anchor']['n_tombstones']} erasures)"
+            + ("\nnote: 0 writes — this store was not written with receipts enabled; write with "
+               "`inspeximus --receipts remember ...` to build an auditable chain." if n == 0 else ""))
+        return 0
 
     if a.cmd == "remember":
         tags = [t.strip() for t in a.tags.split(",")] if a.tags else None

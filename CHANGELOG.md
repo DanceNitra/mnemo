@@ -3,6 +3,26 @@
 All notable changes to inspeximus (`inspeximus`). Format loosely follows Keep a Changelog; versioning is semver
 (MAJOR = stable/breaking, MINOR = features, PATCH = fixes).
 
+## 1.40.0 - portable audit bundle: hand an auditor one file they verify offline
+
+The governance / EU AI Act Art.12 wedge — a portable, content-free record-keeping artifact + a STANDALONE
+verifier that needs neither the live store nor the receipt key. New module `inspeximus.audit_bundle`:
+  - `build_bundle(store, expected_pubkey=, sign=)` — serialise the store's record-keeping state (signed anchor,
+    governance_report, supersession_report, and the content-free write + tombstone hash-chains) into one
+    self-verifying json. Content-free: receipts commit to content/attribution HASHES, tombstones to surrogate
+    ids — no memory text leaves the store.
+  - `verify_bundle(bundle, witnesses=, threshold=)` — OFFLINE verification: re-walks both chains from genesis
+    (every hash + prev-link), matches tips/counts to the anchor, checks the anchor's sth_hash, and (if witnesses
+    given) verifies external co-signatures — the only operator-adversarial check. Returns {ok, checks, problems,
+    summary}; any post-export tamper fails it.
+  - CLI: `inspeximus --receipts remember ...` (opt-in tamper-evident chain), `inspeximus audit-build --out
+    bundle.json`, `inspeximus audit-verify bundle.json` (exit 0 PASS / 1 FAIL). Also runnable as
+    `python -m inspeximus.audit_bundle build|verify`.
+New `tests/test_audit_bundle.py` (9: build/verify, content-free, three tamper classes, dropped-tombstone,
+witness operator-adversarial, CLI contract), `examples/09_audit_bundle.py`, README "Portable audit bundle"
+section. Honest scope restated in-band: a tamper-evident record-keeping ARTIFACT, not a compliance
+certification. No behavior change to existing APIs.
+
 ## 1.39.0 - code_guard as a CI gate: `inspeximus check-code` + pre-commit hook
 
 Turn 1.38.0's coding-agent guard from a library call into an enforceable build gate — the distribution wedge:

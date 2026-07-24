@@ -118,6 +118,28 @@ See `examples/07_witness_pool.py` for the full end-to-end (honest k-of-n, honest
 No competitor ships external witnessing; witnesses persist their per-store last-signed head so the refusal
 survives a restart.
 
+### Portable audit bundle — hand an auditor one file they verify offline
+
+EU AI Act **Article 12** (record-keeping / logging, enforceable **2 Aug 2026**) and GDPR Art.17/30 ask an
+operator to *produce*, on demand, a tamper-evident log of what the system recorded, what changed, and what was
+erased — and to let an independent party verify it. inspeximus already computes every piece; `audit_bundle`
+serialises them into **one content-free artifact** with a **standalone verifier that needs neither the live
+store nor the receipt key**:
+
+```bash
+inspeximus --receipts remember "retention policy is 90 days" --key policy::retention --object 90d
+inspeximus audit-build --out bundle.json        # operator exports (content-free: hashes + surrogate ids, no text)
+inspeximus audit-verify bundle.json             # auditor runs this — offline, exit 0 = PASS, 1 = FAIL
+```
+
+`audit-verify` re-walks the entire write **and** erasure history from genesis, confirms every hash and
+prev-link, checks the tips/counts against the signed anchor, and fails on any post-export alteration — with
+nothing but the file. Pass `--witnesses <pubkeys>` to also verify external co-signatures (the operator-adversarial
+check from the witness network above). It is a tamper-evident **record-keeping artifact, not a compliance
+certification** — it proves the *acts* (a write with this commitment at T; a record erased at T for request R)
+and their append-only integrity, never the content (a hash of PII is still PII). Full demo:
+`examples/09_audit_bundle.py`.
+
 ## Why inspeximus — the one thing no other agent memory does
 
 Every mainstream agent-memory library puts an **LLM on the write path**: it calls a model to extract, summarize,
