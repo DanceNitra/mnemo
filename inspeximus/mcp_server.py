@@ -674,6 +674,19 @@ def history(key: str) -> dict:
 
 
 @mcp.tool()
+def erasure_audit(subject: str = "", values: list[str] | None = None) -> dict:
+    """AFTER an erasure: what does the store's lineage say survived? The hard case is not the record — it is
+    the summary built from it, which no longer looks like the subject's data. Reports records still
+    attributable to `subject`, derivatives that outlived an erased origin, dangling lineage, and removals with
+    no deletion tombstone. READ `coverage` BEFORE `verdict`: every structural check walks DECLARED
+    `derived_from` edges, so a store that declares none returns `verdict="unaudited"` (nothing was inspected),
+    never a pass. Housekeeping deletions (capacity eviction, keep-budget) land in `advisory`, not `residue`.
+    `values` adds a text scan that is an explicit heuristic and never moves the verdict. Read-only; evidence
+    about what the store RECORDED, not proof that no copy of the material remains."""
+    return _MEM.erasure_audit(subject=subject or None, values=values or None)
+
+
+@mcp.tool()
 def provenance(key: str = "", id: str = "") -> dict:
     """WHERE DID THIS FACT COME FROM — one answer, assembled from the whole record: the declared source and the
     lineage it inherited through summarization, whether an origin attestation bound it to a verified key, its

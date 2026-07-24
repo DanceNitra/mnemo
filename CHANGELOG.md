@@ -3,6 +3,50 @@
 All notable changes to inspeximus (`inspeximus`). Format loosely follows Keep a Changelog; versioning is semver
 (MAJOR = stable/breaking, MINOR = features, PATCH = fixes).
 
+## 1.48.0 - erasure_audit(): after a deletion, check what the lineage says survived
+
+Erasing the record is the easy half. The half that bites is the **summary built from it**, which no longer
+resembles the subject's data — so a text-match delete walks past it and the fact is back next session.
+`forget_subject()` already cascades along lineage; **`erasure_audit(subject=, values=)`** reports what
+survived: `subject_still_attributable`, `taint_without_origin` (a derivative outlived the origin it
+inherited), `dangling_lineage`, `tombstone_gap`. CLI `inspeximus erasure-audit --subject X` (exit 1 on residue,
+usable as a regression gate) and an MCP tool (surface = 55).
+
+**`coverage` is the load-bearing field, and the CLI prints it first.** Every structural check walks DECLARED
+`derived_from` edges. A store whose writers never threaded lineage has no edges to walk, so it would report
+"nothing found" while having inspected nothing — and most real writers (LLM summarizers, RAG chunkers,
+consolidation passes) declare nothing. Collapsing "checked, clean" and "couldn't check" into one reassuring
+boolean is how a deletion audit becomes a false assurance, so when nothing is declared the verdict is
+**`unaudited`**, never a pass, and `coverage` reports the declared-lineage ratio outright.
+
+**Housekeeping is separated from erasure.** Capacity eviction and the consolidation keep-budget hard-delete
+for size reasons and tombstone exactly like a real erasure does — so a naive check fires constantly on any
+bounded store. Only deletions carrying a request id or a real basis (not the generic default) count as
+`residue`; the rest land in `advisory` with the cause attached, reported but never counted.
+
+**Honest limits, shipped in the response and as tests** — this is evidence about what the store RECORDED, not
+proof that no copy remains, and it does not discharge an erasure obligation. A derivative whose writer never
+declared its parents is invisible to every structural check (`test_an_undeclared_derivative_is_NOT_found_
+structurally` asserts we do NOT find it); it covers this store only, never your vector index, prompt logs,
+model weights or backups; and a party that stops declaring lineage always looks clean. The value text scan is
+an explicit heuristic that never moves the verdict, and matches with longer-token exclusion (plain `` lets
+`UTC` fire inside `UTC-8`, reporting a different, longer value as recovered).
+
+**Prior art, credited:** DELF-style deletion-correctness auditing (Cohn-Gordon et al., USENIX Security 2020)
+applied to an agent-memory store; the orphan/dangling half is classical referential-integrity checking.
+Stronger formal treatments exist (Garg/Goldwasser/Vasudevan, *Formalizing Data Deletion in the Context of
+the Right to be Forgotten*, EUROCRYPT 2020; Chakraborty et al., PVLDB 18(10) 2025).
+Ours is the shipped implementation, not the mechanism.
+
+**Fix:** the CLI opened stores with receipts OFF, so a shell `inspeximus remember` against a receipted store
+silently did **not** extend the receipt chain — the CLI punched a hole in the evidence it exists to produce,
+and the next `verify_writes()` saw an unreceipted record. `_store()` now detects an existing
+`<path>.receipts.json` sidecar and keeps receipts on. Regression test included.
+
+New tests (10), including a mutation-killing negative control: without a case where a surviving taint's origin
+also survives, `taint_without_origin` could degenerate into "has a taint field at all" and the suite would
+still pass. No behavior change to `forget`, `forget_subject` or any existing call.
+
 ## 1.47.0 - provenance(): one answer to "where did this fact come from?", and every adapter goes compliance-aware
 
 **Correction first, because we got it wrong in public.** Until today this project's README, `docs/AI_ACT.md`,

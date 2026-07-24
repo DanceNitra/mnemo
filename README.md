@@ -11,7 +11,7 @@ attests it unaltered. The self-correcting memory layer for AI agents.*
 back — deterministically, with no LLM on the write path. Extracted from an autonomous research OS that has run
 it daily over 10,000 notes.*
 
-`pip install inspeximus` → `import inspeximus` · [PyPI](https://pypi.org/project/inspeximus/) · [Hugging Face](https://huggingface.co/Danchi17/inspeximus) · [DOI](https://doi.org/10.5281/zenodo.21128549) · [Homepage](https://dancenitra.github.io/inspeximus/) · MIT · v1.41.0
+`pip install inspeximus` → `import inspeximus` · [PyPI](https://pypi.org/project/inspeximus/) · [Hugging Face](https://huggingface.co/Danchi17/inspeximus) · [DOI](https://doi.org/10.5281/zenodo.21128549) · [Homepage](https://dancenitra.github.io/inspeximus/) · MIT · v1.48.0
 
 [![audit](https://github.com/DanceNitra/inspeximus/actions/workflows/audit.yml/badge.svg)](https://github.com/DanceNitra/inspeximus/actions/workflows/audit.yml)
 [![Star on GitHub](https://img.shields.io/github/stars/DanceNitra/inspeximus?style=social)](https://github.com/DanceNitra/inspeximus)
@@ -44,7 +44,7 @@ piece that needs a dependency.
 ## What you install, and what it does that others don't
 
 A **mem0 alternative** built the opposite way: deterministic, not an LLM extracting facts on every write — a
-memory that keeps a correction corrected and can *prove* what it erased. At a glance:
+memory that keeps a correction corrected and can show, with an offline-verifiable receipt, what it erased. At a glance:
 
 | | **inspeximus** | mem0 / cognee / Zep&nbsp;·&nbsp;Graphiti |
 |---|---|---|
@@ -59,7 +59,7 @@ memory that keeps a correction corrected and can *prove* what it erased. At a gl
 To our knowledge the only agent-memory library that ships verifiable erasure **and** tamper-evident
 record-keeping (a scan of nine products — [details](docs/AI_ACT.md); honest: Zep has a real SOC 2/HIPAA surface,
 just not verifiable erasure or AI-Act framing). And it doesn't cost you recall — the [measured integrity
-number](#correction-is-a-first-class-operation-measured-across-systems) below is the proof no competitor shows.
+number](#correction-is-a-first-class-operation-measured-across-systems) below is a number no competitor we scanned publishes.
 
 ## New — the EU AI Act compliance-evidence layer for agent memory
 
@@ -472,6 +472,62 @@ context-economy practice (progressive disclosure / small-to-big retrieval); insp
 | `consolidate_clusters(threshold)` | **cluster-triggered** consolidation: consolidate a semantic cluster only once it's grown past `threshold` — sparse topics keep their raw episodes, dense ones don't grow unbounded |
 | `contradictions()` | flag mutually-incompatible **related** memories (similarity-gated) for human review |
 | `forget(ids, where)` | the one op that **truly deletes** (the rest is append-only): hard-removes the matched records *and* scrubs their ids from every survivor's links + toggle pointers + the vec/token caches, so a forgotten memory can't resurface via recall, a consolidation link, or the dream pass. For erasure / right-to-be-forgotten, poison removal, or a hard correction — measured 15/15 on a verified-forgetting severe-test |
+
+## "Delete that" — then check what the lineage says survived
+
+Erasing the record is the easy half. The half that bites is the **summary built from it**, which no longer
+resembles the subject's data at all — so a text-match delete walks straight past it and the fact is back next
+session. `forget_subject()` already cascades along lineage; `erasure_audit()` is the separate question of
+what survived:
+
+```bash
+inspeximus erasure-audit --subject user-42     # exit 1 when declared-lineage residue remains
+```
+
+```
+scanned 1 record(s) for subject 'user-42'
+  coverage  1/1 record(s) declare lineage (ratio 1.0)
+  RESIDUE  3 finding(s) tied to a deliberate erasure:
+    [subject_still_attributable] e3cf66c984
+      still attributable to 'user-42' (status=active)
+    [dangling_lineage] e3cf66c984
+      declares parent 03dad5493e, which was deliberately erased
+    [taint_without_origin] e3cf66c984
+      carries inherited source 'user42', but no surviving record claims it: the origin was erased, this derivative was not
+  limit  this is evidence about what the store RECORDED, not proof that no copy of the material remains
+  limit  a derivative whose writer never declared derived_from carries no taint and is invisible here; read `coverage` before trusting a pass
+  limit  covers THIS store only -- not your vector index, prompt logs, model weights or backups
+  limit  does not discharge an erasure obligation; a party that stops declaring lineage always looks clean
+```
+
+**Read `coverage` before the verdict — the tool prints it first on purpose.** Every structural check walks
+*declared* `derived_from` edges. A store whose writers never threaded lineage has no edges to walk, so it
+would report nothing while having inspected nothing. That is a completely different statement from "checked,
+nothing found", and collapsing the two into one reassuring boolean is how a deletion audit becomes a false
+assurance. So when nothing is declared the verdict is **`unaudited`**, never a pass.
+
+Housekeeping deletions are separated out too: capacity eviction and the consolidation keep-budget hard-delete
+for size reasons, and would otherwise masquerade as erasure residue in any bounded store. They are reported
+as `advisory` with the reason attached, and never counted. What lands in `residue` is tied to a deliberate
+erasure — one carrying a request id or a real basis, not the generic default housekeeping leaves behind.
+
+**What this is and isn't.** It is evidence about what the store has *recorded*, not proof that no copy of the
+material remains — and it does not discharge an erasure obligation. Three limits ship with every answer, in a
+`limits` field a renderer cannot quietly drop:
+
+- taint propagates along **declared** edges only, so a summary whose writer never declared its parents is
+  invisible to every structural check. We ship that as a test asserting we do *not* find it. It is the
+  overtainting/undertainting trade-off argued for dynamic taint analysis by Schwartz, Avgerinos & Brumley
+  (IEEE S&P 2010); that is program analysis, not lineage, so we borrow the trade-off, not a result;
+- it covers *this store* only — never your vector index, prompt logs, model weights or backups;
+- it reads metadata the writer supplied, so a party that stops declaring lineage will always look clean.
+
+The optional `--value` text scan is reported separately and labelled a heuristic, because matching text
+proves neither presence (a paraphrase carries the fact without the string) nor absence.
+
+Not a new idea: this is DELF-style deletion-correctness auditing (Cohn-Gordon et al., *DELF: Safeguarding
+deletion correctness in Online Social Networks*, USENIX Security 2020) applied to an agent-memory store, with
+the orphan/dangling half being classical referential-integrity checking.
 
 ## Where did this fact come from?
 

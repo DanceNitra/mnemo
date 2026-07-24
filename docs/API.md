@@ -801,3 +801,53 @@ databases (Perm, ProvSQL, ProQL); signed Merkle-logged lineage for LLM agent mem
 ([arXiv:2605.14421](https://arxiv.org/abs/2605.14421)), already credited in `remember()`'s lineage
 auto-stamping. The mechanism is not new; the contribution is packaging it into one zero-dependency library
 with the limits returned alongside the answer.
+
+### After a deletion, check what the lineage says survived: `erasure_audit()` (1.48.0)
+`forget_subject()` erases the records attributable to a subject in this store and tombstones the act.
+`erasure_audit(subject=, values=)` answers the next question — what survived? The hard case is never the
+record; it is the summary built from it, which no longer resembles the subject's data.
+
+Returns `{verdict, residue, advisory, coverage, checked, limits}`. **`coverage` is the load-bearing field.**
+Every structural check walks DECLARED `derived_from` edges, so a store that declares none has nothing to walk
+and would otherwise report "nothing found" while having inspected nothing — a false assurance on a deletion.
+When nothing is declared the verdict is `unaudited`, never a pass; `coverage` reports
+`{records, with_declared_lineage, undeclared_derived, declared_ratio}` so a caller can see how much the
+answer is worth.
+
+`residue` (drives the verdict) holds findings tied to a **deliberate** erasure — one whose tombstone carries a
+request id or a real basis, not the generic default: `subject_still_attributable`, `taint_without_origin` (a
+derivative outlived the origin it inherited), `dangling_lineage`, `tombstone_gap`. `advisory` holds the same
+shapes where the missing record was removed with **no** erasure request: capacity eviction and the
+consolidation keep-budget both hard-delete for size reasons and would otherwise masquerade as erasure residue
+in any bounded store — reported with a `cause`, never counted. `value_possibly_recoverable` (only with
+`values=`) is an explicit heuristic in `advisory` that never moves the verdict, and matches with **longer-token
+exclusion**: plain `` lets `UTC` fire inside `UTC-8`, reporting a different, longer value as recovered.
+
+CLI `inspeximus erasure-audit --subject X [--value V]` (prints coverage first; exit 1 only on `residue_found`,
+so it works as a regression gate) and the `erasure_audit` MCP tool. Deterministic, read-only, no LLM.
+
+**What it is not.** Evidence about what the store has RECORDED, not proof that no copy of the material
+remains, and it does not discharge an erasure obligation. Limits shipped in the response: taint propagates
+along declared edges only, so an undeclared summary is invisible to every structural check (asserted by
+`test_an_undeclared_derivative_is_NOT_found_structurally` — we ship the hole as a test, not a footnote); it
+covers this store only, never your vector index, prompt logs, model weights or backups; and because it reads
+metadata the writer supplied, a party that stops declaring lineage always looks clean. The declared-edges
+choice is the under-tainting side of the overtainting/undertainting trade-off argued for dynamic taint
+analysis by Schwartz, Avgerinos & Brumley (IEEE S&P 2010), which is program analysis rather than lineage, so
+we borrow the trade-off, not a result.
+
+**Prior art.** This is DELF-style deletion-correctness auditing (Cohn-Gordon et al., *DELF: Safeguarding
+deletion correctness in Online Social Networks*, USENIX Security 2020 — deletion annotations over a typed
+object graph, statically rejecting unannotated object/edge **types**) applied to an agent-memory store; the orphan/dangling half is
+classical referential-integrity checking. Stronger formal treatments of the same problem exist (Garg,
+Goldwasser & Vasudevan, *Formalizing Data Deletion in the Context of the Right to be Forgotten*,
+EUROCRYPT 2020; Chakraborty et al., *Meaningful Data
+Erasure in the Presence of Dependencies*, PVLDB 18(10) 2025). What is ours is a shipped implementation in an
+agent-memory library. Receipt: `tests/test_erasure_audit.py` (10/10, including a mutation-killing negative
+control and the eviction-is-not-residue case).
+
+**Fix shipped alongside (1.48.0):** the CLI opened stores with receipts OFF, so a shell `inspeximus remember`
+against a receipted store silently did **not** extend the receipt chain — the CLI punched a hole in the very
+evidence it exists to produce, and the next `verify_writes()` saw an unreceipted record. `_store()` now
+detects an existing `<path>.receipts.json` sidecar and keeps receipts on. Regression test:
+`test_cli_write_extends_an_existing_receipt_chain`.

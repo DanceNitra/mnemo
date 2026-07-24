@@ -468,7 +468,7 @@ def verify_erasure_certificate(cert: dict, store_path: str | None = None,
     return {"valid": valid, "checks": checks, "problems": problems, "count": cert.get("count")}
 
 
-__version__ = "1.47.0"
+__version__ = "1.48.0"
 
 # Internal sentinel: marks a reaffirm write already authorized by submit_revert() (which verified the
 # signed INTENT). Object identity — no text/content path can ever produce it.
@@ -2133,6 +2133,156 @@ class Inspeximus:
                               "request_id": t.get("request_id"), "signed": "sig" in t}
                              for t in self._tombstones]}
 
+    def erasure_audit(self, subject: str | None = None, values=None) -> dict:
+        """AFTER an erasure: what does the store's lineage say survived — and how much did it actually see?
+
+        `forget_subject()` deletes what is attributable to a subject and tombstones the act. This answers the
+        question an operator hits afterwards: did anything survive that still carries the erased material?
+        The hard case is never the record itself; it is the summary built from it, which no longer resembles
+        the subject's data. (Graphiti documents the same boundary: its `remove_episode` does not regenerate
+        node summaries that other episodes still support.)
+
+        **Read `coverage` before `verdict`.** Every structural check here walks DECLARED `derived_from` edges.
+        A store whose writers never declared lineage has no edges to walk, so it would report no residue while
+        having inspected nothing — a materially different statement from "checked, nothing found". `coverage`
+        makes that difference visible instead of collapsing both into one reassuring boolean:
+        `{records, with_declared_lineage, undeclared_derived, declared_ratio}`. When nothing is declared the
+        verdict is **`unaudited`**, never a pass.
+
+        Returns `{verdict, residue, advisory, coverage, checked, limits}`:
+          - `verdict` — `residue_found` | `no_declared_residue` | `unaudited`.
+          - `residue` — findings attributable to a DELIBERATE erasure (the vanished record carries a deletion
+            tombstone with a request_id or an authority/basis block): `subject_still_attributable`,
+            `taint_without_origin` (a derivative outlived the origin it inherited), `dangling_lineage`, and
+            `tombstone_gap` (a receipted record gone with no tombstone at all).
+          - `advisory` — the same shapes, but where the missing record was removed with NO erasure request.
+            Capacity eviction and the consolidation keep-budget both hard-delete for size reasons, and would
+            otherwise masquerade as erasure residue in any bounded store. Reported, never counted.
+          - `value_possibly_recoverable` — HEURISTIC, only when `values=` is passed; listed in `advisory` and
+            never drives the verdict, because matching text proves neither presence (a paraphrase carries the
+            fact without the string) nor absence.
+
+        Deterministic, read-only, no LLM. This is evidence about what the store has RECORDED, not proof that
+        no copy of the material remains.
+
+        HONEST SCOPE, also returned in `limits`: (1) a derivative whose writer never declared `derived_from`
+        carries no taint and is invisible to every structural check here — deliberately the under-tainting
+        side of the overtainting/undertainting trade-off argued for dynamic taint analysis by Schwartz, Avgerinos
+        & Brumley (IEEE S&P 2010) -- program analysis, not lineage, so we borrow the trade-off, not a result. (2) It covers THIS store only — never your vector index, prompt logs, model weights or
+        backups. (3) It reads metadata the writer supplied, so it cannot detect what was never declared, and
+        a party that stops declaring lineage will always look clean. Do not treat a pass as discharging an
+        erasure obligation.
+
+        Prior art: DELF-style deletion-correctness auditing (Cohn-Gordon et al., "DELF: Safeguarding deletion
+        correctness in Online Social Networks", USENIX Security 2020) applied to an agent-memory store, with
+        the orphan/dangling half being classical referential-integrity checking."""
+        residue: list[dict] = []
+        advisory: list[dict] = []
+        by_id = {r["id"]: r for r in self.items}
+        tombs = {t.get("memory_id"): t for t in (getattr(self, "_tombstones", None) or [])}
+
+        def _deliberate(mid: str) -> bool:
+            """Was this record ERASED on purpose, or merely dropped for space? Every hard delete routes
+            through forget() and tombstones, INCLUDING capacity eviction and the consolidation keep-budget —
+            so the presence of a tombstone proves nothing. What separates them is intent the caller had to
+            supply: a `request_id`, or a `basis` other than the generic "forget" default that housekeeping
+            leaves behind. Without this, an erasure audit fires on every bounded store that ever evicted."""
+            t = tombs.get(mid)
+            if not t:
+                return False
+            basis = (t.get("auth") or {}).get("basis")
+            return bool(t.get("request_id")) or (bool(basis) and basis != "forget")
+
+        def _add(deliberate: bool, kind: str, rid: str, detail: str, cause: str | None = None):
+            f = {"kind": kind, "id": rid, "detail": detail}
+            if cause:
+                f["cause"] = cause
+            (residue if deliberate else advisory).append(f)
+
+        # every canonical source that some surviving record still claims as its OWN (not inherited)
+        own_sources: set = set()
+        for r in self.items:
+            src = r.get("source")
+            doc = src.get("doc") if isinstance(src, dict) else (src if isinstance(src, str) else None)
+            if doc:
+                own_sources.add(Inspeximus._canon_source(doc))
+
+        if subject is not None:
+            cand = {subject, Inspeximus._canon_source(subject)}
+            for r in self.items:
+                if cand & Inspeximus._rec_sources(r):
+                    _add(True, "subject_still_attributable", r["id"],
+                         f"still attributable to {subject!r} (status={r.get('status')})")
+
+        for r in self.items:
+            # a declared parent that is gone: erased (residue) or evicted/consolidated away (advisory)?
+            missing = [pid for pid in (r.get("derived_from") or []) if pid not in by_id]
+            for pid in missing:
+                if _deliberate(pid):
+                    _add(True, "dangling_lineage", r["id"],
+                         f"declares parent {pid}, which was deliberately erased")
+                else:
+                    _add(False, "dangling_lineage", r["id"],
+                         f"declares parent {pid}, which is gone with no erasure request",
+                         cause="removed without an erasure request (capacity eviction or consolidation)")
+            # inherited a source whose origin no longer survives anywhere
+            for t in (r.get("taint") or []):
+                if t.startswith("id:"):
+                    continue                  # a source-less parent is tainted by its own id; see dangling
+                if t in own_sources:
+                    continue
+                deliberate = any(_deliberate(pid) for pid in missing)
+                _add(deliberate, "taint_without_origin", r["id"],
+                     f"carries inherited source {t!r}, but no surviving record claims it"
+                     + (": the origin was erased, this derivative was not" if deliberate else ""),
+                     None if deliberate else "origin absent, but no erasure request accounts for it")
+
+        # a receipted write whose record is gone must be accounted for by SOME tombstone
+        if getattr(self, "_receipts", None):
+            for mid in {rc.get("memory_id") for rc in self._receipts}:
+                if mid not in by_id and mid not in tombs:
+                    _add(True, "tombstone_gap", mid,
+                         "written and later removed, with no deletion tombstone")
+
+        declared = sum(1 for r in self.items if r.get("derived_from"))
+        undeclared = sum(1 for r in self.items if r.get("orphan"))
+        coverage = {"records": len(self.items), "with_declared_lineage": declared,
+                    "undeclared_derived": undeclared,
+                    "declared_ratio": round(declared / len(self.items), 3) if self.items else 0.0}
+
+        limits = [
+            "this is evidence about what the store RECORDED, not proof that no copy of the material remains",
+            "a derivative whose writer never declared derived_from carries no taint and is invisible here; "
+            "read `coverage` before trusting a pass",
+            "covers THIS store only -- not your vector index, prompt logs, model weights or backups",
+            "does not discharge an erasure obligation; a party that stops declaring lineage always looks clean",
+        ]
+        if values:
+            # Word boundaries alone are NOT enough: plain \b lets 'UTC' fire inside 'UTC-8', reporting a
+            # DIFFERENT, longer value as recovered. So the match must not continue across - / : + or an
+            # INTERIOR dot ('v1.2.3'). A sentence-final dot is not interior: putting a bare . in the
+            # exclusion class silently lost every value that happened to end a sentence ('the tz is UTC.').
+            for r in self.items:
+                blob = ((r.get("text") or "") + " " + str(r.get("object") or "")).lower()
+                for v in values:
+                    v = str(v).strip().lower()
+                    if v and re.search(r"(?<![\w\-/:+])(?<!\w\.)" + re.escape(v)
+                                       + r"(?![\w\-/:+])(?!\.\w)", blob):
+                        advisory.append({"kind": "value_possibly_recoverable", "id": r["id"],
+                                         "detail": f"surviving text still contains {v!r} on a word boundary",
+                                         "cause": "heuristic text match, not evidence"})
+                        break
+            limits.append("value_possibly_recoverable is a HEURISTIC and never drives the verdict: matching "
+                          "text proves neither presence (a paraphrase carries the fact) nor absence")
+
+        if residue:
+            verdict = "residue_found"
+        elif declared == 0:
+            verdict = "unaudited"          # nothing declared => nothing structural was inspected
+        else:
+            verdict = "no_declared_residue"
+        return {"verdict": verdict, "residue": residue, "advisory": advisory, "coverage": coverage,
+                "checked": {"subject": subject, "values_scanned": len(values or [])}, "limits": limits}
     def state_digest(self) -> str:
         """Deterministic SHA-256 fingerprint of the CURRENT store state. Order-independent (records are
         sorted by id) and covers what retrieval can serve: id, status, ts, key, tenant, and the content

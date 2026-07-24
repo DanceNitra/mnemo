@@ -44,6 +44,13 @@ def _embedder():
 def _store(path, persist_vectors: bool = False, receipts: bool = False):
     from inspeximus import Inspeximus
     p = path or os.environ.get("INSPEXIMUS_PATH") or "inspeximus_memory.json"
+    # A store that ALREADY has a receipt chain keeps it. Without this, a plain `inspeximus remember` against a
+    # receipted store opened receipts OFF and the write silently did not extend the chain -- so the very next
+    # verify_writes() reported a record with no receipt, i.e. the CLI quietly punched a hole in the evidence
+    # it exists to produce. Detected from the sidecar rather than a flag, because the user who enabled
+    # receipts in Python should not have to re-declare them at every shell call.
+    if not receipts and os.path.exists(str(p) + ".receipts.json"):
+        receipts = True
     # persist_vectors stays OFF by default (vectors are a re-derivable cache; writing them balloons the store
     # file on every command). `reembed` opts in — persisting is the entire point of that command.
     # receipts (OPT-IN): builds the tamper-evident write/erasure chain (persisted to <path>.receipts.json) that
@@ -111,6 +118,12 @@ def main(argv=None):
 
     wy = sub.add_parser("why", help="explain why memories were recalled for a query (per-channel breakdown)")
     wy.add_argument("query")
+
+    ea = sub.add_parser("erasure-audit", help="after an erasure: is it actually gone, INCLUDING through "
+                                              "everything derived from it? (exit 1 if residue is found)")
+    ea.add_argument("--subject", help="the canonical source that was erased (as passed to forget-subject)")
+    ea.add_argument("--value", action="append", default=[],
+                    help="an erased string to also scan for (heuristic; repeatable)")
 
     pv = sub.add_parser("provenance", help="where a fact came from: source, lineage, trust grade, what it "
                                            "superseded, and whether it still matches its write receipt")
@@ -390,6 +403,36 @@ def main(argv=None):
     elif a.cmd == "why":
         exp = m.why_recalled(a.query)
         _out(exp, a.json) or print(json.dumps(exp, indent=2, default=str))
+
+    elif a.cmd == "erasure-audit":
+        res = m.erasure_audit(subject=a.subject, values=a.value or None)
+        if a.json:
+            _out(res, True)
+        else:
+            cov = res["coverage"]
+            print(f"scanned {cov['records']} record(s)"
+                  + (f" for subject {a.subject!r}" if a.subject else ""))
+            # coverage FIRST: a pass on a store with no declared lineage means nothing was inspected
+            print(f"  coverage  {cov['with_declared_lineage']}/{cov['records']} record(s) declare lineage "
+                  f"(ratio {cov['declared_ratio']})")
+            if res["verdict"] == "residue_found":
+                print(f"  RESIDUE  {len(res['residue'])} finding(s) tied to a deliberate erasure:")
+                for f in res["residue"]:
+                    print(f"    [{f['kind']}] {f['id']}")
+                    print(f"      {f['detail']}")
+            elif res["verdict"] == "unaudited":
+                print("  UNAUDITED  no record declares lineage, so nothing structural was inspected. "
+                      "This is NOT a pass -- declare derived_from on derived writes to make it mean something.")
+            else:
+                print("  NO DECLARED RESIDUE  nothing reachable from the erased material through declared "
+                      "lineage survived")
+            for f in res["advisory"]:
+                print(f"    [advisory/{f['kind']}] {f['id']}: {f['detail']}")
+                if f.get("cause"):
+                    print(f"      cause: {f['cause']}")
+            for lim in res["limits"]:
+                print(f"  limit  {lim}")
+        return 1 if res["verdict"] == "residue_found" else 0
 
     elif a.cmd == "provenance":
         if (a.key is None) == (a.id is None):
