@@ -3,6 +3,22 @@
 All notable changes to inspeximus (`inspeximus`). Format loosely follows Keep a Changelog; versioning is semver
 (MAJOR = stable/breaking, MINOR = features, PATCH = fixes).
 
+## 1.37.0 - reference witness server: stand up your own witness network
+
+Turns 1.36.0's witness pool into something you can actually deploy across independent hosts, with zero new
+dependencies (stdlib `http.server` + `urllib`):
+  - `inspeximus.witness_server` — a runnable reference witness: `python -m inspeximus.witness_server --port
+    9700 --state witness.json`. `GET /pubkey` returns its key; `POST /cosign {store_id, anchor}` co-signs (200)
+    or REFUSES a fork/rollback with `409 {"refused": reason}` (the split-view defense over the wire). Persists
+    its per-store last-signed head to `--state` so the refusal survives a restart.
+  - `witness_pool.http_witness(url)` — a client-side callable `(store_id, anchor) -> (pubkey, sig)` that
+    co-signs via a remote witness and raises on a 409 refusal, so `collect_cosignatures` records a remote fork
+    as an alarm exactly like a local one. Mix local `Witness` objects and `http_witness(...)` in one k-of-n set.
+This is the operator-adversarial layer made deployable: independent parties each run a witness, a client
+requires k-of-n, and a compromised host cannot show two histories that both reach threshold — honest witnesses
+refuse the fork (locally or over HTTP). New: `tests/test_witness_pool.py::test_http_witness_roundtrip`,
+README "Witness network" section. No behavior change to existing APIs.
+
 ## 1.36.0 - witness pool: the k-of-n co-signing layer made usable
 
 New module `inspeximus.witness_pool` turns the 1.34.0 witness primitives (witness_cosign /

@@ -95,3 +95,25 @@ def collect_cosignatures(store_id: str, anchor: dict, witnesses) -> dict:
         except Exception as e:                                          # a refusal is the split-view signal
             refused.append({"index": i, "reason": str(e)})
     return {"cosignatures": cosigs, "refused": refused, "witnesses": signers}
+
+
+def http_witness(url: str, timeout: float = 10.0):
+    """Return a callable `(store_id, anchor) -> (pubkey, sig)` that co-signs via a REMOTE witness HTTP server
+    (see inspeximus.witness_server). Pass it in the `witnesses` list of collect_cosignatures alongside local
+    Witness objects. A remote REFUSAL (HTTP 409, a fork/rollback) raises ValueError, so collect_cosignatures
+    records it as a fork alarm rather than a silent drop. Stdlib urllib only -- no new dependency."""
+    import urllib.request, urllib.error, json as _json
+    base = url.rstrip("/")
+    def _cosign(store_id, anchor):
+        req = urllib.request.Request(base + "/cosign",
+              data=_json.dumps({"store_id": store_id, "anchor": anchor}).encode(),
+              headers={"Content-Type": "application/json"}, method="POST")
+        try:
+            with urllib.request.urlopen(req, timeout=timeout) as r:
+                d = _json.loads(r.read())
+            return d["pubkey"], d["sig"]
+        except urllib.error.HTTPError as e:                             # 409 = refused (fork); surface the reason
+            try: reason = _json.loads(e.read()).get("refused") or f"HTTP {e.code}"
+            except Exception: reason = f"HTTP {e.code}"
+            raise ValueError(f"remote witness refused: {reason}")
+    return _cosign

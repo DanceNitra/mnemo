@@ -67,6 +67,30 @@ def test_secret_roundtrip_public():
     w = Witness(secret_hex=sk)
     assert w.public == pk, "derived public must match the minted public"
 
+def test_http_witness_roundtrip():
+    """Reference witness HTTP server: cosign over HTTP, and a fork gets a 409 refusal surfaced as an alarm."""
+    import threading, socket, time
+    from http.server import ThreadingHTTPServer
+    from inspeximus.witness_server import _make_handler
+    from inspeximus.witness_pool import http_witness
+    w = Witness()
+    s = socket.socket(); s.bind(("127.0.0.1", 0)); port = s.getsockname()[1]; s.close()
+    httpd = ThreadingHTTPServer(("127.0.0.1", port), _make_handler(w))
+    t = threading.Thread(target=httpd.serve_forever, daemon=True); t.start()
+    time.sleep(0.2)
+    try:
+        url = f"http://127.0.0.1:{port}"
+        A = _sth(5, "aaa"); B = _sth(5, "bbb")
+        out = collect_cosignatures("s", A, [http_witness(url)])          # honest cosign over HTTP
+        assert len(out["cosignatures"]) == 1 and out["cosignatures"][0][0] == w.public, out
+        r = Inspeximus.verify_cosigned_anchor(A, out["cosignatures"], [w.public], threshold=1)
+        assert r["ok"], r
+        out2 = collect_cosignatures("s", B, [http_witness(url)])          # fork -> remote refuses (409)
+        assert out2["cosignatures"] == [] and out2["refused"], out2
+        assert "refused" in out2["refused"][0]["reason"].lower(), out2
+    finally:
+        httpd.shutdown()
+
 if __name__ == "__main__":
     fns = [v for k, v in sorted(globals().items()) if k.startswith("test_") and callable(v)]
     p = 0

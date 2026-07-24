@@ -87,6 +87,37 @@ proves the *act* of deletion, never the content; and an operator holding the rec
 receipts, so anchor the chain head externally if your adversary is the operator. Those limits are in the
 docstrings too, and they are the reason the word "certified" does not appear anywhere else on this page.
 
+### Witness network — the operator-adversarial layer
+
+"Anchor the chain head externally" has a concrete, runnable form. `anchor()` emits a signed tree head; on its
+own it catches a rewrite on **one** timeline (`verify_consistency`), but a compromised host can still show a
+**different** history to a different client (a split-view / fork). Independent **witnesses** that co-sign the
+head close that — an honest witness refuses to co-sign a fork, so a client requiring **k-of-n** cannot be shown
+a forked head that reaches threshold. This is the one operator-adversarial guarantee a free single-party
+receipt structurally cannot give — it needs an independent third party — and it needs no LLM, no GPU, no graph
+database.
+
+```bash
+# each independent party runs one witness (stdlib http server, zero framework):
+python -m inspeximus.witness_server --port 9700 --state witnessA.json   # prints its pubkey
+```
+```python
+from inspeximus import Inspeximus
+from inspeximus.witness_pool import collect_cosignatures, http_witness, Witness
+
+anchor = store.anchor()                                  # signed tree head of the whole history
+witnesses = [http_witness("http://hostA:9700"), http_witness("http://hostB:9701"), Witness()]
+out = collect_cosignatures("my-store", anchor, witnesses)
+ok = Inspeximus.verify_cosigned_anchor(anchor, out["cosignatures"],
+                                       witnesses=[...pubkeys...], threshold=2)["ok"]
+# a forked head -> honest witnesses REFUSE (surfaced in out["refused"]) -> it never reaches threshold;
+# Inspeximus.detect_split_view(...) turns two co-signed inconsistent heads into a cryptographic fork proof.
+```
+
+See `examples/07_witness_pool.py` for the full end-to-end (honest k-of-n, honest extension, a refused fork).
+No competitor ships external witnessing; witnesses persist their per-store last-signed head so the refusal
+survives a restart.
+
 ## Why inspeximus — the one thing no other agent memory does
 
 Every mainstream agent-memory library puts an **LLM on the write path**: it calls a model to extract, summarize,
